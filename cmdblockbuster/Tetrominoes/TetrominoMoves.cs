@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.Field
+﻿namespace cmdblockbuster.Tetrominoes
 {
     public enum TetrominoMoves
     {

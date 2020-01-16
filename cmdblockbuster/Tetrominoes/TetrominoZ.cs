@@ -4,10 +4,13 @@
     {
         public TetrominoZ()
         {
-            Cells = new int[,] {
-                {1,1,0},
-                {0,1,1},
-                {0,0,0}
+            var empty = CellType.Empty;
+            var filled = CellType.Red;
+
+            Cells = new CellType[,] {
+                {filled,filled,empty},
+                {empty,filled,filled},
+                {empty,empty,empty}
             };
         }
     }

@@ -4,10 +4,13 @@
     {
         public TetrominoT()
         {
-            Cells = new int[,] {
-                {0,1,0},
-                {1,1,1},
-                {0,0,0}
+            var empty = CellType.Empty;
+            var filled = CellType.Purple;
+
+            Cells = new CellType[,] {
+                {empty,filled,empty},
+                {filled,filled,filled},
+                {empty,empty,empty}
             };
         }
     }

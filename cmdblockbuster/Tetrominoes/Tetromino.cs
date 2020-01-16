@@ -1,16 +1,23 @@
-﻿using cmdblockbuster.Field;
-using System;
+﻿using System;
 
 namespace cmdblockbuster.Tetrominoes
 {
     public abstract class Tetromino
     {
-        public int[,] Cells { get; set; }
+        public CellType[,] Cells { get; set; }
+
+        public int XDimLenght => Cells.GetLength(0);
+        public int YDimLenght => Cells.GetLength(1);
+
+        /// <summary>
+        /// Zero based, true for most of the tetrominoes except I and O
+        /// </summary>
+        public Tuple<int, int> SpawnLocation = new Tuple<int, int>(4, 1);
 
         public TetrominoMoves[] TetrominoMoves;
 
-        // TODO: roatations: check field before rotation, 
-        // looks like field should check it and kick if allowed
+        public bool landed = false;
+
         public void RotateRight()
         {
             Transpose();
@@ -25,21 +32,18 @@ namespace cmdblockbuster.Tetrominoes
 
         private void ReverseEachRow()
         {
-            var xDimLenght = Cells.GetLength(0);
-            var yDimLenght = Cells.GetLength(1);
-
             // Iterate rows
-            for (int row = 0; row < xDimLenght; row++)
+            for (int row = 0; row < XDimLenght; row++)
             {
                 // change each row
-                var rowArray = new int[yDimLenght];
-                for (int rowItemIndex = 0; rowItemIndex < yDimLenght; rowItemIndex++)
+                var rowArray = new CellType[YDimLenght];
+                for (int rowItemIndex = 0; rowItemIndex < YDimLenght; rowItemIndex++)
                 {
                     rowArray[rowItemIndex] = Cells[row, rowItemIndex];
                 }
                 Array.Reverse(rowArray);
 
-                for (int rowItemIndex = 0; rowItemIndex < yDimLenght; rowItemIndex++)
+                for (int rowItemIndex = 0; rowItemIndex < YDimLenght; rowItemIndex++)
                 {
                     Cells[row, rowItemIndex] = rowArray[rowItemIndex];
                 }
@@ -48,14 +52,11 @@ namespace cmdblockbuster.Tetrominoes
 
         private void Transpose()
         {
-            int width = Cells.GetLength(0);
-            int height = Cells.GetLength(1);
+            var result = new CellType[YDimLenght, XDimLenght];
 
-            var result = new int[height, width];
-
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < XDimLenght; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < YDimLenght; j++)
                 {
                     result[j, i] = Cells[i, j];
                 }

@@ -4,10 +4,13 @@
     {
         public TetrominoL()
         {
-            Cells = new int[,] {
-                {0,0,1},
-                {1,1,1},
-                {0,0,0}
+            var empty = CellType.Empty;
+            var filled = CellType.Orange;
+
+            Cells = new CellType[,] {
+                {empty,empty,filled},
+                {filled,filled,filled},
+                {empty,empty,empty}
             };
         }
     }
