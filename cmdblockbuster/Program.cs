@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmdblockbuster.Field;
+using System;
 
 namespace cmdblockbuster
 {
@@ -6,7 +7,8 @@ namespace cmdblockbuster
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var game = new Game();
+            game.Start();
         }
     }
 }

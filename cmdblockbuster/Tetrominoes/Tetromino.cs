@@ -12,7 +12,7 @@ namespace cmdblockbuster.Tetrominoes
         /// <summary>
         /// Zero based, true for most of the tetrominoes except I and O
         /// </summary>
-        public Tuple<int, int> SpawnLocation = new Tuple<int, int>(4, 1);
+        public Tuple<int, int> SpawnLocation = new Tuple<int, int>(0, 4);
 
         public TetrominoMoves[] TetrominoMoves;
 

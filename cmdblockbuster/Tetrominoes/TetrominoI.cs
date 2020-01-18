@@ -4,7 +4,7 @@
     {
         public TetrominoI()
         {
-            SpawnLocation = new System.Tuple<int, int>(3, 1);
+            SpawnLocation = new System.Tuple<int, int>(0, 3);
 
             var empty = CellType.Empty;
             var filled = CellType.Cyan;
