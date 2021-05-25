@@ -1,6 +1,8 @@
-﻿using cmdblockbuster.Field;
+﻿using cmdblockbuster.Common;
+using cmdblockbuster.Field;
 using cmdblockbuster.Tetrominoes;
 using System;
+using System.Threading;
 
 namespace cmdblockbuster
 {
@@ -19,7 +21,8 @@ namespace cmdblockbuster
 
         private bool running;
         private Tetromino currentTetromino;
-        private Tuple<int, int> currentTetrominoLocation;
+        private int currentTetrominoXLocation;
+        private int currentTetrominoYLocation;
 
         public void Start()
         {
@@ -27,23 +30,28 @@ namespace cmdblockbuster
             playfieldInnerState = new Playfield();
             playfieldToDisplay = new Playfield();
 
+            Console.CursorVisible = false;
+
             while (running)
             {
                 SpawnTetromino();
                 ShowTetrominoOnField();
                 ReadInput();
+                Gravity();
                 DestroyRows();
                 // once current tetromino changed which means it landed
+                Console.SetCursorPosition(0, 0);
+                playfieldToDisplay.field.Print();
+
+                Thread.Sleep(100); // Debug, just to reduce CPU usage of my laptop
             }
         }
 
-        private void DestroyRows()
-        {
-            // TODO
-        }
-
         /// <summary>
-        /// TODO: Add listener to constructor and use it
+        /// TODO: Add listener to constructor and use it here
+        /// This one should:
+        /// get input - DONE
+        /// react to other keys - WILL DO LATER
         /// </summary>
         private void ReadInput()
         {
@@ -53,38 +61,43 @@ namespace cmdblockbuster
             }
 
             var key = Console.ReadKey();
-            if (key.Key == ConsoleKey.UpArrow)
+            if (key.Key == ConsoleKey.J)
             {
-                Console.WriteLine("Up");
+                currentTetromino.RotateLeft();
             }
-            else if (key.Key == ConsoleKey.DownArrow)
+            else if (key.Key == ConsoleKey.K)
             {
-                Console.WriteLine("Down");
+                currentTetromino.RotateRight();
             }
-            else if (key.Key == ConsoleKey.LeftArrow)
+            else if (key.Key == ConsoleKey.S)
             {
-                Console.WriteLine("Left");
+                currentTetrominoXLocation++;
             }
-            else if (key.Key == ConsoleKey.RightArrow)
+            else if (key.Key == ConsoleKey.A)
             {
-                Console.WriteLine("Right");
+                currentTetrominoYLocation--;
+            }
+            else if (key.Key == ConsoleKey.D)
+            {
+                currentTetrominoYLocation++;
             }
             else
             {
-                Console.WriteLine("Unhandled:" + key.Key);
+                Console.WriteLine("unhandled:" + key.Key);
             }
         }
 
         private void ShowTetrominoOnField()
         {
-            if (CheckIfCanBePlacedOnCoordinate(currentTetrominoLocation))
+            if (CheckIfCanBePlacedOnCoordinate(currentTetrominoXLocation, currentTetrominoYLocation))
             {
-                // add tetromino to playfield inner state
+                Array.Copy(playfieldInnerState.field, playfieldToDisplay.field, 200);
+                // add tetromino to playfield inner state           
                 var currentTetromninoeYIndex = 0;
                 var currentTetromninoeXIndex = 0;
-                for (int row = currentTetrominoLocation.Item1; row < currentTetromino.XDimLenght - row; row++)
+                for (int row = currentTetrominoXLocation; row < currentTetromino.RowsLenght + currentTetrominoXLocation; row++)
                 {
-                    for (int rowItemIndex = currentTetrominoLocation.Item2; rowItemIndex < currentTetrominoLocation.Item2 + currentTetromino.YDimLenght; rowItemIndex++)
+                    for (int rowItemIndex = currentTetrominoYLocation; rowItemIndex < currentTetrominoYLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
                     {
                         playfieldToDisplay.field[row, rowItemIndex] = currentTetromino.Cells[currentTetromninoeXIndex, currentTetromninoeYIndex];
                         currentTetromninoeYIndex++;
@@ -95,10 +108,13 @@ namespace cmdblockbuster
             }
         }
 
-        public void Stop() => running = false; //TODO: maybe do some cleanup here
+        public void Stop() => running = false; //TODO: Some cleanup here
+
+        public void Pause() => running = false;
 
         /// <summary>
         /// Todo: to replace this with 7pack spawning
+        /// Don't create array each game loop
         /// </summary>
         public bool SpawnTetromino()
         {
@@ -119,35 +135,46 @@ namespace cmdblockbuster
 
             currentTetromino = Activator.CreateInstance(tetrominoes[randomInt]) as Tetromino;
 
-            if (!CheckIfCanBePlacedOnCoordinate(currentTetromino.SpawnLocation))
+            if (!CheckIfCanBePlacedOnCoordinate(currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
             {
                 GameOver();
             }
             else
             {
-                currentTetrominoLocation = currentTetromino.SpawnLocation;
+                currentTetrominoXLocation = currentTetromino.SpawnLocation.Item1;
+                currentTetrominoYLocation = currentTetromino.SpawnLocation.Item2;
             }
             return true;
         }
 
-        private bool CheckIfCanBePlacedOnCoordinate(Tuple<int, int> coordinate)
+        /// <summary>
+        /// TODO: make this method ignore empty cells and going out of bounds of playfield
+        /// </summary>
+        /// <param name="xCoordinate">Vertical top-down</param>
+        /// <param name="yCoordinate">Horizontal left-right</param>
+        /// <returns></returns>
+        private bool CheckIfCanBePlacedOnCoordinate(int xCoordinate, int yCoordinate)
         {
+            CellType[,] cellsWithoutEmptyRowsAndColumns = currentTetromino.CellsWithoutEmptyRowsAndColumns;
+            var cuttedPlayfiedArray = new CellType[
+                cellsWithoutEmptyRowsAndColumns.GetRowsLenght(),
+                cellsWithoutEmptyRowsAndColumns.GetColumnsLenght()];
+
             // Cut tetromino sized array from playfield on location
-            var cuttedPlayfiedArray = new CellType[currentTetromino.XDimLenght, currentTetromino.YDimLenght];
-            for (int row = coordinate.Item1; row < currentTetromino.XDimLenght; row++)
+            for (int row = xCoordinate; row < cuttedPlayfiedArray.GetRowsLenght(); row++)
             {
-                for (int rowItemIndex = coordinate.Item2; rowItemIndex < currentTetromino.YDimLenght; rowItemIndex++)
+                for (int rowItemIndex = yCoordinate; rowItemIndex < cuttedPlayfiedArray.GetColumnsLenght(); rowItemIndex++)
                 {
                     cuttedPlayfiedArray[row, rowItemIndex] = playfieldInnerState.field[row, rowItemIndex];
                 }
             }
 
             // check intersections with current position of tetromino
-            for (int row = 0; row < currentTetromino.XDimLenght; row++)
+            for (int row = 0; row < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght(); row++)
             {
-                for (int column = 0; column < currentTetromino.YDimLenght; column++)
+                for (int column = 0; column < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght(); column++)
                 {
-                    if (CheckIfCellsIntercect(cuttedPlayfiedArray[row, column], currentTetromino.Cells[row, column]))
+                    if (CheckIfCellsIntercect(cuttedPlayfiedArray[row, column], currentTetromino.CellsWithoutEmptyRowsAndColumns[row, column]))
                     {
                         return false; // fail on first found intercestion
                     }
@@ -157,13 +184,18 @@ namespace cmdblockbuster
         }
 
         /// <summary>
+        /// This one will try kick tetromino according to the rules and use <seealso cref="CheckIfCanBePlacedOnCoordinate(int, int)"/>
+        /// </summary>
+        private bool CheckIfCanBePlacedOnCoordinateWithKick(int xCoordinate, int yCoordinate)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+        /// <summary>
         /// Cells intercect if: <para/>
         /// if current cell is empty and tetrominoe's cell is empty or not empty <para/>
         /// if current cell in not empty and tetrominoe's cell is empty <para/>
         /// </summary>
-        /// <param name="fieldCell"></param>
-        /// <param name="tetrominoeCell"></param>
-        /// <returns></returns>
         private bool CheckIfCellsIntercect(CellType fieldCell, CellType tetrominoeCell)
         {
             // if fieldCell empty and tetrominoe cell empty
@@ -185,7 +217,17 @@ namespace cmdblockbuster
 
         private void GameOver()
         {
-            // Handle here this case
+            // TODO
+        }
+
+        private void Gravity()
+        {
+            // TODO
+        }
+
+        private void DestroyRows()
+        {
+            // TODO
         }
     }
 }

@@ -2,8 +2,8 @@
 {
     public class Playfield
     {
-        private const int Width = 10;
-        private const int Height = 22; // Two extra invisible rows to spawn tetrominos
+        public static int Width => 10;
+        public static int Height => 22; // Two extra invisible rows to spawn tetrominos
 
         public CellType[,] field = new CellType[Height, Width];
 

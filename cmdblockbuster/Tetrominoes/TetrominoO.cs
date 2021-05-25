@@ -15,5 +15,15 @@
                 {empty,empty,empty,empty}
             };
         }
+
+        public override void RotateLeft()
+        {
+            // In SRS O mino have only 1 rotation
+        }
+
+        public override void RotateRight()
+        {
+            // In SRS O mino have only 1 rotation
+        }
     }
 }
