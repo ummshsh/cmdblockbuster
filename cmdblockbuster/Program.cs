@@ -1,6 +1,6 @@
-﻿using cmdblockbuster.Common;
-using cmdblockbuster.Tetrominoes;
-using System;
+﻿using cmdblockbuster.Game;
+using cmdblockbuster.InputController;
+using cmdblockbuster.Renderer;
 
 namespace cmdblockbuster
 {
@@ -8,23 +8,26 @@ namespace cmdblockbuster
     {
         static void Main(string[] args)
         {
-            ////new TetrominoO().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoT().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoL().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoS().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoZ().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoJ().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
-            ////new TetrominoI().CellsWithoutEmptyRowsAndColumns.Print();
-            ////Console.WriteLine();
+            var game = new Tetris();
+            game.Start(new ConsoleInputHandler(), new ConsoleRenderer());
+        }
+    }
 
-            var game = new Game();
-            game.Start();
+    public abstract class Abstract
+    {
+        public abstract void MethodFromAbstract();
+    }
+
+    public class A : Abstract
+    {
+        public static void MethodStatic()
+        {
+
+        }
+
+        public override void MethodFromAbstract()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

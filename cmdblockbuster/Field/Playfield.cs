@@ -1,9 +1,9 @@
 ﻿namespace cmdblockbuster.Field
 {
-    public class Playfield
+    public class Playfield : IPlayefield
     {
         public static int Width => 10;
-        public static int Height => 22; // Two extra invisible rows to spawn tetrominos
+        public static int Height => 22; // Plus 2 invisible rows to spawn tetrominos
 
         public CellType[,] field = new CellType[Height, Width];
 

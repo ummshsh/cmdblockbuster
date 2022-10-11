@@ -1,92 +1,77 @@
 ﻿using cmdblockbuster.Common;
 using cmdblockbuster.Field;
+using cmdblockbuster.InputController;
 using cmdblockbuster.Tetrominoes;
 using System;
 using System.Threading;
+using System.Timers;
 
-namespace cmdblockbuster
+namespace cmdblockbuster.Rules
 {
-    class Game
+    // TODO: define tickrate for gamestate updates
+    // TODO: handle movement with account to palyfield state
+    /// <summary>
+    /// Super Rotation System Engine
+    /// </summary>
+    internal class SRSRulesEngine : IRulesEngine
     {
-        /// <summary>
-        /// Only static blocks <para/>
-        /// Inner state of static blocks to check valid moves against
-        /// </summary>
-        private Playfield playfieldInnerState;
-
-        /// <summary>
-        /// Actually will be rendered <para/>
-        /// </summary>
-        private Playfield playfieldToDisplay;
-
         private bool running;
+        public Playfield playfieldInnerState;
+        public Playfield playfieldToDisplay;
+
         private Tetromino currentTetromino;
         private int currentTetrominoXLocation;
         private int currentTetrominoYLocation;
 
+        public event EventHandler<Playfield> PlayFieldUpdated;
+
+        public SRSRulesEngine(IInputHandler inputHandler, Playfield playFieldToDisplay)
+        {
+            inputHandler.InputProvided += InputProvided;
+            this.playfieldToDisplay = playFieldToDisplay;
+            this.playfieldInnerState = new Playfield(); // TODO: just make copy of original, it may have custom size
+        }
+
+        private void InputProvided(object sender, InputType e)
+        {
+            throw new NotImplementedException(); // update playfield
+        }
+
         public void Start()
         {
-            running = true;
-            playfieldInnerState = new Playfield();
-            playfieldToDisplay = new Playfield();
+            this.running = true;
+            var myTimer = new System.Timers.Timer();
+            myTimer.Elapsed += new ElapsedEventHandler(Tick);
+            myTimer.Interval = 250;
+            myTimer.Start();
+        }
 
-            Console.CursorVisible = false;
+        public void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            PlayFieldUpdated?.Invoke(this, this.playfieldToDisplay);
 
             while (running)
             {
-                SpawnTetromino();
-                ShowTetrominoOnField();
-                ReadInput();
-                Gravity();
-                DestroyRows();
-                // once current tetromino changed which means it landed
-                Console.SetCursorPosition(0, 0);
-                playfieldToDisplay.field.Print();
-
-                Thread.Sleep(100); // Debug, just to reduce CPU usage of my laptop
+                Thread.Sleep(100); // TODO: delete
+                //    SpawnTetromino();
+                //    ShowTetrominoOnField();
+                //    Gravity();
+                //    DestroyRows();
+                //    once current tetromino changed which means it landed
             }
         }
 
-        /// <summary>
-        /// TODO: Add listener to constructor and use it here
-        /// This one should:
-        /// get input - DONE
-        /// react to other keys - WILL DO LATER
-        /// </summary>
-        private void ReadInput()
+        private void Gravity()
         {
-            if (!Console.KeyAvailable)
-            {
-                return;
-            }
-
-            var key = Console.ReadKey();
-            if (key.Key == ConsoleKey.J)
-            {
-                currentTetromino.RotateLeft();
-            }
-            else if (key.Key == ConsoleKey.K)
-            {
-                currentTetromino.RotateRight();
-            }
-            else if (key.Key == ConsoleKey.S)
-            {
-                currentTetrominoXLocation++;
-            }
-            else if (key.Key == ConsoleKey.A)
-            {
-                currentTetrominoYLocation--;
-            }
-            else if (key.Key == ConsoleKey.D)
-            {
-                currentTetrominoYLocation++;
-            }
-            else
-            {
-                Console.WriteLine("unhandled:" + key.Key);
-            }
+            // TODO: define gravity with regard to tickrate
         }
 
+        private void DestroyRows()
+        {
+            // TODO: define destroy rows with regard to tickrate
+        }
+
+        // TODO: revork methods bellow so they won't depend on playfieldToDisplay
         private void ShowTetrominoOnField()
         {
             if (CheckIfCanBePlacedOnCoordinate(currentTetrominoXLocation, currentTetrominoYLocation))
@@ -108,13 +93,9 @@ namespace cmdblockbuster
             }
         }
 
-        public void Stop() => running = false; //TODO: Some cleanup here
-
-        public void Pause() => running = false;
-
         /// <summary>
-        /// Todo: to replace this with 7pack spawning
-        /// Don't create array each game loop
+        /// Todo: To replace this with 7pack spawning
+        /// Todo: Don't create array each game loop
         /// </summary>
         public bool SpawnTetromino()
         {
@@ -137,7 +118,7 @@ namespace cmdblockbuster
 
             if (!CheckIfCanBePlacedOnCoordinate(currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
             {
-                GameOver();
+                //GameOver();
             }
             else
             {
@@ -213,21 +194,6 @@ namespace cmdblockbuster
             {
                 return true;
             }
-        }
-
-        private void GameOver()
-        {
-            // TODO
-        }
-
-        private void Gravity()
-        {
-            // TODO
-        }
-
-        private void DestroyRows()
-        {
-            // TODO
         }
     }
 }

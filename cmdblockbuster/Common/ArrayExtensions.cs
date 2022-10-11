@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace cmdblockbuster.Common
 {
@@ -17,20 +16,6 @@ namespace cmdblockbuster.Common
             return Enumerable.Range(0, matrix.GetLength(1))
                     .Select(x => matrix[rowNumber, x])
                     .ToArray();
-        }
-
-        public static void Print(this CellType[,] array)
-        {
-            var xDimLenght = array.GetLength(0);
-            var yDimLenght = array.GetLength(1);
-            for (int row = 0; row < xDimLenght; row++)
-            {
-                for (int rowItemIndex = 0; rowItemIndex < yDimLenght; rowItemIndex++)
-                {
-                    Console.Write((int)array[row, rowItemIndex] + " ");
-                }
-                Console.Write(Environment.NewLine);
-            }
         }
 
         public static int GetRowsLenght(this CellType[,] array) => array.GetLength(0);
