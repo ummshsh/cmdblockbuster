@@ -34,7 +34,10 @@ namespace cmdblockbuster.Rules
 
         private void InputProvided(object sender, InputType e)
         {
-            throw new NotImplementedException(); // update playfield
+            // TODO: manipulate playfieldInnerState
+            // TODO: playfieldToDisplay update from playfieldInnerState
+
+            //throw new NotImplementedException(); // update playfield
         }
 
         public void Start()

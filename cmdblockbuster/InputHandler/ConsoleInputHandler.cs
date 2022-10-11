@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace cmdblockbuster.InputController
@@ -46,9 +47,16 @@ namespace cmdblockbuster.InputController
             InputProvided?.Invoke(this, inputToReturn);
         }
 
-        public void BeginReadingInput()
+        public void BeginReadingInput(CancellationToken token)
         {
-            Task.Run(() => ReadInput());
+            Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    ReadInput();
+                    ////await Task.Delay(TimeSpan.FromMilliseconds(100), token);
+                }
+            }, token);
         }
     }
 }

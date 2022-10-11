@@ -3,6 +3,7 @@ using cmdblockbuster.InputController;
 using cmdblockbuster.Renderer;
 using cmdblockbuster.Rules;
 using System;
+using System.Threading;
 
 namespace cmdblockbuster.Game
 {
@@ -17,6 +18,8 @@ namespace cmdblockbuster.Game
         internal void Start(IInputHandler inputController, ITetrisRenderer tetrisRenderer)
         {
             this.inputController = inputController;
+            var cts = new CancellationTokenSource();
+            this.inputController.BeginReadingInput(cts.Token);
             this.tetrisRenderer = tetrisRenderer;
 
             this.rulesEngine = new SRSRulesEngine(this.inputController, new Playfield());
