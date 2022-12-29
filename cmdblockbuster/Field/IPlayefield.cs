@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.Field
+﻿namespace CMDblockbuster.Field
 {
     internal interface IPlayefield
     {

@@ -1,7 +1,7 @@
-﻿using cmdblockbuster.Field;
+﻿using CMDblockbuster.Field;
 using System;
 
-namespace cmdblockbuster.Rules
+namespace CMDblockbuster.Rules
 {
     internal interface IRulesEngine
     {

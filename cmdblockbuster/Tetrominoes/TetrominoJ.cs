@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.Tetrominoes
+﻿namespace CMDblockbuster.Tetrominoes
 {
     class TetrominoJ : Tetromino
     {

@@ -1,6 +1,6 @@
-﻿using cmdblockbuster.Field;
+﻿using CMDblockbuster.Field;
 
-namespace cmdblockbuster.Renderer
+namespace CMDblockbuster.Renderer
 {
     public interface ITetrisRenderer
     {

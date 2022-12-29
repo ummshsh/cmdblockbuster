@@ -1,8 +1,8 @@
-﻿using cmdblockbuster.Game;
-using cmdblockbuster.InputController;
-using cmdblockbuster.Renderer;
+﻿using CMDblockbuster.Game;
+using CMDblockbuster.InputController;
+using CMDblockbuster.Renderer;
 
-namespace cmdblockbuster
+namespace CMDblockbuster
 {
     class Program
     {

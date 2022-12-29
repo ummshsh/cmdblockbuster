@@ -1,7 +1,7 @@
-﻿using cmdblockbuster.Field;
+﻿using CMDblockbuster.Field;
 using System;
 
-namespace cmdblockbuster.Renderer
+namespace CMDblockbuster.Renderer
 {
     internal class ConsoleRenderer : ITetrisRenderer
     {

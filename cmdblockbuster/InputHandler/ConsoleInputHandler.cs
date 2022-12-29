@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace cmdblockbuster.InputController
+namespace CMDblockbuster.InputController
 {
     public class ConsoleInputHandler : IInputHandler
     {

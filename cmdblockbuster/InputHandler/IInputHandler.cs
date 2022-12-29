@@ -1,8 +1,8 @@
-﻿using cmdblockbuster.Field;
+﻿using CMDblockbuster.Field;
 using System;
 using System.Threading;
 
-namespace cmdblockbuster.InputController
+namespace CMDblockbuster.InputController
 {
     public interface IInputHandler
     {

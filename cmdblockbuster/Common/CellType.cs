@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster
+﻿namespace CMDblockbuster
 {
     public enum CellType
     {

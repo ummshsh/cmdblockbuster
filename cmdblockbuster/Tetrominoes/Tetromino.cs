@@ -1,9 +1,9 @@
-﻿using cmdblockbuster.Common;
+﻿using CMDblockbuster.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace cmdblockbuster.Tetrominoes
+namespace CMDblockbuster.Tetrominoes
 {
     public abstract class Tetromino
     {

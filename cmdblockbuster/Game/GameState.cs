@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.Game
+﻿namespace CMDblockbuster.Game
 {
     public enum GameState
     {

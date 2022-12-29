@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.InputController
+﻿namespace CMDblockbuster.InputController
 {
     public enum InputType
     {

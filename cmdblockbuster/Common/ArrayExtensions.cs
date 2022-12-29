@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace cmdblockbuster.Common
+namespace CMDblockbuster.Common
 {
     public static class ArrayExtensions
     {

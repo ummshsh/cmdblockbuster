@@ -1,11 +1,11 @@
-﻿using cmdblockbuster.Field;
-using cmdblockbuster.InputController;
-using cmdblockbuster.Renderer;
-using cmdblockbuster.Rules;
+﻿using CMDblockbuster.Field;
+using CMDblockbuster.InputController;
+using CMDblockbuster.Renderer;
+using CMDblockbuster.Rules;
 using System;
 using System.Threading;
 
-namespace cmdblockbuster.Game
+namespace CMDblockbuster.Game
 {
     public class Tetris
     {

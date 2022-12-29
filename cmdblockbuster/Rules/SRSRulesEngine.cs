@@ -1,12 +1,12 @@
-﻿using cmdblockbuster.Common;
-using cmdblockbuster.Field;
-using cmdblockbuster.InputController;
-using cmdblockbuster.Tetrominoes;
+﻿using CMDblockbuster.Common;
+using CMDblockbuster.Field;
+using CMDblockbuster.InputController;
+using CMDblockbuster.Tetrominoes;
 using System;
 using System.Threading;
 using System.Timers;
 
-namespace cmdblockbuster.Rules
+namespace CMDblockbuster.Rules
 {
     // TODO: define tickrate for gamestate updates
     // TODO: handle movement with account to palyfield state

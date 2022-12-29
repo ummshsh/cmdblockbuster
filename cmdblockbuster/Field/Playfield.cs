@@ -1,4 +1,4 @@
-﻿namespace cmdblockbuster.Field
+﻿namespace CMDblockbuster.Field
 {
     public class Playfield : IPlayefield
     {

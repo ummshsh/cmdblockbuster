@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace cmdblockbuster.Common
+namespace CMDblockbuster.Common
 {
     public static class TimeConstants
     {
