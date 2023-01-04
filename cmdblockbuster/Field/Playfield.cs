@@ -2,13 +2,32 @@
 {
     public class Playfield : IPlayefield
     {
-        public static int Width => 10;
-        public static int Height => 22; // Plus 2 invisible rows to spawn tetrominos
+        public int Width { get; private set; }
 
-        public CellType[,] field = new CellType[Height, Width];
+        public int Height { get; private set; }
+
+        public readonly CellType[,] field;
 
         public Playfield()
         {
+            Width = 10;
+            Height = 22;
+
+            this.field = ConsructField();
+        }
+
+        public Playfield(int width, int height)
+        {
+            Width = width;
+            Height = height;
+
+            this.field = ConsructField();
+        }
+
+        private CellType[,] ConsructField()
+        {
+            var field = new CellType[Height, Width];
+
             var xDimLenght = field.GetLength(0);
             var yDimLenght = field.GetLength(1);
 
@@ -19,6 +38,8 @@
                     field[row, rowItemIndex] = CellType.Empty;
                 }
             }
+
+            return field;
         }
     }
 }

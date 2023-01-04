@@ -40,7 +40,7 @@ namespace CMDblockbuster.InputController
             }
             else
             {
-                Console.WriteLine("unhandled:" + key.Key);
+                //Console.WriteLine("unhandled:" + key.Key);
                 inputToReturn = InputType.None;
             }
 
