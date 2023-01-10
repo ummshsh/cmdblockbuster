@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace CMDblockbuster.Renderer
 {
+    [Obsolete]
     internal class ConsoleRenderer : ITetrisRenderer
     {
         public ConsoleRenderer()

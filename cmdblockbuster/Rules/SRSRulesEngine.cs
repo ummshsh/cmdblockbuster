@@ -3,6 +3,8 @@ using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace CMDblockbuster.Rules
@@ -25,7 +27,7 @@ namespace CMDblockbuster.Rules
         private int currentTetrominoWidthLocation { get; set; }
 
         // Time
-        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(500);
+        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(100);
         public TimeSpan FallRate { get; } = TimeSpan.FromSeconds(1);
 
         // Tetromino types
@@ -53,35 +55,36 @@ namespace CMDblockbuster.Rules
             ArrayLength = playfieldInnerState.Width * playfieldInnerState.Height;
         }
 
-        public void Start()
+        public Task Start()
         {
             this.running = true;
 
-            // Starts timer and call Tick() each TickRate defined interval
-            var tickRateTimer = new Timer();
-            tickRateTimer.Elapsed += new ElapsedEventHandler(Tick);
-            tickRateTimer.Interval = TickRate.TotalMilliseconds;
-            tickRateTimer.Start();
+            return Task.Run(() =>
+            {
 
-            // TODO: for now just one speed
-            var fallRateTimer = new Timer();
-            fallRateTimer.Elapsed += new ElapsedEventHandler(Gravity);
-            fallRateTimer.Interval = FallRate.TotalMilliseconds;
-            fallRateTimer.Start();
+                while (running)
+                {
+                    Tick();
+                    Task.Delay(TickRate).Wait();
+                }
+            });
         }
 
-        public void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
+        public void Tick()
         {
-            PlayFieldUpdated?.Invoke(this, this.playfieldToDisplay);
-
-            while (running)
+            if (running)
             {
+                PlayFieldUpdated?.Invoke(this, this.playfieldToDisplay);
                 SpawnTetromino();
+                //CheckIfGameIsOver();
                 ShowTetrominoOnField();
-                // Gravity: done using timer in Start()
-                // TODO: figure out how to Stick tetromino(remove control of current tetromino) and then DestroyRows() if possible; 
-                // CheckIfGameIsOver(); // if tetromino spawned, but landed on 2 offsceen rows with at least 1 block
-                // once current tetromino changed, means it landed
+                Gravity();
+                if (Stick())
+                {
+                    DestroyRows();
+
+                    //mark current tetromino as landed
+                }
             }
         }
 
@@ -92,15 +95,19 @@ namespace CMDblockbuster.Rules
             switch (inputType)
             {
                 case InputType.Left:
+                    MoveLeft();
                     break;
 
                 case InputType.Right:
+                    MoveRight();
                     break;
 
                 case InputType.RotateLeft:
+                    RotateLeft();
                     break;
 
                 case InputType.RotateRight:
+                    RotateRight();
                     break;
 
                 case InputType.Up:
@@ -123,6 +130,31 @@ namespace CMDblockbuster.Rules
             }
         }
 
+        private bool RotateLeft()
+        {
+            currentTetromino.RotateLeft();
+            return true;
+        }
+
+        private bool RotateRight()
+        {
+            currentTetromino.RotateLeft();
+            return true;
+        }
+
+        private bool MoveLeft()
+        {
+            currentTetrominoWidthLocation--;
+            return true;
+        }
+
+        private bool MoveRight()
+        {
+            currentTetrominoWidthLocation++;
+            return true;
+        }
+
+
         private bool MoveDown()
         {
             var newLocation = currentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
@@ -144,13 +176,18 @@ namespace CMDblockbuster.Rules
 
         private void HardFall()
         {
-            // TODO: make tetromino fall immideately and release control of current tetromino
+            // TODO: make tetromino fall immideately and mark it is as landed and release control of current tetromino
             throw new NotImplementedException();
         }
 
-        private void Gravity(object sender, ElapsedEventArgs elapsedEventArgs)
+        private void Gravity()
         {
-            //MoveDown();
+            // TODO: keep track of Fall rate time and do MoveDown(); once time is up
+        }
+
+        private bool Stick()
+        {
+            return false; //TODO: retrun true if timer for current tetromino is up or it is marked as landed
         }
 
         private void DestroyRows()

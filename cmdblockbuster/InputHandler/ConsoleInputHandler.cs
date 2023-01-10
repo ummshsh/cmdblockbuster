@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace CMDblockbuster.InputController
 {
+    [Obsolete]
     public class ConsoleInputHandler : IInputHandler
     {
         public event EventHandler<InputType> InputProvided;
@@ -47,16 +48,15 @@ namespace CMDblockbuster.InputController
             InputProvided?.Invoke(this, inputToReturn);
         }
 
-        public void BeginReadingInput(CancellationToken token)
+        public void BeginReadingInput()
         {
             Task.Run(async () =>
             {
-                while (!token.IsCancellationRequested)
+                while (true)
                 {
                     ReadInput();
-                    ////await Task.Delay(TimeSpan.FromMilliseconds(100), token);
                 }
-            }, token);
+            });
         }
     }
 }
