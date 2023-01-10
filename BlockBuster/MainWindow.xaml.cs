@@ -35,11 +35,11 @@ namespace BlockBuster
         {
             CMDblockbuster.InputController.InputType inputToReturn;
 
-            if (e.Key == Key.J | e.Key == Key.PageUp)
+            if (e.Key == Key.J | e.Key == Key.RightAlt)
             {
                 inputToReturn = CMDblockbuster.InputController.InputType.RotateLeft;
             }
-            else if (e.Key == Key.K | e.Key == Key.PageDown)
+            else if (e.Key == Key.K | e.Key == Key.RightCtrl)
             {
                 inputToReturn = CMDblockbuster.InputController.InputType.RotateRight;
             }

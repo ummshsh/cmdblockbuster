@@ -23,6 +23,7 @@ namespace CMDblockbuster.Rules
 
         // Current tetromino and it's location
         private Tetromino currentTetromino;
+        // TODO: add ghost tetromino
         private int currentTetrominoHeightLocation { get; set; }
         private int currentTetrominoWidthLocation { get; set; }
 
@@ -41,7 +42,6 @@ namespace CMDblockbuster.Rules
                 typeof(TetrominoZ)};
 
         private bool running;
-
 
         public SRSRulesEngine(IInputHandler inputHandler, Playfield playFieldToDisplay)
         {
@@ -138,7 +138,7 @@ namespace CMDblockbuster.Rules
 
         private bool RotateRight()
         {
-            currentTetromino.RotateLeft();
+            currentTetromino.RotateRight();
             return true;
         }
 
@@ -228,7 +228,7 @@ namespace CMDblockbuster.Rules
             }
 
             // Create tetromnino
-            var randomInt = new Random().Next(0, tetrominoes.Length - 1);
+            var randomInt = new Random().Next(0, tetrominoes.Length - 1); // TODO: make SevenPackQueue class fot this
             currentTetromino = Activator.CreateInstance(tetrominoes[randomInt]) as Tetromino;
 
             // If tetromino can be spawned, then 
