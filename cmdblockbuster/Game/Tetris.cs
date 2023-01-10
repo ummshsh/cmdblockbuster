@@ -15,12 +15,15 @@ namespace CMDblockbuster.Game
 
         internal GameState GameState { get; set; } = GameState.Stopped;
 
-        public Task Start(IInputHandler inputController, ITetrisRenderer tetrisRenderer)
+        public Tetris(IInputHandler inputController, ITetrisRenderer tetrisRenderer)
         {
             this.inputController = inputController;
             this.tetrisRenderer = tetrisRenderer;
+        }
 
-            this.rulesEngine = new SRSRulesEngine(this.inputController, new Playfield());
+        public Task Start()
+        {
+            this.rulesEngine = new SRSRulesEngine(this.inputController);
             this.rulesEngine.PlayFieldUpdated += this.tetrisRenderer.RenderPlayfield;
 
             this.GameState = GameState.Running;

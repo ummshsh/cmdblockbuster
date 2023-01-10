@@ -1,11 +1,10 @@
 ﻿using CMDblockbuster.Common;
 using CMDblockbuster.Field;
+using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace CMDblockbuster.Rules
 {
@@ -28,7 +27,7 @@ namespace CMDblockbuster.Rules
         private int currentTetrominoWidthLocation { get; set; }
 
         // Time
-        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(100);
+        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(10);
         public TimeSpan FallRate { get; } = TimeSpan.FromSeconds(1);
 
         // Tetromino types
@@ -41,28 +40,29 @@ namespace CMDblockbuster.Rules
                 typeof(TetrominoT),
                 typeof(TetrominoZ)};
 
-        private bool running;
+        private GameState GameState;
+        private int BlankRowsCountOnLeftSide = 2;
 
-        public SRSRulesEngine(IInputHandler inputHandler, Playfield playFieldToDisplay)
+        public SRSRulesEngine(IInputHandler inputHandler)
         {
             // Set input handler
             inputHandler.InputProvided += InputProvided;
 
             // Init flayfields
-            this.playfieldToDisplay = playFieldToDisplay;
-            this.playfieldInnerState = new Playfield(playFieldToDisplay.Width, playFieldToDisplay.Height);
+            this.playfieldToDisplay = new Playfield(10, 22);
+            this.playfieldInnerState = new Playfield(playfieldToDisplay.Width + BlankRowsCountOnLeftSide, playfieldToDisplay.Height);
 
             ArrayLength = playfieldInnerState.Width * playfieldInnerState.Height;
         }
 
         public Task Start()
         {
-            this.running = true;
+            this.GameState = GameState.Running;
 
             return Task.Run(() =>
             {
 
-                while (running)
+                while (GameState == GameState.Running)
                 {
                     Tick();
                     Task.Delay(TickRate).Wait();
@@ -72,12 +72,12 @@ namespace CMDblockbuster.Rules
 
         public void Tick()
         {
-            if (running)
+            if (GameState == GameState.Running)
             {
                 PlayFieldUpdated?.Invoke(this, this.playfieldToDisplay);
                 SpawnTetromino();
                 //CheckIfGameIsOver();
-                ShowTetrominoOnField();
+                UpdateFieldToDisplay();
                 Gravity();
                 if (Stick())
                 {
@@ -88,7 +88,7 @@ namespace CMDblockbuster.Rules
             }
         }
 
-        public void Pause() => this.running = false;
+        public void Pause() => this.GameState = GameState.Paused;
 
         private void InputProvided(object sender, InputType inputType)
         {
@@ -133,13 +133,25 @@ namespace CMDblockbuster.Rules
         private bool RotateLeft()
         {
             currentTetromino.RotateLeft();
-            return true;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
+            {
+                return true;
+            }
+
+            currentTetromino.RotateRight();
+            return false;
         }
 
         private bool RotateRight()
         {
             currentTetromino.RotateRight();
-            return true;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
+            {
+                return true;
+            }
+
+            currentTetromino.RotateLeft();
+            return false;
         }
 
         private bool MoveLeft()
@@ -148,9 +160,9 @@ namespace CMDblockbuster.Rules
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
             {
                 currentTetrominoWidthLocation = newLocation;
+                return true;
             }
-
-            return true;
+            return false;
         }
 
         private bool MoveRight()
@@ -159,10 +171,9 @@ namespace CMDblockbuster.Rules
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
             {
                 currentTetrominoWidthLocation = newLocation;
+                return true;
             }
-
-            currentTetrominoWidthLocation++;
-            return true;
+            return false;
         }
 
 
@@ -170,7 +181,7 @@ namespace CMDblockbuster.Rules
         {
             var newLocation = currentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
 
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, newLocation, currentTetrominoWidthLocation))
             {
                 currentTetrominoHeightLocation = newLocation;
                 return true;
@@ -206,13 +217,19 @@ namespace CMDblockbuster.Rules
             // TODO: define destroy rows with regard to FallRate
         }
 
-        private void ShowTetrominoOnField()
+        private void UpdateFieldToDisplay()
         {
             // TODO: this guard check will not be necessary in future
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
             {
                 // Add all static elements to playfield to display
-                Array.Copy(playfieldInnerState.field, playfieldToDisplay.field, ArrayLength);
+                for (int row = 0; row < playfieldToDisplay.Height; row++)
+                {
+                    for (int rowItemIndex = 0; rowItemIndex < playfieldToDisplay.Width; rowItemIndex++)
+                    {
+                        playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + BlankRowsCountOnLeftSide];
+                    }
+                }
 
                 // Add current tetromino to playfield to display
                 var currentTetromninoeYIndex = 0;
@@ -233,14 +250,14 @@ namespace CMDblockbuster.Rules
         public bool SpawnTetromino()
         {
             // Exit if tetromino exists already
-            if (currentTetromino != null || (currentTetromino?.landed ?? false))
+            if (currentTetromino != null || (currentTetromino?.IsLanded ?? false))
             {
                 return false;
             }
 
             // Create tetromnino
             var randomInt = new Random().Next(0, tetrominoes.Length - 1); // TODO: make SevenPackQueue class fot this
-            currentTetromino = Activator.CreateInstance(tetrominoes[randomInt]) as Tetromino;
+            currentTetromino = Activator.CreateInstance(tetrominoes[0]) as Tetromino;
 
             // If tetromino can be spawned, then 
             if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
@@ -263,20 +280,28 @@ namespace CMDblockbuster.Rules
         /// <summary>
         /// TODO: make this method ignore empty cells and going out of bounds of playfield
         /// </summary>
-        /// <param name="xCoordinate">Vertical top-down</param>
-        /// <param name="yCoordinate">Horizontal left-right</param>
+        /// <param name="rowCoordinate">Vertical top-down</param>
+        /// <param name="rowItemCoordinate">Horizontal left-right</param>
         /// <returns></returns>
-        private bool CheckIfCanBePlacedOnCoordinate(Tetromino currentTetromino, int xCoordinate, int yCoordinate)
+        private bool CheckIfCanBePlacedOnCoordinate(Tetromino currentTetromino, int rowCoordinate, int rowItemCoordinate)
         {
+            if (rowCoordinate < 0 ||
+                rowCoordinate > playfieldInnerState.Height ||
+                rowItemCoordinate < 0 ||
+                rowItemCoordinate >= playfieldInnerState.Width - 1 - currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght())
+            {
+                return false;
+            }
+
             CellType[,] cellsWithoutEmptyRowsAndColumns = currentTetromino.CellsWithoutEmptyRowsAndColumns;
             var cuttedPlayfiedArray = new CellType[
                 cellsWithoutEmptyRowsAndColumns.GetRowsLenght(),
                 cellsWithoutEmptyRowsAndColumns.GetColumnsLenght()];
 
             // Cut tetromino sized array from playfield on location
-            for (int row = xCoordinate; row < cuttedPlayfiedArray.GetRowsLenght(); row++)
+            for (int row = rowCoordinate; row < cuttedPlayfiedArray.GetRowsLenght(); row++)
             {
-                for (int rowItemIndex = yCoordinate; rowItemIndex < cuttedPlayfiedArray.GetColumnsLenght(); rowItemIndex++)
+                for (int rowItemIndex = rowItemCoordinate; rowItemIndex < cuttedPlayfiedArray.GetColumnsLenght(); rowItemIndex++)
                 {
                     cuttedPlayfiedArray[row, rowItemIndex] = playfieldInnerState.field[row, rowItemIndex];
                 }

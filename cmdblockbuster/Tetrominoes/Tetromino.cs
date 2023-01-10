@@ -78,7 +78,8 @@ namespace CMDblockbuster.Tetrominoes
 
         public TetrominoMoves[] TetrominoMoves;
 
-        public bool landed = false;
+        public bool IsLanded = false;
+        public bool IsGhost = false;
 
         public virtual void RotateRight()
         {

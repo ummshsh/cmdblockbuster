@@ -8,6 +8,18 @@
 
         public readonly CellType[,] field;
 
+        public CellType this[int row, int rowItem]
+        {
+            get
+            {
+                return field[row, rowItem];
+            }
+            set
+            {
+                field[row, rowItem] = value;
+            }
+        }
+
         public Playfield()
         {
             Width = 10;

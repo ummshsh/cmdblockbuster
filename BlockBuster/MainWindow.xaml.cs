@@ -26,9 +26,9 @@ namespace BlockBuster
 
         async void OnLoad(object sender, RoutedEventArgs e)
         {
-            var Tetris = new Tetris();
             wpfInputHandler = new WpfInputHandler();
-            await Tetris.Start(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid));
+            var Tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid));
+            await Tetris.Start();
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
