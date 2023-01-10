@@ -144,12 +144,23 @@ namespace CMDblockbuster.Rules
 
         private bool MoveLeft()
         {
-            currentTetrominoWidthLocation--;
+            var newLocation = currentTetrominoWidthLocation - 1;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
+            {
+                currentTetrominoWidthLocation = newLocation;
+            }
+
             return true;
         }
 
         private bool MoveRight()
         {
+            var newLocation = currentTetrominoWidthLocation + 1;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
+            {
+                currentTetrominoWidthLocation = newLocation;
+            }
+
             currentTetrominoWidthLocation++;
             return true;
         }
