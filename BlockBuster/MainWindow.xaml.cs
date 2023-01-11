@@ -2,6 +2,7 @@
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
+using CMDblockbuster.Tetrominoes;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,6 +88,7 @@ namespace BlockBuster
                     for (int rowItemIndex = 0; rowItemIndex < width; rowItemIndex++)
                     {
                         TextBlock cell = new TextBlock();
+                        cell.Text = $"{row}:{rowItemIndex}";
                         cell.Background = new SolidColorBrush(e.field[row, rowItemIndex] > 0 ? Colors.Green : Colors.White);
                         Grid.SetRow(cell, row);
                         Grid.SetColumn(cell, rowItemIndex);

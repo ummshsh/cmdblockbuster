@@ -41,7 +41,7 @@ namespace CMDblockbuster.Rules
                 typeof(TetrominoZ)};
 
         private GameState GameState;
-        private int BlankRowsCountOnLeftSide = 2;
+        private int BlankRowsCountOnLeftSide = 0;
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -79,12 +79,8 @@ namespace CMDblockbuster.Rules
                 //CheckIfGameIsOver();
                 UpdateFieldToDisplay();
                 Gravity();
-                if (Stick())
-                {
-                    DestroyRows();
-
-                    //mark current tetromino as landed
-                }
+                DestroyRows();
+                //mark current tetromino as landed
             }
         }
 
@@ -132,6 +128,10 @@ namespace CMDblockbuster.Rules
 
         private bool RotateLeft()
         {
+            if (currentTetromino.IsLanded)
+            {
+                return false;
+            }
             currentTetromino.RotateLeft();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
             {
@@ -144,6 +144,10 @@ namespace CMDblockbuster.Rules
 
         private bool RotateRight()
         {
+            if (currentTetromino.IsLanded)
+            {
+                return false;
+            }
             currentTetromino.RotateRight();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
             {
@@ -156,6 +160,10 @@ namespace CMDblockbuster.Rules
 
         private bool MoveLeft()
         {
+            if (currentTetromino.IsLanded)
+            {
+                return false;
+            }
             var newLocation = currentTetrominoWidthLocation - 1;
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
             {
@@ -167,6 +175,10 @@ namespace CMDblockbuster.Rules
 
         private bool MoveRight()
         {
+            if (currentTetromino.IsLanded)
+            {
+                return false;
+            }
             var newLocation = currentTetrominoWidthLocation + 1;
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
             {
@@ -179,6 +191,11 @@ namespace CMDblockbuster.Rules
 
         private bool MoveDown()
         {
+            if (currentTetromino.IsLanded)
+            {
+                return false;
+            }
+
             if (IfTouchedFoundationOrAnotherTetrominoUnderneath())
             {
                 AddCurrentTetrominoToInnerState();
@@ -198,24 +215,28 @@ namespace CMDblockbuster.Rules
         private void AddCurrentTetrominoToInnerState()
         {
             currentTetromino.IsLanded = true;
-            currentTetromino = null;
-            //throw new NotImplementedException();
+
+            for (int row = currentTetrominoHeightLocation; row < currentTetrominoHeightLocation + currentTetromino.RowsLenght; row++)
+            {
+                for (int rowItemIndex = currentTetrominoWidthLocation; rowItemIndex < currentTetrominoWidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
+                {
+                    var cellToPaste = currentTetromino.Cells[row - currentTetrominoHeightLocation, rowItemIndex - currentTetrominoWidthLocation];
+                    if (cellToPaste != CellType.Empty)
+                    {
+                        playfieldInnerState.field[row, rowItemIndex + BlankRowsCountOnLeftSide] = cellToPaste;
+                    }
+                }
+            }
         }
 
         private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
         {
-            // Check to check if touched foundation
-            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght())
+            // Check to check if touched foundation or to check if touched another tetromino underneath
+            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght() ||
+                !CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation + 1, currentTetrominoWidthLocation))
             {
                 return true;
             }
-
-            // Check if touched another tetromino underneath
-            //if (true) // TODO: to add check
-
-            //{
-            //    return true;
-            //}
 
             return false;
         }
@@ -244,17 +265,55 @@ namespace CMDblockbuster.Rules
 
         private void DestroyRows()
         {
-            // TODO: define destroy rows with regard to FallRate
+            for (int row = playfieldInnerState.Height - 1; row >= 0; row--)
+            {
+                if (CheckRowFilled(row))
+                {
+                    DestroyRow(row);
+                    MoveTopRowsToRow(row);
+                }
+            }
+        }
+
+        private void MoveTopRowsToRow(int rowToMoveTo)
+        {
+            for (int row = rowToMoveTo - 1; row > 0; row--)
+            {
+                for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+                {
+                    if (row == 0)
+                    {
+                        return;
+                    }
+
+                    playfieldInnerState[row + 1, rowItem] = playfieldInnerState[row, rowItem];
+                }
+            }
+
+        }
+
+        private void DestroyRow(int row)
+        {
+            for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+            {
+                playfieldInnerState[row, rowItem] = CellType.Empty;
+            }
+        }
+
+        private bool CheckRowFilled(int row)
+        {
+            for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+            {
+                if (playfieldInnerState[row, rowItem] == CellType.Empty)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void UpdateFieldToDisplay()
         {
-            // TODO: this guard check will not be necessary in future
-            if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
-            {
-                return;
-            }
-
             // Add all static elements to playfield to display
             for (int row = 0; row < playfieldToDisplay.Height; row++)
             {
@@ -265,31 +324,30 @@ namespace CMDblockbuster.Rules
             }
 
             // Add current tetromino to playfield to display
-            var currentTetromninoeRowIndex = 0;
-            var currentTetromninoeRowItemIndex = 0;
-            for (int row = currentTetrominoHeightLocation; row < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght() + currentTetrominoHeightLocation; row++)
+            for (int row = 0; row < currentTetromino.RowsLenght; row++)
             {
-                for (int rowItemIndex = currentTetrominoWidthLocation; rowItemIndex < currentTetrominoWidthLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght(); rowItemIndex++)
+                for (int rowItem = 0; rowItem < currentTetromino.ColumnsLenght; rowItem++)
                 {
-                    playfieldToDisplay.field[row, rowItemIndex] = currentTetromino.CellsWithoutEmptyRowsAndColumns[currentTetromninoeRowItemIndex, currentTetromninoeRowIndex];
-                    currentTetromninoeRowIndex++;
+                    var cellToPaste = currentTetromino.Cells[row, rowItem];
+                    if (cellToPaste != CellType.Empty)
+                    {
+                        playfieldToDisplay.field[row + currentTetrominoHeightLocation, rowItem + currentTetrominoWidthLocation] = cellToPaste;
+                    }
                 }
-                currentTetromninoeRowItemIndex++;
-                currentTetromninoeRowIndex = 0;
             }
         }
 
         public bool SpawnTetromino()
         {
             // Exit if tetromino exists already
-            if (currentTetromino != null || (currentTetromino?.IsLanded ?? false))
+            if (currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
             {
                 return false;
             }
 
             // Create tetromnino
             var randomInt = new Random().Next(0, tetrominoes.Length - 1); // TODO: make SevenPackQueue class fot this
-            currentTetromino = Activator.CreateInstance(tetrominoes[randomInt]) as Tetromino;
+            currentTetromino = Activator.CreateInstance(tetrominoes[0]) as Tetromino;
 
             // If tetromino can be spawned, then 
             if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
@@ -306,6 +364,7 @@ namespace CMDblockbuster.Rules
 
         private void GameOver()
         {
+            GameState = GameState.GameOver;
             throw new NotImplementedException("GAME OVER!");
         }
 
@@ -315,41 +374,62 @@ namespace CMDblockbuster.Rules
         /// <param name="rowCoordinate">Vertical top-down</param>
         /// <param name="rowItemCoordinate">Horizontal left-right</param>
         /// <returns></returns>
-        private bool CheckIfCanBePlacedOnCoordinate(Tetromino currentTetromino, int rowCoordinate, int rowItemCoordinate)
+        private bool CheckIfCanBePlacedOnCoordinate(Tetromino tetromino, int rowCoordinate, int rowItemCoordinate)
         {
+            //// Check that coordinate is not outside playfield boundaries
             if (rowCoordinate < 0 ||
-                rowCoordinate > playfieldInnerState.Height ||
-                rowItemCoordinate < 0 ||
-                rowItemCoordinate >= playfieldInnerState.Width - 1 - currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght())
+                rowCoordinate > playfieldInnerState.Height)
             {
                 return false;
             }
 
-            CellType[,] cellsWithoutEmptyRowsAndColumns = currentTetromino.CellsWithoutEmptyRowsAndColumns;
-            var cuttedPlayfiedArray = new CellType[
-                cellsWithoutEmptyRowsAndColumns.GetRowsLenght(),
-                cellsWithoutEmptyRowsAndColumns.GetColumnsLenght()];
-
-            // Cut tetromino sized array from playfield on location
-            for (int row = rowCoordinate; row < cuttedPlayfiedArray.GetRowsLenght(); row++)
+            // Check that tetromino fits on playfield on coordinate
+            for (int rowIndex = rowCoordinate; rowIndex < rowCoordinate + tetromino.RowsLenght; rowIndex++)
             {
-                for (int rowItemIndex = rowItemCoordinate; rowItemIndex < cuttedPlayfiedArray.GetColumnsLenght(); rowItemIndex++)
+                for (int rowItemIndex = rowItemCoordinate; rowItemIndex < rowItemCoordinate + tetromino.ColumnsLenght; rowItemIndex++)
                 {
-                    cuttedPlayfiedArray[row, rowItemIndex] = playfieldInnerState.field[row, rowItemIndex];
-                }
-            }
-
-            // check intersections with current position of tetromino
-            for (int row = 0; row < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght(); row++)
-            {
-                for (int column = 0; column < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght(); column++)
-                {
-                    if (CheckIfCellsIntercect(cuttedPlayfiedArray[row, column], currentTetromino.CellsWithoutEmptyRowsAndColumns[row, column]))
+                    if (rowItemIndex >= 0 && rowItemIndex < playfieldInnerState.Width && rowCoordinate + tetromino.RowsLenght < playfieldInnerState.Height)
                     {
-                        return false; // fail on first found intercestion
+                        if (CheckIfCellsIntercect(currentTetromino.Cells[rowIndex - rowCoordinate, rowItemIndex - rowItemCoordinate], playfieldInnerState.field[rowIndex, rowItemIndex + BlankRowsCountOnLeftSide]))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        // Check intersection ignoring empty columns and rows that are outside of the bounds of array
+                        if (rowItemIndex < 0)
+                        {
+                            // left
+                            if (currentTetromino.EmptyColumnsOnLeftSideCount < rowIndex)
+                            {
+                                return true;
+                            }
+                        }
+                        else if (rowItemIndex + tetromino.ColumnsLenght > playfieldInnerState.Width - 1)
+                        {
+                            // right
+                            if (rowItemIndex + tetromino.ColumnsLenght - currentTetromino.EmptyColumnsOnRightSideCount < playfieldInnerState.Width)
+                            {
+                                return true;
+                            }
+                        }
+                        else if (rowIndex + tetromino.RowsLenght -1 + tetromino.EmptyRowsOnBottomSideCount > playfieldInnerState.Height)
+                        {
+                            // bottom
+                            if (rowIndex + tetromino.RowsLenght - currentTetromino.EmptyRowsOnBottomSideCount < playfieldInnerState.Height)
+                            {
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
             }
+
             return true;
         }
 

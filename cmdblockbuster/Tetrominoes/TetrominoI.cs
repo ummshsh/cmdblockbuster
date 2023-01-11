@@ -1,6 +1,6 @@
 ﻿namespace CMDblockbuster.Tetrominoes
 {
-    class TetrominoI : Tetromino
+    public class TetrominoI : Tetromino
     {
         public TetrominoI()
         {

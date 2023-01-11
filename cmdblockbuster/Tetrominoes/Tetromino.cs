@@ -71,12 +71,96 @@ namespace CMDblockbuster.Tetrominoes
         /// </summary>
         public int ColumnsLenght => Cells.GetLength(1);
 
+        public int EmptyColumnsOnLeftSideCount
+        {
+            get
+            {
+                var columnCount = 0;
+                for (int column = 0; column < Cells.GetColumnsLenght(); column++)
+                {
+                    var emptyCellsInColumn = 0;
+                    for (int row = 0; row < Cells.GetRowsLenght(); row++)
+                    {
+                        if (Cells[row, column] == CellType.Empty)
+                        {
+                            emptyCellsInColumn++;
+                        }
+                        else
+                        {
+                            return columnCount;
+                        }
+                    }
+                    if (emptyCellsInColumn == Cells.GetColumnsLenght())
+                    {
+                        columnCount++;
+                    }
+                }
+                return columnCount;
+            }
+        }
+
+        public int EmptyColumnsOnRightSideCount
+        {
+            get
+            {
+                var columnCount = 0;
+                for (int column = Cells.GetColumnsLenght() - 1; column > 0; column--)
+                {
+                    var emptyCellsInColumn = 0;
+                    for (int row = 0; row < Cells.GetRowsLenght(); row++)
+                    {
+                        if (Cells[row, column] == CellType.Empty)
+                        {
+                            emptyCellsInColumn++;
+                        }
+                        else
+                        {
+                            return columnCount;
+                        }
+                    }
+                    if (emptyCellsInColumn == Cells.GetColumnsLenght())
+                    {
+                        columnCount++;
+                    }
+                }
+                return columnCount;
+            }
+        }
+
+        public int EmptyRowsOnBottomSideCount
+        {
+            get
+            {
+                var columnCount = 0;
+                for (int row = Cells.GetRowsLenght() - 1; row > 0; row--)
+                {
+                    var emptyCellsInColumn = 0;
+                    for (int column = 0; column < Cells.GetColumnsLenght(); column++)
+                    {
+                        {
+                            if (Cells[row, column] == CellType.Empty)
+                            {
+                                emptyCellsInColumn++;
+                            }
+                            else
+                            {
+                                return columnCount;
+                            }
+                        }
+                        if (emptyCellsInColumn == Cells.GetColumnsLenght())
+                        {
+                            columnCount++;
+                        }
+                    }
+                }
+                return columnCount;
+            }
+        }
+
         /// <summary>
         /// Zero based, true for most of the tetrominoes except I and O
         /// </summary>
         public Tuple<int, int> SpawnLocation = new Tuple<int, int>(0, 4);
-
-        public TetrominoMoves[] TetrominoMoves;
 
         public bool IsLanded = false;
         public bool IsGhost = false;
