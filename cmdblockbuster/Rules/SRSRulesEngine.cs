@@ -179,13 +179,43 @@ namespace CMDblockbuster.Rules
 
         private bool MoveDown()
         {
-            var newLocation = currentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
+            if (IfTouchedFoundationOrAnotherTetrominoUnderneath())
+            {
+                AddCurrentTetrominoToInnerState();
+                return false;
+            }
 
+            var newLocation = currentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, newLocation, currentTetrominoWidthLocation))
             {
                 currentTetrominoHeightLocation = newLocation;
                 return true;
             }
+
+            return false;
+        }
+
+        private void AddCurrentTetrominoToInnerState()
+        {
+            currentTetromino.IsLanded = true;
+            currentTetromino = null;
+            //throw new NotImplementedException();
+        }
+
+        private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
+        {
+            // Check to check if touched foundation
+            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght())
+            {
+                return true;
+            }
+
+            // Check if touched another tetromino underneath
+            //if (true) // TODO: to add check
+
+            //{
+            //    return true;
+            //}
 
             return false;
         }
@@ -204,7 +234,7 @@ namespace CMDblockbuster.Rules
 
         private void Gravity()
         {
-            // TODO: keep track of Fall rate time and do MoveDown(); once time is up
+            //MoveDown();
         }
 
         private bool Stick()
@@ -220,30 +250,32 @@ namespace CMDblockbuster.Rules
         private void UpdateFieldToDisplay()
         {
             // TODO: this guard check will not be necessary in future
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
+            if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
             {
-                // Add all static elements to playfield to display
-                for (int row = 0; row < playfieldToDisplay.Height; row++)
-                {
-                    for (int rowItemIndex = 0; rowItemIndex < playfieldToDisplay.Width; rowItemIndex++)
-                    {
-                        playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + BlankRowsCountOnLeftSide];
-                    }
-                }
+                return;
+            }
 
-                // Add current tetromino to playfield to display
-                var currentTetromninoeYIndex = 0;
-                var currentTetromninoeXIndex = 0;
-                for (int row = currentTetrominoHeightLocation; row < currentTetromino.RowsLenght + currentTetrominoHeightLocation; row++)
+            // Add all static elements to playfield to display
+            for (int row = 0; row < playfieldToDisplay.Height; row++)
+            {
+                for (int rowItemIndex = 0; rowItemIndex < playfieldToDisplay.Width; rowItemIndex++)
                 {
-                    for (int rowItemIndex = currentTetrominoWidthLocation; rowItemIndex < currentTetrominoWidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
-                    {
-                        playfieldToDisplay.field[row, rowItemIndex] = currentTetromino.Cells[currentTetromninoeXIndex, currentTetromninoeYIndex];
-                        currentTetromninoeYIndex++;
-                    }
-                    currentTetromninoeXIndex++;
-                    currentTetromninoeYIndex = 0;
+                    playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + BlankRowsCountOnLeftSide];
                 }
+            }
+
+            // Add current tetromino to playfield to display
+            var currentTetromninoeRowIndex = 0;
+            var currentTetromninoeRowItemIndex = 0;
+            for (int row = currentTetrominoHeightLocation; row < currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght() + currentTetrominoHeightLocation; row++)
+            {
+                for (int rowItemIndex = currentTetrominoWidthLocation; rowItemIndex < currentTetrominoWidthLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetColumnsLenght(); rowItemIndex++)
+                {
+                    playfieldToDisplay.field[row, rowItemIndex] = currentTetromino.CellsWithoutEmptyRowsAndColumns[currentTetromninoeRowItemIndex, currentTetromninoeRowIndex];
+                    currentTetromninoeRowIndex++;
+                }
+                currentTetromninoeRowItemIndex++;
+                currentTetromninoeRowIndex = 0;
             }
         }
 
@@ -257,7 +289,7 @@ namespace CMDblockbuster.Rules
 
             // Create tetromnino
             var randomInt = new Random().Next(0, tetrominoes.Length - 1); // TODO: make SevenPackQueue class fot this
-            currentTetromino = Activator.CreateInstance(tetrominoes[0]) as Tetromino;
+            currentTetromino = Activator.CreateInstance(tetrominoes[randomInt]) as Tetromino;
 
             // If tetromino can be spawned, then 
             if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
