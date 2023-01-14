@@ -4,6 +4,7 @@ Tetris that supports most popular [Super Rotation System](https://tetris.fandom.
 Features:  
  - Hard drops
  - SRS rotaion
+ - Naive gravity
 
  # Field
  It have 2 invisible top rows to spawn tetrominoes, it is enough if using SRS system
@@ -16,3 +17,4 @@ Features:
  - [ ] Implement gravity and speed levels
  - [ ] Implement scoring
  - [ ] Ghost tetromino
+ - [ ] Implement new cell type for playfield to be rendered, to it can have move properties

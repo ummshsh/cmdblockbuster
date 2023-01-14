@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         KeyDown="OnKeyDownHandler"
         Title="MainWindow" Height="800" Width="400">
-    <Grid ShowGridLines="True" Name="PlayfieldGrid" Loaded="OnLoad">
+    <Grid ShowGridLines="False" Name="PlayfieldGrid" Loaded="OnLoad">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />

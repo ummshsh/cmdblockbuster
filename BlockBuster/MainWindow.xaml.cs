@@ -3,11 +3,8 @@ using CMDblockbuster.Field;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
-using CMDblockbuster.Tetrominoes;
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -72,7 +69,7 @@ namespace BlockBuster
         private Grid playfieldGrid;
 
         private TetrominoCellType[,] lastUpdatedField;
-        private bool DisplayFirstTime = true;
+        private readonly bool DisplayFirstTime = true;
 
         public WpfRenderer(Grid playfieldGrid)
         {
@@ -104,17 +101,32 @@ namespace BlockBuster
                         }
                         else
                         {
-                            TextBlock cell = new TextBlock();
-                            ////cell.Text = $"{row}:{rowItemIndex}"; // index
-                            cell.Background = new SolidColorBrush(e.field[row, rowItemIndex] > 0 ? Colors.Green : Colors.White);
-                            Grid.SetRow(cell, row);
-                            Grid.SetColumn(cell, rowItemIndex);
-                            this.playfieldGrid.Children.Add(cell);
+                            var border = new Border();
+                            border.BorderBrush = Brushes.Black;
+                            border.Background = new SolidColorBrush(GetColor(e.field[row, rowItemIndex]));
+                            border.BorderThickness = new Thickness(0.5);
+                            Grid.SetRow(border, row);
+                            Grid.SetColumn(border, rowItemIndex);
+                            this.playfieldGrid.Children.Add(border);
                         }
                     }
                 }
             });
+        }
 
+        private Color GetColor(TetrominoCellType tetrominoCellType)
+        {
+            return tetrominoCellType switch
+            {
+                TetrominoCellType.Red => Colors.Red,
+                TetrominoCellType.Cyan => Colors.Cyan,
+                TetrominoCellType.Purple => Colors.Purple,
+                TetrominoCellType.Green => Colors.Green,
+                TetrominoCellType.Yellow => Colors.Yellow,
+                TetrominoCellType.Orange => Colors.Orange,
+                TetrominoCellType.Blue => Colors.Blue,
+                _ => Colors.White,
+            };
         }
 
         private bool SequenceEquals<T>(T[,] a, T[,] b)

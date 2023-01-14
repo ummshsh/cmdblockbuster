@@ -40,11 +40,10 @@ namespace cmdblockbuster.Game
 
             return Task.Run(() =>
             {
-
                 while (gameState.State == State.Running)
                 {
                     Tick();
-                    Task.Delay(TimeConstants.TickRate).Wait();
+                    Task.Delay(Variables.TickRate).Wait();
                 }
             });
         }
@@ -53,7 +52,12 @@ namespace cmdblockbuster.Game
         {
             if (gameState.State == State.Running)
             {
-                PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
+                if ((gameState.LastTimePlayfieldWasUpdated - Variables.RenderUpdateRate).Millisecond > 0)
+                {
+                    PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
+                    gameState.LastTimePlayfieldWasUpdated = DateTime.Now;
+                }
+
                 SpawnTetromino();
                 //CheckIfGameIsOver();
                 UpdateFieldToDisplay();
@@ -62,6 +66,7 @@ namespace cmdblockbuster.Game
                 //mark current tetromino as landed
             }
         }
+
         private void GameOver()
         {
             gameState.State = State.GameOver;
@@ -183,7 +188,9 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            if (IfTouchedFoundationOrAnotherTetrominoUnderneath())
+            if (
+                IfTouchedFoundationOrAnotherTetrominoUnderneath() &&
+               gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now)
             {
                 AddCurrentTetrominoToInnerState();
                 return false;
@@ -213,12 +220,11 @@ namespace cmdblockbuster.Game
 
         private void Gravity()
         {
-            //MoveDown();
-        }
-
-        private bool Stick()
-        {
-            return false; //TODO: retrun true if timer for current tetromino is up or it is marked as landed
+            if (DateTime.Now > gameState.LastTimeTetrominoMovedDown + gameState.CurrentPerRowInterval)
+            {
+                MoveDown();
+                gameState.LastTimeTetrominoMovedDown = DateTime.Now;
+            }
         }
 
         #endregion

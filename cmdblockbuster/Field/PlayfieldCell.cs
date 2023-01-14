@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
 
 namespace cmdblockbuster.Field
 {
-    internal class PlayfieldCell
+    internal class Cell
     {
         public Color ColorColor { get; set; } = Color.White;
         public bool Ghost { get; set; } = false;
+    }
+
+    internal class EmptyPlayfieldCell : Cell
+    {
+
     }
 }
