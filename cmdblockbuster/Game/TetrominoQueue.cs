@@ -11,7 +11,10 @@ namespace cmdblockbuster.Game
 
         private Type _hold = null;
 
-        public Type HoldTetromino
+        public Tetromino HoldTetrominoInstance => 
+            Activator.CreateInstance(HoldTetrominoType) as Tetromino;
+
+        public Type HoldTetrominoType
         {
             get
             {
@@ -19,12 +22,9 @@ namespace cmdblockbuster.Game
             }
             set
             {
-                CanUseHold = false;
                 _hold = value;
             }
         }
-
-        public bool CanUseHold { get; set; } = true;
 
         public readonly Stack<Type> stack;
 
@@ -69,10 +69,16 @@ namespace cmdblockbuster.Game
 
         public Tetromino GetTetrominoFromQueue()
         {
-            CanUseHold = true;
-            var tetromino = Activator.CreateInstance(typeof(TetrominoI)) as Tetromino;
+            var tetromino = Activator.CreateInstance(/*typeof(TetrominoI)*/ stack.Pop()) as Tetromino;
             RegenerateQueue();
             return tetromino;
+        }
+
+        public Tetromino GetTetrominoFromHold(Type tetrominoToStoreInstead)
+        {
+            var tetrominoFromHold = Activator.CreateInstance(HoldTetrominoType) as Tetromino;
+            HoldTetrominoType = tetrominoToStoreInstead;
+            return tetrominoFromHold;
         }
     }
 }

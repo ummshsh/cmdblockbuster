@@ -25,5 +25,7 @@ namespace cmdblockbuster.Game
         public int Level { get; internal set; } = 1;
 
         public TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow((0.8 - ((Level - 1) * 0.007)), Level - 1));
+
+        public bool CanUseHold { get; internal set; } = true;
     }
 }

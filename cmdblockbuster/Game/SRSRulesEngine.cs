@@ -52,7 +52,7 @@ namespace cmdblockbuster.Game
         {
             if (gameState.State == State.Running)
             {
-                if ((gameState.LastTimePlayfieldWasUpdated - Variables.RenderUpdateRate).Millisecond > 0)
+                if ((gameState.LastTimePlayfieldWasUpdated + Variables.RenderUpdateRate) < DateTime.Now)
                 {
                     PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
                     gameState.LastTimePlayfieldWasUpdated = DateTime.Now;
@@ -106,10 +106,19 @@ namespace cmdblockbuster.Game
                     break;
 
                 case InputType.Hold:
-                    if (queue.CanUseHold)
+                    if (gameState.CanUseHold)
                     {
-                        queue.HoldTetromino = currentTetromino.GetType();
-
+                        if (queue.HoldTetrominoType == null)
+                        {
+                            queue.HoldTetrominoType = currentTetromino.GetType();
+                            SpawnTetromino();
+                        }
+                        else
+                        {
+                            var tetrominoToSpawnFromHold = queue.HoldTetrominoInstance;
+                            queue.HoldTetrominoType = currentTetromino.GetType();
+                            SpawnTetromino(tetrominoToSpawnFromHold);
+                        }
                     }
                     break;
 
@@ -341,15 +350,23 @@ namespace cmdblockbuster.Game
             }
         }
 
-        public bool SpawnTetromino(bool afterHold = false)
+        public bool SpawnTetromino(Tetromino tetrominoToSpawnFromHold = null)
         {
-            // Return  if tetromino exists already
-            if (afterHold & currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
+            if (tetrominoToSpawnFromHold == null)
             {
-                return false;
+                // Return  if tetromino exists already
+                if (currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
+                {
+                    return false;
+                }
+                currentTetromino = queue.GetTetrominoFromQueue();
+                gameState.CanUseHold = true;
             }
-
-            currentTetromino = queue.GetTetrominoFromQueue();
+            else
+            {
+                gameState.CanUseHold = false;
+                currentTetromino = tetrominoToSpawnFromHold;
+            }
 
             lock (currentTetromino)
             {
