@@ -14,8 +14,13 @@ namespace cmdblockbuster.Game
         /// </summary>
         public static TimeSpan LockTimeout = TimeSpan.FromMilliseconds(500);
 
+        public static TimeSpan GetFallRate(int gameLevel)
+        {
+            return FallRatesCurve[gameLevel];
+        }
+
         // 1 Cell per frame
-        private static TimeSpan[] FallRatesCurve = new[]
+        private static readonly TimeSpan[] FallRatesCurve = new[]
         {
             TimeSpan.FromSeconds(1),
             TimeSpan.FromSeconds(1),

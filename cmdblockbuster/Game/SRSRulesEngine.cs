@@ -1,7 +1,6 @@
 ﻿using CMDblockbuster;
 using CMDblockbuster.Common;
 using CMDblockbuster.Field;
-using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
 using System;
@@ -23,16 +22,15 @@ namespace cmdblockbuster.Game
         private int CurrentTetrominoHeightLocation { get; set; }
         private int CurrentTetrominoWidthLocation { get; set; }
 
-        private GameState GameState = GameState.Stopped;
+        //private State GameState = State.Stopped;
 
         private readonly TetrominoQueue queue = new TetrominoQueue();
+        private readonly GameState gameState = new GameState();
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
-            // Set input handler
-            inputHandler.InputProvided += InputProvided;
+            inputHandler.InputProvided += InputProvided; // Set input handler
 
-            // Init flayfields
             playfieldToDisplay = new Playfield(10, 22);
             playfieldInnerState = new Playfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
         }
@@ -41,12 +39,12 @@ namespace cmdblockbuster.Game
 
         public Task Start()
         {
-            GameState = GameState.Running;
+            gameState.State = State.Running;
 
             return Task.Run(() =>
             {
 
-                while (GameState == GameState.Running)
+                while (gameState.State == State.Running)
                 {
                     Tick();
                     Task.Delay(TimeConstants.TickRate).Wait();
@@ -56,7 +54,7 @@ namespace cmdblockbuster.Game
 
         public void Tick()
         {
-            if (GameState == GameState.Running)
+            if (gameState.State == State.Running)
             {
                 PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
                 SpawnTetromino();
@@ -69,11 +67,11 @@ namespace cmdblockbuster.Game
         }
         private void GameOver()
         {
-            GameState = GameState.GameOver;
+            gameState.State = State.GameOver;
             throw new NotImplementedException("GAME OVER!");
         }
 
-        public void Pause() => GameState = GameState.Paused;
+        public void Pause() => gameState.State = State.Paused;
 
         #endregion
 
@@ -99,11 +97,11 @@ namespace cmdblockbuster.Game
                     RotateRight();
                     break;
 
-                case InputType.Up:
+                case InputType.HardDrop:
                     HardFall();
                     break;
 
-                case InputType.Down:
+                case InputType.SoftDrop:
                     SoftFall();
                     break;
 
@@ -361,9 +359,6 @@ namespace cmdblockbuster.Game
             return true;
         }
 
-        /// <summary>
-        /// TODO: make this method ignore empty cells and going out of bounds of playfield
-        /// </summary>
         /// <param name="rowCoordinate">Vertical top-down</param>
         /// <param name="rowItemCoordinate">Horizontal left-right</param>
         /// <returns></returns>

@@ -1,8 +1,6 @@
 ﻿using cmdblockbuster.Game;
-using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CMDblockbuster.Game
@@ -13,7 +11,7 @@ namespace CMDblockbuster.Game
         internal ITetrisRenderer tetrisRenderer;
         internal IInputHandler inputController;
 
-        internal GameState GameState { get; set; } = GameState.Stopped;
+        internal State GameState { get; set; } = State.Stopped;
 
         public Tetris(IInputHandler inputController, ITetrisRenderer tetrisRenderer)
         {
@@ -26,14 +24,14 @@ namespace CMDblockbuster.Game
             this.rulesEngine = new SRSRulesEngine(this.inputController);
             this.rulesEngine.PlayFieldUpdated += this.tetrisRenderer.RenderPlayfield;
 
-            this.GameState = GameState.Running;
+            this.GameState = State.Running;
             return rulesEngine.Start();
         }
 
-        private void GameOver() => this.GameState = GameState.GameOver;
+        private void GameOver() => this.GameState = State.GameOver;
 
-        public void Stop() => this.GameState = GameState.Stopped;
+        public void Stop() => this.GameState = State.Stopped;
 
-        public void Pause() => this.GameState = GameState.Paused;
+        public void Pause() => this.GameState = State.Paused;
     }
 }

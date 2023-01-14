@@ -5,8 +5,8 @@
         None,
         Left,
         Right,
-        Down,
-        Up,
+        SoftDrop,
+        HardDrop,
         RotateLeft,
         RotateRight,
         Pause

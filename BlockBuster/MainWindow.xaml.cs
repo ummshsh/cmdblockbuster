@@ -48,7 +48,7 @@ namespace BlockBuster
             }
             else if (e.Key == Key.S | e.Key == Key.Down)
             {
-                inputToReturn = CMDblockbuster.InputController.InputType.Down;
+                inputToReturn = CMDblockbuster.InputController.InputType.SoftDrop;
             }
             else if (e.Key == Key.A | e.Key == Key.Left)
             {

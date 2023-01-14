@@ -1,6 +1,10 @@
 ﻿# CmdBlockBuster  
 Tetris that supports most popular [Super Rotation System](https://tetris.fandom.com/wiki/SRS)  
 
+Features:  
+ - Hard drops
+ - SRS rotaion
+
  # Field
  It have 2 invisible top rows to spawn tetrominoes, it is enough if using SRS system
 
