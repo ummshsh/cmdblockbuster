@@ -1,7 +1,7 @@
-﻿using CMDblockbuster.Field;
+﻿using cmdblockbuster.Game;
+using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
-using CMDblockbuster.Rules;
 using System.Threading;
 using System.Threading.Tasks;
 

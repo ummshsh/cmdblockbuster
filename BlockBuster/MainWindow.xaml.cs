@@ -77,7 +77,7 @@ namespace BlockBuster
         public WpfRenderer(Grid playfieldGrid)
         {
             this.playfieldGrid = playfieldGrid;
-            lastUpdatedField = new CellType[22,10];
+            lastUpdatedField = new CellType[22, 10];
         }
 
         public void RenderPlayfield(object sender, Playfield e)
@@ -114,9 +114,10 @@ namespace BlockBuster
                     }
                 }
             });
+
         }
 
-        public bool SequenceEquals<T>(T[,] a, T[,] b)
+        private bool SequenceEquals<T>(T[,] a, T[,] b)
         {
             return a?.Rank == b?.Rank
             && Enumerable.Range(0, a.Rank).All(d => a.GetLength(d) == b.GetLength(d))

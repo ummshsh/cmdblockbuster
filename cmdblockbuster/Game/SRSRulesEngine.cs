@@ -1,4 +1,4 @@
-﻿using cmdblockbuster.Rules;
+﻿using CMDblockbuster;
 using CMDblockbuster.Common;
 using CMDblockbuster.Field;
 using CMDblockbuster.Game;
@@ -7,7 +7,7 @@ using CMDblockbuster.Tetrominoes;
 using System;
 using System.Threading.Tasks;
 
-namespace CMDblockbuster.Rules
+namespace cmdblockbuster.Game
 {
     /// <summary>
     /// Super Rotation System Engine
@@ -17,43 +17,15 @@ namespace CMDblockbuster.Rules
         public Playfield playfieldInnerState; // All static elements without current tetromino
         public Playfield playfieldToDisplay;  // All static elements with current tetromino
 
-        // Event fires each time clean playfield is updated
-        public event EventHandler<Playfield> PlayFieldUpdated;
+        public event EventHandler<Playfield> PlayFieldUpdated; // Event fires each time clean playfield is updated
 
-        // Current tetromino and it's location
         private Tetromino currentTetromino;
-        // TODO: add ghost tetromino
+        private int CurrentTetrominoHeightLocation { get; set; }
+        private int CurrentTetrominoWidthLocation { get; set; }
 
-        private int currentTetrominoHeightLocation { get; set; }
-        private int currentTetrominoWidthLocation { get; set; }
+        private GameState GameState = GameState.Stopped;
 
-        // Time
-        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(16.7);
-
-        // 1 Cell per frame
-        private TimeSpan[] FallRatesCurve = new[]
-        {
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-            TimeSpan.FromSeconds(1),
-        };
-
-        private GameState GameState;
-
-        private TetrominoQueue queue;
+        private readonly TetrominoQueue queue = new TetrominoQueue();
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -61,15 +33,15 @@ namespace CMDblockbuster.Rules
             inputHandler.InputProvided += InputProvided;
 
             // Init flayfields
-            this.playfieldToDisplay = new Playfield(10, 22);
-            this.playfieldInnerState = new Playfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
-
-            queue = new TetrominoQueue();
+            playfieldToDisplay = new Playfield(10, 22);
+            playfieldInnerState = new Playfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
         }
+
+        #region StateManagement
 
         public Task Start()
         {
-            this.GameState = GameState.Running;
+            GameState = GameState.Running;
 
             return Task.Run(() =>
             {
@@ -77,7 +49,7 @@ namespace CMDblockbuster.Rules
                 while (GameState == GameState.Running)
                 {
                     Tick();
-                    Task.Delay(TickRate).Wait();
+                    Task.Delay(TimeConstants.TickRate).Wait();
                 }
             });
         }
@@ -86,7 +58,7 @@ namespace CMDblockbuster.Rules
         {
             if (GameState == GameState.Running)
             {
-                PlayFieldUpdated?.Invoke(this, this.playfieldToDisplay);
+                PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
                 SpawnTetromino();
                 //CheckIfGameIsOver();
                 UpdateFieldToDisplay();
@@ -95,8 +67,17 @@ namespace CMDblockbuster.Rules
                 //mark current tetromino as landed
             }
         }
+        private void GameOver()
+        {
+            GameState = GameState.GameOver;
+            throw new NotImplementedException("GAME OVER!");
+        }
 
-        public void Pause() => this.GameState = GameState.Paused;
+        public void Pause() => GameState = GameState.Paused;
+
+        #endregion
+
+        #region HandleMovement
 
         private void InputProvided(object sender, InputType inputType)
         {
@@ -145,7 +126,7 @@ namespace CMDblockbuster.Rules
                 return false;
             }
             currentTetromino.RotateLeft();
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation, CurrentTetrominoWidthLocation))
             {
                 return true;
             }
@@ -161,7 +142,7 @@ namespace CMDblockbuster.Rules
                 return false;
             }
             currentTetromino.RotateRight();
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, currentTetrominoWidthLocation))
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation, CurrentTetrominoWidthLocation))
             {
                 return true;
             }
@@ -176,10 +157,10 @@ namespace CMDblockbuster.Rules
             {
                 return false;
             }
-            var newLocation = currentTetrominoWidthLocation - 1;
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
+            var newLocation = CurrentTetrominoWidthLocation - 1;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation, newLocation))
             {
-                currentTetrominoWidthLocation = newLocation;
+                CurrentTetrominoWidthLocation = newLocation;
                 return true;
             }
             return false;
@@ -191,15 +172,14 @@ namespace CMDblockbuster.Rules
             {
                 return false;
             }
-            var newLocation = currentTetrominoWidthLocation + 1;
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation, newLocation))
+            var newLocation = CurrentTetrominoWidthLocation + 1;
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation, newLocation))
             {
-                currentTetrominoWidthLocation = newLocation;
+                CurrentTetrominoWidthLocation = newLocation;
                 return true;
             }
             return false;
         }
-
 
         private bool MoveDown()
         {
@@ -214,39 +194,10 @@ namespace CMDblockbuster.Rules
                 return false;
             }
 
-            var newLocation = currentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
-            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, newLocation, currentTetrominoWidthLocation))
+            var newLocation = CurrentTetrominoHeightLocation + 1; // Plus one because coordinates starts from top left
+            if (CheckIfCanBePlacedOnCoordinate(currentTetromino, newLocation, CurrentTetrominoWidthLocation))
             {
-                currentTetrominoHeightLocation = newLocation;
-                return true;
-            }
-
-            return false;
-        }
-
-        private void AddCurrentTetrominoToInnerState()
-        {
-            currentTetromino.IsLanded = true;
-
-            for (int row = currentTetrominoHeightLocation; row < currentTetrominoHeightLocation + currentTetromino.RowsLenght; row++)
-            {
-                for (int rowItemIndex = currentTetrominoWidthLocation; rowItemIndex < currentTetrominoWidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
-                {
-                    var cellToPaste = currentTetromino.Cells[row - currentTetrominoHeightLocation, rowItemIndex - currentTetrominoWidthLocation];
-                    if (cellToPaste != CellType.Empty)
-                    {
-                        playfieldInnerState.field[row, rowItemIndex] = cellToPaste;
-                    }
-                }
-            }
-        }
-
-        private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
-        {
-            // Check to check if touched foundation or check if touched another tetromino underneath
-            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.Cells.GetRowsLenght() - currentTetromino.EmptyRowsOnBottomSideCount ||
-                !CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation + 1, currentTetrominoWidthLocation))
-            {
+                CurrentTetrominoHeightLocation = newLocation;
                 return true;
             }
 
@@ -273,6 +224,39 @@ namespace CMDblockbuster.Rules
         private bool Stick()
         {
             return false; //TODO: retrun true if timer for current tetromino is up or it is marked as landed
+        }
+
+        #endregion
+
+        #region Playfied Management And Helpers
+
+        private void AddCurrentTetrominoToInnerState()
+        {
+            currentTetromino.IsLanded = true;
+
+            for (int row = CurrentTetrominoHeightLocation; row < CurrentTetrominoHeightLocation + currentTetromino.RowsLenght; row++)
+            {
+                for (int rowItemIndex = CurrentTetrominoWidthLocation; rowItemIndex < CurrentTetrominoWidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
+                {
+                    var cellToPaste = currentTetromino.Cells[row - CurrentTetrominoHeightLocation, rowItemIndex - CurrentTetrominoWidthLocation];
+                    if (cellToPaste != CellType.Empty)
+                    {
+                        playfieldInnerState.field[row, rowItemIndex] = cellToPaste;
+                    }
+                }
+            }
+        }
+
+        private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
+        {
+            // Check to check if touched foundation or check if touched another tetromino underneath
+            if (playfieldInnerState.Height <= CurrentTetrominoHeightLocation + currentTetromino.Cells.GetRowsLenght() - currentTetromino.EmptyRowsOnBottomSideCount ||
+                !CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation + 1, CurrentTetrominoWidthLocation))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void DestroyRows()
@@ -343,11 +327,11 @@ namespace CMDblockbuster.Rules
                     var cellToPaste = currentTetromino.Cells[row, rowItem];
                     if (cellToPaste != CellType.Empty)
                     {
-                        if (rowItem + currentTetrominoWidthLocation < 0 || rowItem + currentTetrominoWidthLocation > playfieldInnerState.Width)
+                        if (rowItem + CurrentTetrominoWidthLocation < 0 || rowItem + CurrentTetrominoWidthLocation > playfieldInnerState.Width)
                         {
                             continue;
                         }
-                        playfieldToDisplay.field[row + currentTetrominoHeightLocation, rowItem + currentTetrominoWidthLocation] = cellToPaste;
+                        playfieldToDisplay.field[row + CurrentTetrominoHeightLocation, rowItem + CurrentTetrominoWidthLocation] = cellToPaste;
                     }
                 }
             }
@@ -370,17 +354,11 @@ namespace CMDblockbuster.Rules
             }
             else
             {
-                currentTetrominoHeightLocation = currentTetromino.SpawnLocation.Item1;
-                currentTetrominoWidthLocation = currentTetromino.SpawnLocation.Item2;
+                CurrentTetrominoHeightLocation = currentTetromino.SpawnLocation.Item1;
+                CurrentTetrominoWidthLocation = currentTetromino.SpawnLocation.Item2;
             }
 
             return true;
-        }
-
-        private void GameOver()
-        {
-            GameState = GameState.GameOver;
-            throw new NotImplementedException("GAME OVER!");
         }
 
         /// <summary>
@@ -483,5 +461,7 @@ namespace CMDblockbuster.Rules
                 return true;
             }
         }
+
+        #endregion
     }
 }

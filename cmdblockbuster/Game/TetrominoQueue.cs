@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace cmdblockbuster.Rules
+namespace cmdblockbuster.Game
 {
     internal class TetrominoQueue
     {
