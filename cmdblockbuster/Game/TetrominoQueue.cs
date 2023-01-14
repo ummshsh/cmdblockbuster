@@ -7,7 +7,6 @@ namespace cmdblockbuster.Game
 {
     internal class TetrominoQueue
     {
-
         public Type NextTetromino => stack.Peek();
 
         private Type _hold = null;
@@ -20,9 +19,12 @@ namespace cmdblockbuster.Game
             }
             set
             {
+                CanUseHold = false;
                 _hold = value;
             }
         }
+
+        public bool CanUseHold { get; set; } = true;
 
         public readonly Stack<Type> stack;
 
@@ -67,7 +69,8 @@ namespace cmdblockbuster.Game
 
         public Tetromino GetTetrominoFromQueue()
         {
-            var tetromino = Activator.CreateInstance(stack.Pop()) as Tetromino;
+            CanUseHold = true;
+            var tetromino = Activator.CreateInstance(typeof(TetrominoI)) as Tetromino;
             RegenerateQueue();
             return tetromino;
         }

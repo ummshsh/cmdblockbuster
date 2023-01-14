@@ -59,11 +59,9 @@ namespace cmdblockbuster.Game
                 }
 
                 SpawnTetromino();
-                //CheckIfGameIsOver();
-                UpdateFieldToDisplay();
+                UpdateFieldToDisplay(currentTetromino, CurrentTetrominoHeightLocation, CurrentTetrominoWidthLocation);
                 Gravity();
                 DestroyRows();
-                //mark current tetromino as landed
             }
         }
 
@@ -105,6 +103,14 @@ namespace cmdblockbuster.Game
 
                 case InputType.SoftDrop:
                     SoftFall();
+                    break;
+
+                case InputType.Hold:
+                    if (queue.CanUseHold)
+                    {
+                        queue.HoldTetromino = currentTetromino.GetType();
+
+                    }
                     break;
 
                 case InputType.Pause:
@@ -181,16 +187,15 @@ namespace cmdblockbuster.Game
             return false;
         }
 
-        private bool MoveDown()
+        private bool MoveDown(bool hardDrop = false)
         {
             if (currentTetromino.IsLanded)
             {
                 return false;
             }
 
-            if (
-                IfTouchedFoundationOrAnotherTetrominoUnderneath() &&
-               gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now)
+            if (IfTouchedFoundationOrAnotherTetrominoUnderneath() &&
+                (hardDrop ? true : gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now))
             {
                 AddCurrentTetrominoToInnerState();
                 return false;
@@ -206,16 +211,14 @@ namespace cmdblockbuster.Game
             return false;
         }
 
-        private void SoftFall()
-        {
-            // TODO: Move tetromino down, and if it is already in contact with any block bellow, then release control of tetromino
-            MoveDown();
-        }
+        private void SoftFall() => MoveDown();
 
         private void HardFall()
         {
-            // TODO: make tetromino fall immideately and mark it is as landed and release control of current tetromino
-            throw new NotImplementedException();
+            while (MoveDown(true))
+            {
+                // Empty
+            }
         }
 
         private void Gravity()
@@ -309,7 +312,7 @@ namespace cmdblockbuster.Game
             return true;
         }
 
-        private void UpdateFieldToDisplay()
+        private void UpdateFieldToDisplay(Tetromino tetromino, int currentTetrominoHeight, int currentTetrominoWidth)
         {
             // Add all static elements to playfield to display
             for (int row = 0; row < playfieldToDisplay.Height; row++)
@@ -321,42 +324,45 @@ namespace cmdblockbuster.Game
             }
 
             // Add current tetromino to playfield to display
-            for (int row = 0; row < currentTetromino.RowsLenght; row++)
+            for (int row = 0; row < tetromino.RowsLenght; row++)
             {
-                for (int rowItem = 0; rowItem < currentTetromino.ColumnsLenght; rowItem++)
+                for (int rowItem = 0; rowItem < tetromino.ColumnsLenght; rowItem++)
                 {
-                    var cellToPaste = currentTetromino.Cells[row, rowItem];
+                    var cellToPaste = tetromino.Cells[row, rowItem];
                     if (cellToPaste != TetrominoCellType.Empty)
                     {
-                        if (rowItem + CurrentTetrominoWidthLocation < 0 || rowItem + CurrentTetrominoWidthLocation > playfieldInnerState.Width)
+                        if (rowItem + currentTetrominoWidth < 0 || rowItem + currentTetrominoWidth > playfieldInnerState.Width)
                         {
                             continue;
                         }
-                        playfieldToDisplay.field[row + CurrentTetrominoHeightLocation, rowItem + CurrentTetrominoWidthLocation] = cellToPaste;
+                        playfieldToDisplay.field[row + currentTetrominoHeight, rowItem + currentTetrominoWidth] = cellToPaste;
                     }
                 }
             }
         }
 
-        public bool SpawnTetromino()
+        public bool SpawnTetromino(bool afterHold = false)
         {
             // Return  if tetromino exists already
-            if (currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
+            if (afterHold & currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
             {
                 return false;
             }
 
             currentTetromino = queue.GetTetrominoFromQueue();
 
-            // Check if can be spawned
-            if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
+            lock (currentTetromino)
             {
-                GameOver();
-            }
-            else
-            {
-                CurrentTetrominoHeightLocation = currentTetromino.SpawnLocation.Item1;
-                CurrentTetrominoWidthLocation = currentTetromino.SpawnLocation.Item2;
+                // Check if can be spawned
+                if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
+                {
+                    GameOver();
+                }
+                else
+                {
+                    CurrentTetrominoHeightLocation = currentTetromino.SpawnLocation.Item1;
+                    CurrentTetrominoWidthLocation = currentTetromino.SpawnLocation.Item2;
+                }
             }
 
             return true;

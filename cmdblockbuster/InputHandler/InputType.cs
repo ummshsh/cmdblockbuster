@@ -9,6 +9,7 @@
         HardDrop,
         RotateLeft,
         RotateRight,
+        Hold,
         Pause
     }
 }
