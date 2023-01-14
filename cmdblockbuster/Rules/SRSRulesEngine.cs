@@ -1,4 +1,5 @@
-﻿using CMDblockbuster.Common;
+﻿using cmdblockbuster.Rules;
+using CMDblockbuster.Common;
 using CMDblockbuster.Field;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
@@ -15,7 +16,6 @@ namespace CMDblockbuster.Rules
     {
         public Playfield playfieldInnerState; // All static elements without current tetromino
         public Playfield playfieldToDisplay;  // All static elements with current tetromino
-        public readonly int ArrayLength; // Number used to specify array lengh while copying arrays
 
         // Event fires each time clean playfield is updated
         public event EventHandler<Playfield> PlayFieldUpdated;
@@ -23,25 +23,37 @@ namespace CMDblockbuster.Rules
         // Current tetromino and it's location
         private Tetromino currentTetromino;
         // TODO: add ghost tetromino
+
         private int currentTetrominoHeightLocation { get; set; }
         private int currentTetrominoWidthLocation { get; set; }
 
         // Time
-        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(10);
-        public TimeSpan FallRate { get; } = TimeSpan.FromSeconds(1);
+        public TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(16.7);
 
-        // Tetromino types
-        public Type[] tetrominoes = new[] {
-                typeof(TetrominoI),
-                typeof(TetrominoJ),
-                typeof(TetrominoL),
-                typeof(TetrominoO),
-                typeof(TetrominoS),
-                typeof(TetrominoT),
-                typeof(TetrominoZ)};
+        // 1 Cell per frame
+        private TimeSpan[] FallRatesCurve = new[]
+        {
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(1),
+        };
 
         private GameState GameState;
-        private int BlankRowsCountOnLeftSide = 0;
+
+        private TetrominoQueue queue;
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -50,9 +62,9 @@ namespace CMDblockbuster.Rules
 
             // Init flayfields
             this.playfieldToDisplay = new Playfield(10, 22);
-            this.playfieldInnerState = new Playfield(playfieldToDisplay.Width + BlankRowsCountOnLeftSide, playfieldToDisplay.Height);
+            this.playfieldInnerState = new Playfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
 
-            ArrayLength = playfieldInnerState.Width * playfieldInnerState.Height;
+            queue = new TetrominoQueue();
         }
 
         public Task Start()
@@ -223,7 +235,7 @@ namespace CMDblockbuster.Rules
                     var cellToPaste = currentTetromino.Cells[row - currentTetrominoHeightLocation, rowItemIndex - currentTetrominoWidthLocation];
                     if (cellToPaste != CellType.Empty)
                     {
-                        playfieldInnerState.field[row, rowItemIndex + BlankRowsCountOnLeftSide] = cellToPaste;
+                        playfieldInnerState.field[row, rowItemIndex] = cellToPaste;
                     }
                 }
             }
@@ -231,8 +243,8 @@ namespace CMDblockbuster.Rules
 
         private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
         {
-            // Check to check if touched foundation or to check if touched another tetromino underneath
-            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.CellsWithoutEmptyRowsAndColumns.GetRowsLenght() ||
+            // Check to check if touched foundation or check if touched another tetromino underneath
+            if (playfieldInnerState.Height <= currentTetrominoHeightLocation + currentTetromino.Cells.GetRowsLenght() - currentTetromino.EmptyRowsOnBottomSideCount ||
                 !CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetrominoHeightLocation + 1, currentTetrominoWidthLocation))
             {
                 return true;
@@ -279,7 +291,7 @@ namespace CMDblockbuster.Rules
         {
             for (int row = rowToMoveTo - 1; row > 0; row--)
             {
-                for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+                for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
                 {
                     if (row == 0)
                     {
@@ -294,7 +306,7 @@ namespace CMDblockbuster.Rules
 
         private void DestroyRow(int row)
         {
-            for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+            for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
             {
                 playfieldInnerState[row, rowItem] = CellType.Empty;
             }
@@ -302,7 +314,7 @@ namespace CMDblockbuster.Rules
 
         private bool CheckRowFilled(int row)
         {
-            for (int rowItem = BlankRowsCountOnLeftSide; rowItem < playfieldInnerState.Width; rowItem++)
+            for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
             {
                 if (playfieldInnerState[row, rowItem] == CellType.Empty)
                 {
@@ -319,7 +331,7 @@ namespace CMDblockbuster.Rules
             {
                 for (int rowItemIndex = 0; rowItemIndex < playfieldToDisplay.Width; rowItemIndex++)
                 {
-                    playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + BlankRowsCountOnLeftSide];
+                    playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + 0];
                 }
             }
 
@@ -331,6 +343,10 @@ namespace CMDblockbuster.Rules
                     var cellToPaste = currentTetromino.Cells[row, rowItem];
                     if (cellToPaste != CellType.Empty)
                     {
+                        if (rowItem + currentTetrominoWidthLocation < 0 || rowItem + currentTetrominoWidthLocation > playfieldInnerState.Width)
+                        {
+                            continue;
+                        }
                         playfieldToDisplay.field[row + currentTetrominoHeightLocation, rowItem + currentTetrominoWidthLocation] = cellToPaste;
                     }
                 }
@@ -339,17 +355,15 @@ namespace CMDblockbuster.Rules
 
         public bool SpawnTetromino()
         {
-            // Exit if tetromino exists already
+            // Return  if tetromino exists already
             if (currentTetromino != null && !(currentTetromino?.IsLanded ?? false))
             {
                 return false;
             }
 
-            // Create tetromnino
-            var randomInt = new Random().Next(0, tetrominoes.Length - 1); // TODO: make SevenPackQueue class fot this
-            currentTetromino = Activator.CreateInstance(tetrominoes[0]) as Tetromino;
+            currentTetromino = queue.GetTetrominoFromQueue();
 
-            // If tetromino can be spawned, then 
+            // Check if can be spawned
             if (!CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.SpawnLocation.Item1, currentTetromino.SpawnLocation.Item2))
             {
                 GameOver();
@@ -359,6 +373,7 @@ namespace CMDblockbuster.Rules
                 currentTetrominoHeightLocation = currentTetromino.SpawnLocation.Item1;
                 currentTetrominoWidthLocation = currentTetromino.SpawnLocation.Item2;
             }
+
             return true;
         }
 
@@ -378,19 +393,23 @@ namespace CMDblockbuster.Rules
         {
             //// Check that coordinate is not outside playfield boundaries
             if (rowCoordinate < 0 ||
-                rowCoordinate > playfieldInnerState.Height)
+                rowCoordinate > playfieldInnerState.Height ||
+                rowItemCoordinate + tetromino.EmptyColumnsOnLeftSideCount < 0 ||
+                rowItemCoordinate + tetromino.ColumnsLenght - tetromino.EmptyColumnsOnRightSideCount > playfieldInnerState.Width)
             {
                 return false;
             }
 
             // Check that tetromino fits on playfield on coordinate
-            for (int rowIndex = rowCoordinate; rowIndex < rowCoordinate + tetromino.RowsLenght; rowIndex++)
+            for (int rowIndex = rowCoordinate; rowIndex < rowCoordinate + tetromino.RowsLenght - tetromino.EmptyRowsOnBottomSideCount; rowIndex++)
             {
                 for (int rowItemIndex = rowItemCoordinate; rowItemIndex < rowItemCoordinate + tetromino.ColumnsLenght; rowItemIndex++)
                 {
-                    if (rowItemIndex >= 0 && rowItemIndex < playfieldInnerState.Width && rowCoordinate + tetromino.RowsLenght < playfieldInnerState.Height)
+                    if (rowItemIndex >= 0 && rowItemIndex < playfieldInnerState.Width && rowCoordinate + tetromino.RowsLenght - 1 - tetromino.EmptyRowsOnBottomSideCount < playfieldInnerState.Height)
                     {
-                        if (CheckIfCellsIntercect(currentTetromino.Cells[rowIndex - rowCoordinate, rowItemIndex - rowItemCoordinate], playfieldInnerState.field[rowIndex, rowItemIndex + BlankRowsCountOnLeftSide]))
+                        if (CheckIfCellsIntercect(
+                            currentTetromino.Cells[rowIndex - rowCoordinate, rowItemIndex - rowItemCoordinate],
+                            playfieldInnerState.field[rowIndex, rowItemIndex + 0]))
                         {
                             return false;
                         }
@@ -401,7 +420,7 @@ namespace CMDblockbuster.Rules
                         if (rowItemIndex < 0)
                         {
                             // left
-                            if (currentTetromino.EmptyColumnsOnLeftSideCount < rowIndex)
+                            if (0 - currentTetromino.EmptyColumnsOnLeftSideCount < rowItemIndex)
                             {
                                 return true;
                             }
@@ -414,10 +433,10 @@ namespace CMDblockbuster.Rules
                                 return true;
                             }
                         }
-                        else if (rowIndex + tetromino.RowsLenght -1 + tetromino.EmptyRowsOnBottomSideCount > playfieldInnerState.Height)
+                        else if (rowIndex + tetromino.RowsLenght - 1 - tetromino.EmptyRowsOnBottomSideCount <= playfieldInnerState.Height)
                         {
                             // bottom
-                            if (rowIndex + tetromino.RowsLenght - currentTetromino.EmptyRowsOnBottomSideCount < playfieldInnerState.Height)
+                            if (rowIndex + tetromino.RowsLenght - 1 - currentTetromino.EmptyRowsOnBottomSideCount < playfieldInnerState.Height)
                             {
                                 return true;
                             }

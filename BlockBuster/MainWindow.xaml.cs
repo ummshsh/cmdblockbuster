@@ -1,9 +1,11 @@
-﻿using CMDblockbuster.Field;
+﻿using CMDblockbuster;
+using CMDblockbuster.Field;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
 using CMDblockbuster.Tetrominoes;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -69,13 +71,22 @@ namespace BlockBuster
     {
         private Grid playfieldGrid;
 
+        private CellType[,] lastUpdatedField;
+        private bool DisplayFirstTime = true;
+
         public WpfRenderer(Grid playfieldGrid)
         {
             this.playfieldGrid = playfieldGrid;
+            lastUpdatedField = new CellType[22,10];
         }
 
         public void RenderPlayfield(object sender, Playfield e)
         {
+            if (SequenceEquals(lastUpdatedField, e.field) && !DisplayFirstTime)
+            {
+                return; // Exit if playfield updated already
+            }
+
             Application.Current.Dispatcher.BeginInvoke(() =>
             {
                 this.playfieldGrid.Children.Clear();
@@ -87,15 +98,29 @@ namespace BlockBuster
                 {
                     for (int rowItemIndex = 0; rowItemIndex < width; rowItemIndex++)
                     {
-                        TextBlock cell = new TextBlock();
-                        cell.Text = $"{row}:{rowItemIndex}";
-                        cell.Background = new SolidColorBrush(e.field[row, rowItemIndex] > 0 ? Colors.Green : Colors.White);
-                        Grid.SetRow(cell, row);
-                        Grid.SetColumn(cell, rowItemIndex);
-                        this.playfieldGrid.Children.Add(cell);
+                        if (lastUpdatedField[row, rowItemIndex].Equals(e[row, rowItemIndex]) && !DisplayFirstTime)
+                        {
+                            continue; // Do not update what is already up to date
+                        }
+                        else
+                        {
+                            TextBlock cell = new TextBlock();
+                            ////cell.Text = $"{row}:{rowItemIndex}"; // index
+                            cell.Background = new SolidColorBrush(e.field[row, rowItemIndex] > 0 ? Colors.Green : Colors.White);
+                            Grid.SetRow(cell, row);
+                            Grid.SetColumn(cell, rowItemIndex);
+                            this.playfieldGrid.Children.Add(cell);
+                        }
                     }
                 }
             });
+        }
+
+        public bool SequenceEquals<T>(T[,] a, T[,] b)
+        {
+            return a?.Rank == b?.Rank
+            && Enumerable.Range(0, a.Rank).All(d => a.GetLength(d) == b.GetLength(d))
+            && a.Cast<T>().SequenceEqual(b.Cast<T>());
         }
     }
 

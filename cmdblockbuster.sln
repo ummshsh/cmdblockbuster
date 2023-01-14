@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cmdblockbuster", "cmdblockbuster\cmdblockbuster.csproj", "{2AA6C3BC-BFFD-4E44-9CB9-88C478F0598E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockBuster", "BlockBuster\BlockBuster.csproj", "{4FADDB5C-1DDC-4CC8-9943-05C5D9966646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlockBuster", "BlockBuster\BlockBuster.csproj", "{4FADDB5C-1DDC-4CC8-9943-05C5D9966646}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

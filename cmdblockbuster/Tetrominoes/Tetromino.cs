@@ -90,7 +90,7 @@ namespace CMDblockbuster.Tetrominoes
                             return columnCount;
                         }
                     }
-                    if (emptyCellsInColumn == Cells.GetColumnsLenght())
+                    if (emptyCellsInColumn == Cells.GetRowsLenght())
                     {
                         columnCount++;
                     }
@@ -118,7 +118,7 @@ namespace CMDblockbuster.Tetrominoes
                             return columnCount;
                         }
                     }
-                    if (emptyCellsInColumn == Cells.GetColumnsLenght())
+                    if (emptyCellsInColumn == Cells.GetRowsLenght())
                     {
                         columnCount++;
                     }
