@@ -1,13 +1,15 @@
-﻿namespace CMDblockbuster.Tetrominoes
+﻿using cmdblockbuster.Tetrominoes;
+
+namespace CMDblockbuster.Tetrominoes
 {
     class TetrominoS : Tetromino
     {
         public TetrominoS()
         {
-            var empty = CellType.Empty;
-            var filled = CellType.Green;
+            var empty = TetrominoCellType.Empty;
+            var filled = TetrominoCellType.Green;
 
-            Cells = new CellType[,] {
+            Cells = new TetrominoCellType[,] {
                 {empty,filled,filled},
                 {filled,filled,empty},
                 {empty,empty,empty}

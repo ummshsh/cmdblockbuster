@@ -1,4 +1,4 @@
-﻿using CMDblockbuster;
+﻿using cmdblockbuster.Tetrominoes;
 using CMDblockbuster.Field;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
@@ -71,13 +71,13 @@ namespace BlockBuster
     {
         private Grid playfieldGrid;
 
-        private CellType[,] lastUpdatedField;
+        private TetrominoCellType[,] lastUpdatedField;
         private bool DisplayFirstTime = true;
 
         public WpfRenderer(Grid playfieldGrid)
         {
             this.playfieldGrid = playfieldGrid;
-            lastUpdatedField = new CellType[22, 10];
+            lastUpdatedField = new TetrominoCellType[22, 10];
         }
 
         public void RenderPlayfield(object sender, Playfield e)

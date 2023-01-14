@@ -1,4 +1,6 @@
-﻿namespace CMDblockbuster.Field
+﻿using cmdblockbuster.Tetrominoes;
+
+namespace CMDblockbuster.Field
 {
     public class Playfield : IPlayefield
     {
@@ -6,9 +8,9 @@
 
         public int Height { get; private set; }
 
-        public readonly CellType[,] field;
+        public readonly TetrominoCellType[,] field;
 
-        public CellType this[int row, int rowItem]
+        public TetrominoCellType this[int row, int rowItem]
         {
             get
             {
@@ -36,9 +38,9 @@
             this.field = ConsructField();
         }
 
-        private CellType[,] ConsructField()
+        private TetrominoCellType[,] ConsructField()
         {
-            var field = new CellType[Height, Width];
+            var field = new TetrominoCellType[Height, Width];
 
             var xDimLenght = field.GetLength(0);
             var yDimLenght = field.GetLength(1);
@@ -47,7 +49,7 @@
             {
                 for (int rowItemIndex = 0; rowItemIndex < yDimLenght; rowItemIndex++)
                 {
-                    field[row, rowItemIndex] = CellType.Empty;
+                    field[row, rowItemIndex] = TetrominoCellType.Empty;
                 }
             }
 

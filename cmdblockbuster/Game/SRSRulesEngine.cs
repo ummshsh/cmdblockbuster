@@ -1,5 +1,4 @@
-﻿using CMDblockbuster;
-using CMDblockbuster.Common;
+﻿using cmdblockbuster.Tetrominoes;
 using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
@@ -21,8 +20,6 @@ namespace cmdblockbuster.Game
         private Tetromino currentTetromino;
         private int CurrentTetrominoHeightLocation { get; set; }
         private int CurrentTetrominoWidthLocation { get; set; }
-
-        //private State GameState = State.Stopped;
 
         private readonly TetrominoQueue queue = new TetrominoQueue();
         private readonly GameState gameState = new GameState();
@@ -237,7 +234,7 @@ namespace cmdblockbuster.Game
                 for (int rowItemIndex = CurrentTetrominoWidthLocation; rowItemIndex < CurrentTetrominoWidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
                 {
                     var cellToPaste = currentTetromino.Cells[row - CurrentTetrominoHeightLocation, rowItemIndex - CurrentTetrominoWidthLocation];
-                    if (cellToPaste != CellType.Empty)
+                    if (cellToPaste != TetrominoCellType.Empty)
                     {
                         playfieldInnerState.field[row, rowItemIndex] = cellToPaste;
                     }
@@ -248,7 +245,7 @@ namespace cmdblockbuster.Game
         private bool IfTouchedFoundationOrAnotherTetrominoUnderneath()
         {
             // Check to check if touched foundation or check if touched another tetromino underneath
-            if (playfieldInnerState.Height <= CurrentTetrominoHeightLocation + currentTetromino.Cells.GetRowsLenght() - currentTetromino.EmptyRowsOnBottomSideCount ||
+            if (playfieldInnerState.Height <= CurrentTetrominoHeightLocation + currentTetromino.RowsLenght - currentTetromino.EmptyRowsOnBottomSideCount ||
                 !CheckIfCanBePlacedOnCoordinate(currentTetromino, CurrentTetrominoHeightLocation + 1, CurrentTetrominoWidthLocation))
             {
                 return true;
@@ -290,7 +287,7 @@ namespace cmdblockbuster.Game
         {
             for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
             {
-                playfieldInnerState[row, rowItem] = CellType.Empty;
+                playfieldInnerState[row, rowItem] = TetrominoCellType.Empty;
             }
         }
 
@@ -298,7 +295,7 @@ namespace cmdblockbuster.Game
         {
             for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
             {
-                if (playfieldInnerState[row, rowItem] == CellType.Empty)
+                if (playfieldInnerState[row, rowItem] == TetrominoCellType.Empty)
                 {
                     return false;
                 }
@@ -323,7 +320,7 @@ namespace cmdblockbuster.Game
                 for (int rowItem = 0; rowItem < currentTetromino.ColumnsLenght; rowItem++)
                 {
                     var cellToPaste = currentTetromino.Cells[row, rowItem];
-                    if (cellToPaste != CellType.Empty)
+                    if (cellToPaste != TetrominoCellType.Empty)
                     {
                         if (rowItem + CurrentTetrominoWidthLocation < 0 || rowItem + CurrentTetrominoWidthLocation > playfieldInnerState.Width)
                         {
@@ -438,7 +435,7 @@ namespace cmdblockbuster.Game
         /// if current cell is empty and tetrominoe's cell is empty or not empty <para/>
         /// if current cell in not empty and tetrominoe's cell is empty <para/>
         /// </summary>
-        private bool CheckIfCellsIntercect(CellType fieldCell, CellType tetrominoeCell)
+        private bool CheckIfCellsIntercect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell)
         {
             // if fieldCell empty and tetrominoe cell empty
             // if fieldCell empty and tetrominoe cell not

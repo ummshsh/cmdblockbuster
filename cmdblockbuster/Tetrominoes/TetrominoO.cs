@@ -1,4 +1,6 @@
-﻿namespace CMDblockbuster.Tetrominoes
+﻿using cmdblockbuster.Tetrominoes;
+
+namespace CMDblockbuster.Tetrominoes
 {
     class TetrominoO : Tetromino
     {
@@ -6,10 +8,10 @@
         {
             SpawnLocation = new System.Tuple<int, int>(0, 3);
 
-            var empty = CellType.Empty;
-            var filled = CellType.Yellow;
+            var empty = TetrominoCellType.Empty;
+            var filled = TetrominoCellType.Yellow;
 
-            Cells = new CellType[,] {
+            Cells = new TetrominoCellType[,] {
                 {empty,filled,filled,empty},
                 {empty,filled,filled,empty},
                 {empty,empty,empty,empty}

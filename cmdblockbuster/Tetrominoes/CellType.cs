@@ -1,6 +1,6 @@
-﻿namespace CMDblockbuster
+﻿namespace cmdblockbuster.Tetrominoes
 {
-    public enum CellType
+    public enum TetrominoCellType
     {
         Empty = 0,
         Red = 1,

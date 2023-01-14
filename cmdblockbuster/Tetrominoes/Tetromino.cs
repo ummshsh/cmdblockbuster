@@ -1,74 +1,15 @@
-﻿using CMDblockbuster.Common;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using cmdblockbuster.Tetrominoes;
 
 namespace CMDblockbuster.Tetrominoes
 {
     public abstract class Tetromino
     {
-        public CellType[,] Cells { get; set; }
+        public TetrominoCellType[,] Cells { get; set; }
 
-        public CellType[,] CellsWithoutEmptyRowsAndColumns
-        {
-            get
-            {
-                // Getting rows to exclude from new array
-                var rowsToDelete = new List<int>();
-                for (int row = 0; row < RowsLenght; row++)
-                {
-                    if (Cells.GetRow(row).Count(rowItem => rowItem.Equals(CellType.Empty)) == ColumnsLenght)
-                    {
-                        rowsToDelete.Add(row);
-                    }
-                }
-
-                // Getting columns to exclude from new array
-                var columnsToDelete = new List<int>();
-                for (int column = 0; column < ColumnsLenght; column++)
-                {
-                    if (Cells.GetColumn(column).Count(columnItem => columnItem.Equals(CellType.Empty)) == RowsLenght)
-                    {
-                        columnsToDelete.Add(column);
-                    }
-                }
-
-                // Construction of the new array
-                var arrayToReturn = new CellType[
-                    RowsLenght - rowsToDelete.Count,
-                    ColumnsLenght - columnsToDelete.Count];
-
-                var newColumnsIndex = 0;
-                for (int column = 0; column < ColumnsLenght; column++)
-                {
-                    if (columnsToDelete.Contains(column))
-                    {
-                        continue;
-                    }
-                    for (int row = 0, newRowsIndex = 0; row < RowsLenght; row++)
-                    {
-                        if (rowsToDelete.Contains(row))
-                        {
-                            continue;
-                        }
-                        arrayToReturn[newRowsIndex, newColumnsIndex] = Cells[row, column];
-                        newRowsIndex++;
-                    }
-                    newColumnsIndex++;
-                }
-
-                return arrayToReturn;
-            }
-        }
-
-        /// <summary>
-        /// Rows
-        /// </summary>
         public int RowsLenght => Cells.GetLength(0);
 
-        /// <summary>
-        /// Columns
-        /// </summary>
         public int ColumnsLenght => Cells.GetLength(1);
 
         public int EmptyColumnsOnLeftSideCount
@@ -76,25 +17,22 @@ namespace CMDblockbuster.Tetrominoes
             get
             {
                 var columnCount = 0;
-                for (int column = 0; column < Cells.GetColumnsLenght(); column++)
+                for (int column = 0; column < Cells.GetLength(1); column++)
                 {
-                    var emptyCellsInColumn = 0;
-                    for (int row = 0; row < Cells.GetRowsLenght(); row++)
-                    {
-                        if (Cells[row, column] == CellType.Empty)
-                        {
-                            emptyCellsInColumn++;
-                        }
-                        else
-                        {
-                            return columnCount;
-                        }
-                    }
-                    if (emptyCellsInColumn == Cells.GetRowsLenght())
+                    var foundEmptyColumn = Enumerable.Range(0, Cells.GetLength(0))
+                        .Select(x => Cells[x, column])
+                        .All(c => c == TetrominoCellType.Empty);
+
+                    if (foundEmptyColumn)
                     {
                         columnCount++;
                     }
+                    else
+                    {
+                        return columnCount;
+                    }
                 }
+
                 return columnCount;
             }
         }
@@ -104,25 +42,22 @@ namespace CMDblockbuster.Tetrominoes
             get
             {
                 var columnCount = 0;
-                for (int column = Cells.GetColumnsLenght() - 1; column > 0; column--)
+                for (int column = Cells.GetLength(1) - 1; column > 0; column--)
                 {
-                    var emptyCellsInColumn = 0;
-                    for (int row = 0; row < Cells.GetRowsLenght(); row++)
-                    {
-                        if (Cells[row, column] == CellType.Empty)
-                        {
-                            emptyCellsInColumn++;
-                        }
-                        else
-                        {
-                            return columnCount;
-                        }
-                    }
-                    if (emptyCellsInColumn == Cells.GetRowsLenght())
+                    var foundEmptyColumn = Enumerable.Range(0, Cells.GetLength(0))
+                        .Select(x => Cells[x, column])
+                        .All(c => c == TetrominoCellType.Empty);
+
+                    if (foundEmptyColumn)
                     {
                         columnCount++;
                     }
+                    else
+                    {
+                        return columnCount;
+                    }
                 }
+
                 return columnCount;
             }
         }
@@ -131,29 +66,24 @@ namespace CMDblockbuster.Tetrominoes
         {
             get
             {
-                var columnCount = 0;
-                for (int row = Cells.GetRowsLenght() - 1; row > 0; row--)
+                var rowCount = 0;
+                for (int row = Cells.GetLength(0) - 1; row > 0; row--)
                 {
-                    var emptyCellsInColumn = 0;
-                    for (int column = 0; column < Cells.GetColumnsLenght(); column++)
+                    var foundEmptyRow = Enumerable.Range(0, Cells.GetLength(1))
+                        .Select(x => Cells[row, x])
+                        .All(c => c == TetrominoCellType.Empty);
+
+                    if (foundEmptyRow)
                     {
-                        {
-                            if (Cells[row, column] == CellType.Empty)
-                            {
-                                emptyCellsInColumn++;
-                            }
-                            else
-                            {
-                                return columnCount;
-                            }
-                        }
-                        if (emptyCellsInColumn == Cells.GetColumnsLenght())
-                        {
-                            columnCount++;
-                        }
+                        rowCount++;
+                    }
+                    else
+                    {
+                        return rowCount;
                     }
                 }
-                return columnCount;
+
+                return rowCount;
             }
         }
 
@@ -183,7 +113,7 @@ namespace CMDblockbuster.Tetrominoes
             for (int row = 0; row < RowsLenght; row++)
             {
                 // change each row
-                var rowArray = new CellType[ColumnsLenght];
+                var rowArray = new TetrominoCellType[ColumnsLenght];
                 for (int rowItemIndex = 0; rowItemIndex < ColumnsLenght; rowItemIndex++)
                 {
                     rowArray[rowItemIndex] = Cells[row, rowItemIndex];
@@ -199,7 +129,7 @@ namespace CMDblockbuster.Tetrominoes
 
         private void Transpose()
         {
-            var result = new CellType[ColumnsLenght, RowsLenght];
+            var result = new TetrominoCellType[ColumnsLenght, RowsLenght];
 
             for (int i = 0; i < RowsLenght; i++)
             {
