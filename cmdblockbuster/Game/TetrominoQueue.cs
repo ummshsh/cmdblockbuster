@@ -11,22 +11,11 @@ namespace cmdblockbuster.Game
 
         public IEnumerable<Type> NextQueuePreview => stack.Take(5);
 
-        private Type _hold = null;
 
         public Tetromino HoldTetrominoInstance =>
             Activator.CreateInstance(HoldTetrominoType) as Tetromino;
 
-        public Type HoldTetrominoType
-        {
-            get
-            {
-                return _hold;
-            }
-            set
-            {
-                _hold = value;
-            }
-        }
+        public Type HoldTetrominoType { get; private set; }
 
         public readonly Stack<Type> stack;
 
@@ -78,9 +67,19 @@ namespace cmdblockbuster.Game
 
         public Tetromino GetTetrominoFromHold(Type tetrominoToStoreInstead)
         {
-            var tetrominoFromHold = Activator.CreateInstance(HoldTetrominoType) as Tetromino;
-            HoldTetrominoType = tetrominoToStoreInstead;
-            return tetrominoFromHold;
+            Type typeToReturn;
+            if (HoldTetrominoType == null)
+            {
+                typeToReturn = stack.Pop();
+                HoldTetrominoType = tetrominoToStoreInstead;
+            }
+            else
+            {
+                typeToReturn = HoldTetrominoType;
+                HoldTetrominoType = tetrominoToStoreInstead;
+            }
+
+            return Activator.CreateInstance(typeToReturn) as Tetromino;
         }
     }
 }

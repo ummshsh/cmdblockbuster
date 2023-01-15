@@ -108,18 +108,9 @@ namespace cmdblockbuster.Game
                 case InputType.Hold:
                     if (gameState.CanUseHold)
                     {
-                        if (gameState.Queue.HoldTetrominoType == null)
-                        {
-                            gameState.Queue.HoldTetrominoType = currentTetromino.GetType();
-                            currentTetromino = null;
-                            SpawnTetromino();
-                        }
-                        else
-                        {
-                            var tetrominoToSpawnFromHold = gameState.Queue.HoldTetrominoInstance;
-                            gameState.Queue.HoldTetrominoType = currentTetromino.GetType();
-                            SpawnTetromino(tetrominoToSpawnFromHold);
-                        }
+                        var tetrominoToSpawnFromHold = gameState.Queue.GetTetrominoFromHold(currentTetromino.GetType());
+                        currentTetromino = null;
+                        SpawnTetromino(tetrominoToSpawnFromHold);
                     }
                     break;
 
