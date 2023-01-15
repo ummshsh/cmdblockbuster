@@ -406,9 +406,9 @@ namespace cmdblockbuster.Game
                 {
                     if (rowItemIndex >= 0 && rowItemIndex < playfieldInnerState.Width && rowCoordinate + tetromino.RowsLenght - 1 - tetromino.EmptyRowsOnBottomSideCount < playfieldInnerState.Height)
                     {
-                        if (CheckIfCellsIntercect(
+                        if (CheckIfCellsIntersect(
                             currentTetromino.Cells[rowIndex - rowCoordinate, rowItemIndex - rowItemCoordinate],
-                            playfieldInnerState.field[rowIndex, rowItemIndex + 0]))
+                            playfieldInnerState.field[rowIndex, rowItemIndex]))
                         {
                             return false;
                         }
@@ -421,7 +421,12 @@ namespace cmdblockbuster.Game
                             // left
                             if (0 - currentTetromino.EmptyColumnsOnLeftSideCount < rowItemIndex)
                             {
-                                return true;
+                                if (CheckIfCellsIntersect(
+                                    currentTetromino.Cells[rowIndex - rowCoordinate, rowItemIndex - rowItemCoordinate],
+                                    playfieldInnerState.field[rowIndex, rowItemIndex + currentTetromino.EmptyColumnsOnLeftSideCount]))
+                                {
+                                    return false;
+                                }
                             }
                         }
                         else if (rowItemIndex + tetromino.ColumnsLenght > playfieldInnerState.Width - 1)
@@ -459,29 +464,8 @@ namespace cmdblockbuster.Game
             throw new NotImplementedException("TODO");
         }
 
-        /// <summary>
-        /// Cells intercect if: <para/>
-        /// if current cell is empty and tetrominoe's cell is empty or not empty <para/>
-        /// if current cell in not empty and tetrominoe's cell is empty <para/>
-        /// </summary>
-        private bool CheckIfCellsIntercect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell)
-        {
-            // if fieldCell empty and tetrominoe cell empty
-            // if fieldCell empty and tetrominoe cell not
-            if ((int)fieldCell < 1)
-            {
-                return false;
-            }
-            // if field cell not empty and tetrominoe cell is empty
-            else if ((int)fieldCell > 0 && (int)tetrominoeCell < 1)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
+        private bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>
+            (int)fieldCell > 0 && (int)tetrominoeCell > 0;
 
         #endregion
     }

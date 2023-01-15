@@ -13,7 +13,6 @@ namespace cmdblockbuster.Game
     internal class GameState
     {
         public State State { get; set; } = State.Stopped;
-
         public DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
         public DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
 
