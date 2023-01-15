@@ -14,7 +14,8 @@ Features:
  - [ ] Fix spelling of 'tetromino' everywhere)  
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
  - [ ] Implement wallkicks
- - [ ] Implement gravity and speed levels
+ - [x] Implement gravity and speed levels
  - [ ] Implement scoring
  - [ ] Ghost tetromino
+ - [ ] Sound events
  - [ ] Implement new cell type for playfield to be rendered, to it can have move properties
