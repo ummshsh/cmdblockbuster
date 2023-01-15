@@ -9,9 +9,11 @@ namespace cmdblockbuster.Game
     {
         public Type NextTetromino => stack.Peek();
 
+        public IEnumerable<Type> NextQueuePreview => stack.Take(5);
+
         private Type _hold = null;
 
-        public Tetromino HoldTetrominoInstance => 
+        public Tetromino HoldTetrominoInstance =>
             Activator.CreateInstance(HoldTetrominoType) as Tetromino;
 
         public Type HoldTetrominoType

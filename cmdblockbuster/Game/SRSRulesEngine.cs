@@ -21,7 +21,7 @@ namespace cmdblockbuster.Game
         private int CurrentTetrominoHeightLocation { get; set; }
         private int CurrentTetrominoWidthLocation { get; set; }
 
-        private readonly TetrominoQueue queue = new TetrominoQueue();
+        //private readonly TetrominoQueue queue = new TetrominoQueue();
         private readonly GameState gameState = new GameState();
 
         public SRSRulesEngine(IInputHandler inputHandler)
@@ -108,15 +108,16 @@ namespace cmdblockbuster.Game
                 case InputType.Hold:
                     if (gameState.CanUseHold)
                     {
-                        if (queue.HoldTetrominoType == null)
+                        if (gameState.Queue.HoldTetrominoType == null)
                         {
-                            queue.HoldTetrominoType = currentTetromino.GetType();
+                            gameState.Queue.HoldTetrominoType = currentTetromino.GetType();
+                            currentTetromino = null;
                             SpawnTetromino();
                         }
                         else
                         {
-                            var tetrominoToSpawnFromHold = queue.HoldTetrominoInstance;
-                            queue.HoldTetrominoType = currentTetromino.GetType();
+                            var tetrominoToSpawnFromHold = gameState.Queue.HoldTetrominoInstance;
+                            gameState.Queue.HoldTetrominoType = currentTetromino.GetType();
                             SpawnTetromino(tetrominoToSpawnFromHold);
                         }
                     }
@@ -359,7 +360,7 @@ namespace cmdblockbuster.Game
                 {
                     return false;
                 }
-                currentTetromino = queue.GetTetrominoFromQueue();
+                currentTetromino = gameState.Queue.GetTetrominoFromQueue();
                 gameState.CanUseHold = true;
             }
             else
