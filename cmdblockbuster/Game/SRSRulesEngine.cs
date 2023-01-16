@@ -6,6 +6,7 @@ using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace cmdblockbuster.Game
@@ -208,13 +209,7 @@ namespace cmdblockbuster.Game
                     break;
 
                 case InputType.Hold:
-                    if (gameState.CanUseHold)
-                    {
-                        var tetrominoToSpawnFromHold = gameState.Queue.GetTetrominoFromHold(currentTetromino.GetType());
-                        currentTetromino = null;
-                        SpawnTetromino(tetrominoToSpawnFromHold);
-                        SoundTriggered?.Invoke(this, TetrisSound.Hold);
-                    }
+                    Hold();
                     break;
 
                 case InputType.Pause:
@@ -226,6 +221,17 @@ namespace cmdblockbuster.Game
 
                 default:
                     throw new NotImplementedException($"Input {inputType} not implemented");
+            }
+        }
+
+        private void Hold()
+        {
+            if (gameState.CanUseHold)
+            {
+                var tetrominoToSpawnFromHold = gameState.Queue.GetTetrominoFromHold(currentTetromino.GetType());
+                currentTetromino = null;
+                SpawnTetromino(tetrominoToSpawnFromHold);
+                SoundTriggered?.Invoke(this, TetrisSound.Hold);
             }
         }
 
@@ -366,12 +372,21 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            if (gameState.TimeInfinityTriggered + Variables.InfinityTime > DateTime.Now && IfTouchedFoundationOrAnotherTetrominoUnderneath(currentTetromino) &&
+            bool infinity = gameState.TimeInfinityTriggered + Variables.InfinityTime > DateTime.Now && gameState.ThisMinoInfinityAvailable;
+            if (IfTouchedFoundationOrAnotherTetrominoUnderneath(currentTetromino) &&
                 (hardDrop || gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now))
             {
-                AddCurrentTetrominoToInnerState();
-                SoundTriggered?.Invoke(this, TetrisSound.Locking);
-                return false;
+                if (infinity)
+                {
+                    return false;
+                }
+                else
+                {
+                    AddCurrentTetrominoToInnerState();
+                    SoundTriggered?.Invoke(this, TetrisSound.Locking);
+                    return false;
+
+                }
             }
 
             var newLocation = currentTetromino.HeightLocation + 1; // Plus one because coordinates starts from top left

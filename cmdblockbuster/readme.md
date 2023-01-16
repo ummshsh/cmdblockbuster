@@ -17,7 +17,7 @@ Features:
  - [x] Game status event
  - [x] Sound events
  - [x] Implement wallkicks
- - [ ] Constrained(time/repetition) infinity(With toggle) https://tetris.fandom.com/wiki/Infinity
+ - [x] Constrained(time/repetition) infinity(With toggle) https://tetris.fandom.com/wiki/Infinity
  - [ ] Implement scoring
  - [ ] Playtest variable levels up
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
