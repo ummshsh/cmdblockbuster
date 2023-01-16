@@ -6,7 +6,7 @@ namespace cmdblockbuster.Field
     /// <summary>
     /// Passed to renderer and contains Tetromino and Ghost tetromino
     /// </summary>
-    internal class VisiblePlayfield : IPlayefield
+    public class VisiblePlayfield : IPlayefield
     {
         public int Width { get; private set; }
 

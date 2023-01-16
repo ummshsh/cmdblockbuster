@@ -1,4 +1,5 @@
-﻿using cmdblockbuster.Tetrominoes;
+﻿using cmdblockbuster.Field;
+using cmdblockbuster.Tetrominoes;
 using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
@@ -13,9 +14,9 @@ namespace cmdblockbuster.Game
     internal class SRSRulesEngine : IRulesEngine
     {
         private InnerPlayfield playfieldInnerState; // All static elements without current tetromino
-        public InnerPlayfield playfieldToDisplay;  // All static elements with current tetromino
+        public VisiblePlayfield playfieldToDisplay;  // All static elements with current tetromino
 
-        public event EventHandler<InnerPlayfield> PlayFieldUpdated; // Event fires each time clean playfield is updated
+        public event EventHandler<VisiblePlayfield> PlayFieldUpdated; // Event fires each time clean playfield is updated
 
         private Tetromino currentTetromino = null;
         private Tetromino currentTetrominoGhost = null;
@@ -26,7 +27,7 @@ namespace cmdblockbuster.Game
         {
             inputHandler.InputProvided += InputProvided; // Set input handler
 
-            playfieldToDisplay = new InnerPlayfield(10, 22);
+            playfieldToDisplay = new VisiblePlayfield(10, 22);
             playfieldInnerState = new InnerPlayfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
 
             gameState = new GameState();
@@ -335,7 +336,7 @@ namespace cmdblockbuster.Game
             {
                 for (int rowItemIndex = 0; rowItemIndex < playfieldToDisplay.Width; rowItemIndex++)
                 {
-                    playfieldToDisplay[row, rowItemIndex] = playfieldInnerState[row, rowItemIndex + 0];
+                    playfieldToDisplay[row, rowItemIndex] = Cell.FromInnerCell(playfieldInnerState[row, rowItemIndex + 0], false);
                 }
             }
 
@@ -352,7 +353,7 @@ namespace cmdblockbuster.Game
                         continue;
                     }
 
-                    playfieldToDisplay.Cells[row + tetromino.HeightLocation, rowItem + tetromino.WidthLocation] = cellToPaste;
+                    playfieldToDisplay[row + tetromino.HeightLocation, rowItem + tetromino.WidthLocation] = Cell.FromInnerCell(cellToPaste, false);
                 }
             }
 
@@ -375,7 +376,7 @@ namespace cmdblockbuster.Game
                     {
                         continue;
                     }
-                    playfieldToDisplay.Cells[height, rowItem + tetrominoGhost.WidthLocation] = cellToPaste;
+                    playfieldToDisplay[height, rowItem + tetrominoGhost.WidthLocation] = Cell.FromInnerCell(cellToPaste, true);
                 }
             }
         }
@@ -427,7 +428,7 @@ namespace cmdblockbuster.Game
                     // Check if not empty cell is outside field
                     if (/*rowItemIndex == 0 & rowItemIndex + tetromino.EmptyColumnsOnLeftSideCount == 0 ||*/
                         (rowItemIndex < 0 & rowItemCoordinate + tetromino.EmptyColumnsOnLeftSideCount < 0) ||
-                        rowItemCoordinate + currentTetromino.ColumnsLenght -1 - currentTetromino.EmptyColumnsOnRightSideCount >= playfieldInnerState.Width ||
+                        rowItemCoordinate + currentTetromino.ColumnsLenght - 1 - currentTetromino.EmptyColumnsOnRightSideCount >= playfieldInnerState.Width ||
                         rowIndex > playfieldInnerState.Height - 1)
                     {
                         return false;

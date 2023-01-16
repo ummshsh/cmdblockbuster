@@ -4,7 +4,7 @@ using System.Text;
 
 namespace cmdblockbuster.Field
 {
-    internal class IPlayfieldCell
+    public class IPlayfieldCell
     {
     }
 }

@@ -1,14 +1,17 @@
-﻿using cmdblockbuster.Tetrominoes;
+﻿using cmdblockbuster.Field;
+using cmdblockbuster.Tetrominoes;
 using CMDblockbuster.Field;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 
 namespace BlockBuster
@@ -76,28 +79,41 @@ namespace BlockBuster
     {
         private Grid playfieldGrid;
 
-        private TetrominoCellType[,] lastUpdatedField;
+        private Cell[,] lastUpdatedField;
         private readonly bool DisplayFirstTime = true;
 
         public WpfRenderer(Grid playfieldGrid)
         {
             this.playfieldGrid = playfieldGrid;
-            lastUpdatedField = new TetrominoCellType[22, 10];
+            lastUpdatedField = new Cell[22, 10];
+
+            this.lastUpdatedField = new Cell[22, 10];
+
+            var rowsCount = this.lastUpdatedField.GetLength(0);
+            var rowLength = this.lastUpdatedField.GetLength(1);
+
+            for (int row = 0; row < rowsCount; row++)
+            {
+                for (int rowItemIndex = 0; rowItemIndex < rowLength; rowItemIndex++)
+                {
+                    this.lastUpdatedField[row, rowItemIndex] = Cell.EmptyCell;
+                }
+            }
         }
 
-        public void RenderPlayfield(object sender, InnerPlayfield e)
+        public void RenderPlayfield(object sender, VisiblePlayfield e)
         {
-            if (SequenceEquals(lastUpdatedField, e.Cells) && !DisplayFirstTime)
+            if (SequenceEquals(lastUpdatedField, e.StaticCells) && !DisplayFirstTime)
             {
                 return; // Exit if playfield updated already
             }
 
-            Application.Current.Dispatcher.BeginInvoke(() =>
+            DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
             {
                 this.playfieldGrid.Children.Clear();
 
-                var height = e.Cells.GetLength(0);
-                var width = e.Cells.GetLength(1);
+                var height = e.Height;
+                var width = e.Width;
 
                 for (int row = 0; row < height; row++)
                 {
@@ -109,10 +125,15 @@ namespace BlockBuster
                         }
                         else
                         {
-                            var border = new Border();
-                            border.BorderBrush = Brushes.Black;
-                            border.Background = new SolidColorBrush(GetColor(e.Cells[row, rowItemIndex]));
-                            border.BorderThickness = new Thickness(0.5);
+                            Cell cell = e[row, rowItemIndex];
+                            SolidColorBrush solidColorBrush = GetColor(cell);
+
+                            var border = new Border
+                            {
+                                BorderBrush = Brushes.Black,
+                                Background = cell.Ghost ? Brushes.LightGray : solidColorBrush,
+                                BorderThickness = new Thickness(0.5)                                
+                            };
                             Grid.SetRow(border, row);
                             Grid.SetColumn(border, rowItemIndex);
                             this.playfieldGrid.Children.Add(border);
@@ -122,19 +143,16 @@ namespace BlockBuster
             });
         }
 
-        private Color GetColor(TetrominoCellType tetrominoCellType)
+        private SolidColorBrush GetColor(Cell tetrominoCellType)
         {
-            return tetrominoCellType switch
-            {
-                TetrominoCellType.Red => Colors.Red,
-                TetrominoCellType.Cyan => Colors.Cyan,
-                TetrominoCellType.Purple => Colors.Purple,
-                TetrominoCellType.Green => Colors.Green,
-                TetrominoCellType.Yellow => Colors.Yellow,
-                TetrominoCellType.Orange => Colors.Orange,
-                TetrominoCellType.Blue => Colors.Blue,
-                _ => Colors.White,
-            };
+            var color = new SolidColorBrush(
+                System.Windows.Media.Color.FromArgb(
+                    tetrominoCellType.Color.A,
+                    tetrominoCellType.Color.R,
+                    tetrominoCellType.Color.G,
+                    tetrominoCellType.Color.B));
+
+            return color;
         }
 
         private bool SequenceEquals<T>(T[,] a, T[,] b)
