@@ -1,6 +1,6 @@
-﻿using System;
+﻿using cmdblockbuster.Tetrominoes;
+using System;
 using System.Linq;
-using cmdblockbuster.Tetrominoes;
 
 namespace CMDblockbuster.Tetrominoes
 {
@@ -8,6 +8,8 @@ namespace CMDblockbuster.Tetrominoes
     public abstract class Tetromino
     {
         public TetrominoCellType[,] Cells { get; set; }
+
+        public TetrominoRotation Rotation { get; } = new TetrominoRotation();
 
         public int RowsLenght => Cells.GetLength(0);
 
@@ -18,9 +20,9 @@ namespace CMDblockbuster.Tetrominoes
             get
             {
                 var columnCount = 0;
-                for (int column = 0; column < Cells.GetLength(1); column++)
+                for (int column = 0; column < ColumnsLenght; column++)
                 {
-                    var foundEmptyColumn = Enumerable.Range(0, Cells.GetLength(0))
+                    var foundEmptyColumn = Enumerable.Range(0, RowsLenght)
                         .Select(x => Cells[x, column])
                         .All(c => c == TetrominoCellType.Empty);
 
@@ -43,9 +45,9 @@ namespace CMDblockbuster.Tetrominoes
             get
             {
                 var columnCount = 0;
-                for (int column = Cells.GetLength(1) - 1; column > 0; column--)
+                for (int column = ColumnsLenght - 1; column > 0; column--)
                 {
-                    var foundEmptyColumn = Enumerable.Range(0, Cells.GetLength(0))
+                    var foundEmptyColumn = Enumerable.Range(0, RowsLenght)
                         .Select(x => Cells[x, column])
                         .All(c => c == TetrominoCellType.Empty);
 
@@ -68,9 +70,9 @@ namespace CMDblockbuster.Tetrominoes
             get
             {
                 var rowCount = 0;
-                for (int row = Cells.GetLength(0) - 1; row > 0; row--)
+                for (int row = RowsLenght - 1; row > 0; row--)
                 {
-                    var foundEmptyRow = Enumerable.Range(0, Cells.GetLength(1))
+                    var foundEmptyRow = Enumerable.Range(0, ColumnsLenght)
                         .Select(x => Cells[row, x])
                         .All(c => c == TetrominoCellType.Empty);
 
@@ -94,6 +96,7 @@ namespace CMDblockbuster.Tetrominoes
         public Tuple<int, int> SpawnLocation = new Tuple<int, int>(0, 4);
 
         public int HeightLocation { get; set; }
+
         public int WidthLocation { get; set; }
 
         public Tetromino()
@@ -109,12 +112,14 @@ namespace CMDblockbuster.Tetrominoes
         {
             Transpose();
             ReverseEachRow();
+            Rotation.RotateRight();
         }
 
         public virtual void RotateLeft()
         {
             ReverseEachRow();
             Transpose();
+            Rotation.RotateLeft();
         }
 
         private void ReverseEachRow()

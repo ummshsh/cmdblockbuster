@@ -233,6 +233,7 @@ namespace cmdblockbuster.Game
             {
                 return false;
             }
+
             currentTetromino.RotateLeft();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
@@ -374,19 +375,20 @@ namespace cmdblockbuster.Game
 
         private void DestroyRows()
         {
-            var rowsDestroyed = false;
+            var rowsDestroyed = 0;
             for (int row = playfieldInnerState.Height - 1; row >= 0; row--)
             {
                 if (CheckRowFilled(row))
                 {
                     DestroyRow(row);
                     MoveTopRowsToRow(row);
-                    rowsDestroyed = true;
+                    rowsDestroyed++;
                 }
             }
 
-            if (rowsDestroyed)
+            if (rowsDestroyed > 0)
             {
+                gameState.ScoreCounter.AddLinesCleared(rowsDestroyed);
                 SoundTriggered?.Invoke(this, TetrisSound.LineClear);
             }
         }

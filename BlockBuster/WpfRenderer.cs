@@ -87,8 +87,9 @@ namespace BlockBuster
                 var childred = dockStats.Children;
                 (dockStats.Children[0] as TextBlock).Text = "Hold: " + e.Queue.HoldTetrominoType?.Name;
                 (dockStats.Children[1] as TextBlock).Text = "Score: " + e.Score;
-                (dockStats.Children[2] as TextBlock).Text = "Level: " + e.Level;
-                (dockStats.Children[3] as TextBlock).Text = "Next: " + e.Queue.NextTetromino.Name;
+                (dockStats.Children[2] as TextBlock).Text = "Lines Cleared: " + e.LinesCleared;
+                (dockStats.Children[3] as TextBlock).Text = "Level: " + e.Level;
+                (dockStats.Children[4] as TextBlock).Text = "Next: " + e.Queue.NextTetromino.Name;
             });
         }
 

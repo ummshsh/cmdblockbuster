@@ -12,6 +12,7 @@
         <StackPanel x:Name="DockStats" Width="150">
             <TextBlock x:Name="Hold" HorizontalAlignment="Left" FontSize="16">Hold</TextBlock>
             <TextBlock x:Name="Score" HorizontalAlignment="Left" FontSize="16">Score</TextBlock>
+            <TextBlock x:Name="LinesCleared" HorizontalAlignment="Left" FontSize="16">Lines Cleared</TextBlock>
             <TextBlock x:Name="Level" HorizontalAlignment="Left" FontSize="16">Level</TextBlock>
             <TextBlock x:Name="Next" HorizontalAlignment="Left"  FontSize="16">Next</TextBlock>
         </StackPanel>

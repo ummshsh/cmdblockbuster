@@ -2,10 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Media;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -35,7 +32,7 @@ namespace BlockBuster
             {
                 if (loadedSounds.TryGetValue(sound, out MediaPlayer player))
                 {
-                    player.Volume= 0.5;
+                    player.Volume = 0.5;
                     player.Position = TimeSpan.Zero;
                     player.Play();
                 }

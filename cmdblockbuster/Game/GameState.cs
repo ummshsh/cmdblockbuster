@@ -1,4 +1,5 @@
-﻿using System;
+﻿using cmdblockbuster.Score;
+using System;
 
 namespace cmdblockbuster.Game
 {
@@ -33,18 +34,22 @@ namespace cmdblockbuster.Game
     {
         public State State { get; set; } = State.Stopped;
 
+        public int Score => ScoreCounter.Score;
+
+        public int LinesCleared => ScoreCounter.LinesCleared;
+
+        public Level Level => ScoreCounter.Level;
+
+        public TetrominoQueue Queue { get; } = new TetrominoQueue();
+
         internal DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
 
         internal DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
-
-        public int Score { get; internal set; } = 0;
-
-        public Level Level { get; internal set; } = Level.Level_1;
 
         internal TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow((0.8 - (((int)Level - 1) * 0.007)), (int)Level - 1));
 
         internal bool CanUseHold { get; set; } = true;
 
-        public TetrominoQueue Queue { get; } = new TetrominoQueue();
+        internal ScoreCounter ScoreCounter { get; } = new ScoreCounter();
     }
 }

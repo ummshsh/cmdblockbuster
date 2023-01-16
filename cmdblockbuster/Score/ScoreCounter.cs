@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using cmdblockbuster.Game;
 
 namespace cmdblockbuster.Score
 {
@@ -11,5 +9,12 @@ namespace cmdblockbuster.Score
     // Perfect clear
     internal class ScoreCounter
     {
+        public int Score { get; set; } = 0;
+
+        public int LinesCleared { get; private set; } = 0;
+
+        public Level Level => (Level)(LinesCleared / 10);
+
+        public void AddLinesCleared(int count) => LinesCleared += count;
     }
 }
