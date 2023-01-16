@@ -4,10 +4,11 @@ using System.Text;
 
 namespace cmdblockbuster.Score
 {
-    // increase score on soft drop
-    // t spin
-    // tetris
-    // back to back
+    // Increase score on soft drop
+    // T-Spin
+    // Tetris
+    // Back to back
+    // Perfect clear
     internal class ScoreCounter
     {
     }

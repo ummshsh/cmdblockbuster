@@ -1,6 +1,6 @@
 ﻿namespace cmdblockbuster.Sound
 {
-    internal enum Sound
+    public enum TetrisSound
     {
         // Required by guidelines
         Rotation,
@@ -9,6 +9,7 @@
         TouchingWall,
         Locking,
         LineClear,
-        GameOver
+        GameOver,
+        Hold
     }
 }
