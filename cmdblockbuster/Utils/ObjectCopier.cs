@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace cmdblockbuster.Game
+namespace cmdblockbuster.Utils
 {
     public static class ObjectCopier
     {
@@ -21,7 +21,10 @@ namespace cmdblockbuster.Game
             }
 
             // Don't serialize a null object, simply return the default for that object
-            if (ReferenceEquals(source, null)) return default;
+            if (source is null)
+            {
+                return default;
+            }
 
             using Stream stream = new MemoryStream();
             IFormatter formatter = new BinaryFormatter();

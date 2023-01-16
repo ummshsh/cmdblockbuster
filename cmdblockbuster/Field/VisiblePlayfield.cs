@@ -12,7 +12,7 @@ namespace cmdblockbuster.Field
 
         public int Height { get; private set; }
 
-        public Cell[,] StaticCells { get; private set; }
+        public Cell[,] Cells { get; private set; }
 
         public Cell[,] StaticCellsWithTetrominoAndTetrominoGhost { get; private set; }
 
@@ -20,11 +20,11 @@ namespace cmdblockbuster.Field
         {
             get
             {
-                return StaticCells[row, rowItem];
+                return Cells[row, rowItem];
             }
             set
             {
-                StaticCells[row, rowItem] = value;
+                Cells[row, rowItem] = value;
             }
         }
 
@@ -39,16 +39,16 @@ namespace cmdblockbuster.Field
             Height = height;
 
             // Create emty cells
-            this.StaticCells = new Cell[Height, Width];
+            this.Cells = new Cell[Height, Width];
 
-            var rowsCount = this.StaticCells.GetLength(0);
-            var rowLength = this.StaticCells.GetLength(1);
+            var rowsCount = this.Cells.GetLength(0);
+            var rowLength = this.Cells.GetLength(1);
 
             for (int row = 0; row < rowsCount; row++)
             {
                 for (int rowItemIndex = 0; rowItemIndex < rowLength; rowItemIndex++)
                 {
-                    this.StaticCells[row, rowItemIndex] = Cell.EmptyCell;
+                    this.Cells[row, rowItemIndex] = Cell.EmptyCell;
                 }
             }
         }

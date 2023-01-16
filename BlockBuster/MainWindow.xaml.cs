@@ -102,7 +102,7 @@ namespace BlockBuster
 
         public void RenderPlayfield(object sender, VisiblePlayfield e)
         {
-            if (SequenceEquals(lastUpdatedField, e.StaticCells) && !DisplayFirstTime)
+            if (SequenceEquals(lastUpdatedField, e.Cells) && !DisplayFirstTime)
             {
                 return; // Exit if playfield updated already
             }

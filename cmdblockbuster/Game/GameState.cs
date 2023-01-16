@@ -33,17 +33,17 @@ namespace cmdblockbuster.Game
     {
         public State State { get; set; } = State.Stopped;
 
-        public DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
+        internal DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
 
-        public DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
+        internal DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
 
         public int Score { get; internal set; } = 0;
 
         public Level Level { get; internal set; } = Level.Level_1;
 
-        public TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow((0.8 - (((int)Level - 1) * 0.007)), (int)Level - 1));
+        internal TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow((0.8 - (((int)Level - 1) * 0.007)), (int)Level - 1));
 
-        public bool CanUseHold { get; internal set; } = true;
+        internal bool CanUseHold { get; set; } = true;
 
         public TetrominoQueue Queue { get; } = new TetrominoQueue();
     }
