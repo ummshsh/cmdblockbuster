@@ -16,10 +16,10 @@ Features:
  - [x] Implement new cell type for playfield to be rendered, to it can have move properties
  - [x] Game status event
  - [x] Sound events
+ - [x] Implement wallkicks
  - [ ] Constrained(time/repetition) infinity(With toggle) https://tetris.fandom.com/wiki/Infinity
  - [ ] Implement scoring
  - [ ] Playtest variable levels up
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
  - [ ] Tests
- - [ ] Implement wallkicks
  - [ ] Fix spelling of 'tetromino' everywhere)  

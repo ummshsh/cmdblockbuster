@@ -19,6 +19,11 @@ namespace cmdblockbuster.Game
         /// </summary>
         public static TimeSpan LockDelayTimeout = TimeSpan.FromMilliseconds(500);
 
+        /// <summary>
+        /// Time during which tetromino locks after rotation
+        /// </summary>
+        public static TimeSpan InfinityTime { get; set; } = TimeSpan.FromMilliseconds(1500);
+
         public static TimeSpan GetFallRate(int gameLevel)
         {
             // 15 levels of fall rate. Fall rates are expressed in G <para/>

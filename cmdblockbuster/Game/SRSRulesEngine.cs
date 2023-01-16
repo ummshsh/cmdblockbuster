@@ -133,6 +133,8 @@ namespace cmdblockbuster.Game
                 {
                     return false;
                 }
+
+                gameState.ThisMinoInfinityAvailable = true;
                 currentTetromino = gameState.Queue.GetTetrominoFromQueue();
                 gameState.CanUseHold = true;
             }
@@ -238,6 +240,7 @@ namespace cmdblockbuster.Game
             var rotationTransition = currentTetromino.RotateLeft();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
+                gameState.TimeInfinityTriggered = DateTime.Now;
                 rotated = true;
             }
             else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
@@ -253,6 +256,8 @@ namespace cmdblockbuster.Game
                 currentTetromino.WidthLocation = newRowItemCoordinate;
 
                 rotated = true;
+                gameState.TimeInfinityTriggered = DateTime.Now;
+
             }
             else
             {
@@ -261,6 +266,11 @@ namespace cmdblockbuster.Game
 
             if (rotated)
             {
+                if (gameState.ThisMinoInfinityAvailable)
+                {
+                    gameState.TimeInfinityTriggered = DateTime.Now;
+                    gameState.ThisMinoInfinityAvailable = false;
+                }
                 SoundTriggered?.Invoke(this, TetrisSound.Rotation);
             }
 
@@ -279,6 +289,8 @@ namespace cmdblockbuster.Game
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
                 rotated = true;
+                gameState.TimeInfinityTriggered = DateTime.Now;
+
             }
             else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
                 CheckIfCanBePlacedOnCoordinateWithKick(
@@ -293,6 +305,8 @@ namespace cmdblockbuster.Game
                 currentTetromino.WidthLocation = newRowItemCoordinate;
 
                 rotated = true;
+                gameState.TimeInfinityTriggered = DateTime.Now;
+
             }
             else
             {
@@ -301,6 +315,11 @@ namespace cmdblockbuster.Game
 
             if (rotated)
             {
+                if (gameState.ThisMinoInfinityAvailable)
+                {
+                    gameState.TimeInfinityTriggered = DateTime.Now;
+                    gameState.ThisMinoInfinityAvailable = false;
+                }
                 SoundTriggered?.Invoke(this, TetrisSound.Rotation);
             }
 
@@ -347,8 +366,8 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            if (IfTouchedFoundationOrAnotherTetrominoUnderneath(currentTetromino) &&
-                (hardDrop ? true : gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now))
+            if (gameState.TimeInfinityTriggered + Variables.InfinityTime > DateTime.Now && IfTouchedFoundationOrAnotherTetrominoUnderneath(currentTetromino) &&
+                (hardDrop || gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now))
             {
                 AddCurrentTetrominoToInnerState();
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
@@ -530,10 +549,10 @@ namespace cmdblockbuster.Game
             var kicksForThisRotatioin = tetromino.wallKicks[minoRotationTransition];
             foreach (var kick in kicksForThisRotatioin)
             {
-                if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + kick.Item1, rowItemCoordinate + kick.Item2))
+                if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + -(kick.Item2), rowItemCoordinate + kick.Item1))
                 {
-                    newRowCoordinate = rowCoordinate + kick.Item1;
-                    newRowItemCoordinate = rowItemCoordinate + kick.Item2;
+                    newRowCoordinate = rowCoordinate + -(kick.Item2);
+                    newRowItemCoordinate = rowItemCoordinate + kick.Item1;
                     return true;
                 }
             }
