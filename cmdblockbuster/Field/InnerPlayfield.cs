@@ -2,40 +2,32 @@
 
 namespace CMDblockbuster.Field
 {
-    public class Playfield : IPlayefield
+    public class InnerPlayfield : IPlayefield
     {
         public int Width { get; private set; }
 
         public int Height { get; private set; }
 
-        public readonly TetrominoCellType[,] field;
+        public TetrominoCellType[,] Cells { get; private set; }
 
         public TetrominoCellType this[int row, int rowItem]
         {
             get
             {
-                return field[row, rowItem];
+                return Cells[row, rowItem];
             }
             set
             {
-                field[row, rowItem] = value;
+                Cells[row, rowItem] = value;
             }
         }
 
-        public Playfield()
-        {
-            Width = 10;
-            Height = 22;
-
-            this.field = ConsructField();
-        }
-
-        public Playfield(int width, int height)
+        public InnerPlayfield(int width, int height)
         {
             Width = width;
             Height = height;
 
-            this.field = ConsructField();
+            this.Cells = ConsructField();
         }
 
         private TetrominoCellType[,] ConsructField()

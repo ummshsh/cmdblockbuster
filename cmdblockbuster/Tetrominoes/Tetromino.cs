@@ -4,6 +4,7 @@ using cmdblockbuster.Tetrominoes;
 
 namespace CMDblockbuster.Tetrominoes
 {
+    [Serializable]
     public abstract class Tetromino
     {
         public TetrominoCellType[,] Cells { get; set; }
@@ -91,6 +92,15 @@ namespace CMDblockbuster.Tetrominoes
         /// Zero based, true for most of the tetrominoes except I and O
         /// </summary>
         public Tuple<int, int> SpawnLocation = new Tuple<int, int>(0, 4);
+
+        public int HeightLocation { get; set; }
+        public int WidthLocation { get; set; }
+
+        public Tetromino()
+        {
+            HeightLocation = SpawnLocation.Item1;
+            WidthLocation = SpawnLocation.Item2;
+        }
 
         public bool IsLanded = false;
         public bool IsGhost = false;

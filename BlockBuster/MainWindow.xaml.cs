@@ -85,9 +85,9 @@ namespace BlockBuster
             lastUpdatedField = new TetrominoCellType[22, 10];
         }
 
-        public void RenderPlayfield(object sender, Playfield e)
+        public void RenderPlayfield(object sender, InnerPlayfield e)
         {
-            if (SequenceEquals(lastUpdatedField, e.field) && !DisplayFirstTime)
+            if (SequenceEquals(lastUpdatedField, e.Cells) && !DisplayFirstTime)
             {
                 return; // Exit if playfield updated already
             }
@@ -96,8 +96,8 @@ namespace BlockBuster
             {
                 this.playfieldGrid.Children.Clear();
 
-                var height = e.field.GetLength(0);
-                var width = e.field.GetLength(1);
+                var height = e.Cells.GetLength(0);
+                var width = e.Cells.GetLength(1);
 
                 for (int row = 0; row < height; row++)
                 {
@@ -111,7 +111,7 @@ namespace BlockBuster
                         {
                             var border = new Border();
                             border.BorderBrush = Brushes.Black;
-                            border.Background = new SolidColorBrush(GetColor(e.field[row, rowItemIndex]));
+                            border.Background = new SolidColorBrush(GetColor(e.Cells[row, rowItemIndex]));
                             border.BorderThickness = new Thickness(0.5);
                             Grid.SetRow(border, row);
                             Grid.SetColumn(border, rowItemIndex);

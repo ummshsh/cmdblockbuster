@@ -60,7 +60,7 @@ namespace cmdblockbuster.Game
 
         public Tetromino GetTetrominoFromQueue()
         {
-            var tetromino = Activator.CreateInstance(/*typeof(TetrominoI)*/ stack.Pop()) as Tetromino;
+            var tetromino = Activator.CreateInstance(/*typeof(TetrominoJ)*/ stack.Pop()) as Tetromino;
             RegenerateQueue();
             return tetromino;
         }

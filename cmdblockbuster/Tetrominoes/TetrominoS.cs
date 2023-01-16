@@ -1,7 +1,9 @@
 ﻿using cmdblockbuster.Tetrominoes;
+using System;
 
 namespace CMDblockbuster.Tetrominoes
 {
+    [Serializable]
     class TetrominoS : Tetromino
     {
         public TetrominoS()
