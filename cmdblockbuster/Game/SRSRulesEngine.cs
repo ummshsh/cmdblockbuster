@@ -17,6 +17,7 @@ namespace cmdblockbuster.Game
         public VisiblePlayfield playfieldToDisplay;  // All static elements with current tetromino
 
         public event EventHandler<VisiblePlayfield> PlayFieldUpdated; // Event fires each time clean playfield is updated
+        public event EventHandler<GameState> GameStateUpdated; // Event fires each time game state is updated
 
         private Tetromino currentTetromino = null;
         private Tetromino currentTetrominoGhost = null;
@@ -49,7 +50,7 @@ namespace cmdblockbuster.Game
             });
         }
 
-        public void Tick()
+        private void Tick()
         {
             if (gameState.State == State.Running)
             {
@@ -64,6 +65,8 @@ namespace cmdblockbuster.Game
                     PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
                     gameState.LastTimePlayfieldWasUpdated = DateTime.Now;
                 }
+
+                GameStateUpdated?.Invoke(this, gameState);
             }
         }
 
@@ -381,7 +384,7 @@ namespace cmdblockbuster.Game
             }
         }
 
-        public bool SpawnTetromino(Tetromino tetrominoToSpawnFromHold = null)
+        private bool SpawnTetromino(Tetromino tetrominoToSpawnFromHold = null)
         {
             if (tetrominoToSpawnFromHold == null)
             {

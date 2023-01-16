@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace cmdblockbuster.Game
 {
-    internal class TetrominoQueue
+    public class TetrominoQueue
     {
         public Type NextTetromino => stack.Peek();
 

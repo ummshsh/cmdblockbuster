@@ -29,7 +29,7 @@ namespace cmdblockbuster.Game
         Level_15 = 15
     }
 
-    internal class GameState
+    public class GameState
     {
         public State State { get; set; } = State.Stopped;
 

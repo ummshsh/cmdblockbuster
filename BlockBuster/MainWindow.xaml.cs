@@ -1,17 +1,14 @@
 ﻿using cmdblockbuster.Field;
-using cmdblockbuster.Tetrominoes;
-using CMDblockbuster.Field;
+using cmdblockbuster.Game;
 using CMDblockbuster.Game;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Renderer;
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 
 namespace BlockBuster
@@ -30,7 +27,7 @@ namespace BlockBuster
         async void OnLoad(object sender, RoutedEventArgs e)
         {
             wpfInputHandler = new WpfInputHandler();
-            var Tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid));
+            var Tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid, this.DockStats));
             await Tetris.Start();
         }
 
@@ -77,13 +74,15 @@ namespace BlockBuster
 
     public class WpfRenderer : ITetrisRenderer
     {
+        private StackPanel dockStats;
         private Grid playfieldGrid;
 
         private Cell[,] lastUpdatedField;
         private readonly bool DisplayFirstTime = true;
 
-        public WpfRenderer(Grid playfieldGrid)
+        public WpfRenderer(Grid playfieldGrid, StackPanel dockStats)
         {
+            this.dockStats = dockStats;
             this.playfieldGrid = playfieldGrid;
             lastUpdatedField = new Cell[22, 10];
 
@@ -132,7 +131,7 @@ namespace BlockBuster
                             {
                                 BorderBrush = Brushes.Black,
                                 Background = cell.Ghost ? Brushes.LightGray : solidColorBrush,
-                                BorderThickness = new Thickness(0.5)                                
+                                BorderThickness = new Thickness(0.5)
                             };
                             Grid.SetRow(border, row);
                             Grid.SetColumn(border, rowItemIndex);
@@ -140,6 +139,18 @@ namespace BlockBuster
                         }
                     }
                 }
+            });
+        }
+
+        public void RenderGameState(object sender, GameState e)
+        {
+            DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
+            {
+                var childred = dockStats.Children;
+                (dockStats.Children[0] as TextBlock).Text = "Hold: " + e.Queue.HoldTetrominoType?.Name;
+                (dockStats.Children[1] as TextBlock).Text = "Score: " + e.Score;
+                (dockStats.Children[2] as TextBlock).Text = "Level: " + e.Level;
+                (dockStats.Children[3] as TextBlock).Text = "Next: " + e.Queue.NextTetromino.Name;
             });
         }
 

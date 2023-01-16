@@ -2,7 +2,7 @@
 
 namespace CMDblockbuster.Field
 {
-    public class InnerPlayfield : IPlayefield
+    internal class InnerPlayfield : IPlayefield
     {
         public int Width { get; private set; }
 

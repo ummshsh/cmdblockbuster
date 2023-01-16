@@ -23,6 +23,7 @@ namespace CMDblockbuster.Game
         {
             this.rulesEngine = new SRSRulesEngine(this.inputController);
             this.rulesEngine.PlayFieldUpdated += this.tetrisRenderer.RenderPlayfield;
+            this.rulesEngine.GameStateUpdated += this.tetrisRenderer.RenderGameState;
 
             this.GameState = State.Running;
             return rulesEngine.Start();

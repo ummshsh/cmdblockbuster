@@ -11,11 +11,12 @@ Features:
 
  # TODO
  - [x] Implement SRS rotation
+ - [x] Implement gravity and speed levels
+ - [x] Ghost tetromino
+ - [x] Implement new cell type for playfield to be rendered, to it can have move properties
+ - [ ] Implement wallkicks
  - [ ] Fix spelling of 'tetromino' everywhere)  
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
- - [ ] Implement wallkicks
- - [x] Implement gravity and speed levels
  - [ ] Implement scoring
- - [ ] Ghost tetromino
  - [ ] Sound events
- - [ ] Implement new cell type for playfield to be rendered, to it can have move properties
+ - [ ] Game status event

@@ -9,12 +9,12 @@
         Title="MainWindow" MinHeight="900" MinWidth="600" MaxWidth="700"
         WindowStartupLocation="CenterOwner">
     <DockPanel VerticalAlignment="Stretch" Height="Auto" Margin="30">
-        <!--<StackPanel Orientation="Vertical">
+        <StackPanel x:Name="DockStats" >
             <TextBlock x:Name="Hold" HorizontalAlignment="Left">Hold</TextBlock>
             <TextBlock x:Name="Score" HorizontalAlignment="Left">Score</TextBlock>
             <TextBlock x:Name="Level" HorizontalAlignment="Left">Level</TextBlock>
             <TextBlock x:Name="Next" HorizontalAlignment="Left">Next</TextBlock>
-        </StackPanel>-->
+        </StackPanel>
         <Grid ShowGridLines="False" Name="PlayfieldGrid" Loaded="OnLoad" Height="800" Width="400">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
