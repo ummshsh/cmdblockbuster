@@ -229,6 +229,7 @@ namespace cmdblockbuster.Game
 
         private bool RotateLeft()
         {
+            var rotated = false;
             if (currentTetromino.IsLanded)
             {
                 return false;
@@ -237,29 +238,69 @@ namespace cmdblockbuster.Game
             currentTetromino.RotateLeft();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
-                SoundTriggered?.Invoke(this, TetrisSound.Rotation);
-                return true;
+                rotated = true;
+            }
+            else if (CheckIfCanBePlacedOnCoordinateWithKick(
+                currentTetromino,
+                currentTetromino.HeightLocation,
+                currentTetromino.WidthLocation,
+                out int newRowCoordinate,
+                out int newRowItemCoordinate))
+            {
+                currentTetromino.HeightLocation = newRowCoordinate;
+                currentTetromino.WidthLocation = newRowItemCoordinate;
+
+                rotated = true;
+            }
+            else
+            {
+                currentTetromino.RotateRight();
             }
 
-            currentTetromino.RotateRight();
-            return false;
+            if (rotated)
+            {
+                SoundTriggered?.Invoke(this, TetrisSound.Rotation);
+            }
+
+            return rotated;
         }
 
         private bool RotateRight()
         {
+            var rotated = false;
             if (currentTetromino.IsLanded)
             {
                 return false;
             }
+
             currentTetromino.RotateRight();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
-                SoundTriggered?.Invoke(this, TetrisSound.Rotation);
-                return true;
+                rotated = true;
+            }
+            else if (CheckIfCanBePlacedOnCoordinateWithKick(
+                currentTetromino,
+                currentTetromino.HeightLocation,
+                currentTetromino.WidthLocation,
+                out int newRowCoordinate,
+                out int newRowItemCoordinate))
+            {
+                currentTetromino.HeightLocation = newRowCoordinate;
+                currentTetromino.WidthLocation = newRowItemCoordinate;
+
+                rotated = true;
+            }
+            else
+            {
+                currentTetromino.RotateLeft();
             }
 
-            currentTetromino.RotateLeft();
-            return false;
+            if (rotated)
+            {
+                SoundTriggered?.Invoke(this, TetrisSound.Rotation);
+            }
+
+            return rotated;
         }
 
         private bool MoveLeft()
@@ -474,9 +515,11 @@ namespace cmdblockbuster.Game
         /// <summary>
         /// This one will try kick tetromino according to the rules and use <seealso cref="CheckIfCanBePlacedOnCoordinate(int, int)"/>
         /// </summary>
-        private bool CheckIfCanBePlacedOnCoordinateWithKick(int xCoordinate, int yCoordinate)
+        private bool CheckIfCanBePlacedOnCoordinateWithKick(Tetromino tetromino, int rowCoordinate, int rowItemCoordinate, out int newRowCoordinate, out int newRowItemCoordinate)
         {
-            throw new NotImplementedException("TODO");
+            newRowCoordinate = rowCoordinate;
+            newRowItemCoordinate = rowItemCoordinate;
+            return false;
         }
 
         private bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>
