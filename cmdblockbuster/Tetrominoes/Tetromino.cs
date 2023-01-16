@@ -1,5 +1,6 @@
 ﻿using cmdblockbuster.Tetrominoes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CMDblockbuster.Tetrominoes
@@ -7,6 +8,19 @@ namespace CMDblockbuster.Tetrominoes
     [Serializable]
     public abstract class Tetromino
     {
+        // True for all except I
+        public Dictionary<MinoRotationTransition, List<Tuple<int, int>>> wallKicks = new Dictionary<MinoRotationTransition, List<Tuple<int, int>>>
+        {
+            { MinoRotationTransition.Rotation_0_R, new List<Tuple<int,int>>(){ new Tuple<int, int>(-1,0), new Tuple<int, int>(-1,1), new Tuple<int,int>(0,-2), new Tuple<int, int>(-1,-2) } },
+            { MinoRotationTransition.Rotation_R_0, new List<Tuple<int,int>>(){ new Tuple<int, int>(1,0), new Tuple<int, int>(1,-1), new Tuple<int,int>(0,+2), new Tuple<int, int>(1,2) } },
+            { MinoRotationTransition.Rotation_R_2, new List<Tuple<int,int>>(){ new Tuple<int, int>(1,0), new Tuple<int, int>(1,-1), new Tuple<int,int>(0,2), new Tuple<int, int>(1,2) } },
+            { MinoRotationTransition.Rotation_2_R, new List<Tuple<int,int>>(){ new Tuple<int, int>(-1,0), new Tuple<int, int>(-1,1), new Tuple<int,int>(0,-2), new Tuple<int, int>(-1,-2) } },
+            { MinoRotationTransition.Rotation_2_L, new List<Tuple<int,int>>(){ new Tuple<int, int>(1,0), new Tuple<int, int>(1,1), new Tuple<int,int>(0,-2), new Tuple<int, int>(1,-2) } },
+            { MinoRotationTransition.Rotation_L_2, new List<Tuple<int,int>>(){ new Tuple<int, int>(-1,0), new Tuple<int, int>(-1,-1), new Tuple<int,int>(0,2), new Tuple<int, int>(-1,2) } },
+            { MinoRotationTransition.Rotation_L_0, new List<Tuple<int,int>>(){ new Tuple<int, int>(-1,0), new Tuple<int, int>(-1,1), new Tuple<int,int>(0,2), new Tuple<int, int>(-1,2) } },
+            { MinoRotationTransition.Rotation_0_L, new List<Tuple<int,int>>(){ new Tuple<int, int>(1, 0), new Tuple<int, int>(1, 1), new Tuple<int, int>(0, -2), new Tuple<int, int>(1, -2) } }
+        };
+
         public TetrominoCellType[,] Cells { get; set; }
 
         public TetrominoRotation Rotation { get; } = new TetrominoRotation();
@@ -108,18 +122,18 @@ namespace CMDblockbuster.Tetrominoes
         public bool IsLanded = false;
         public bool IsGhost = false;
 
-        public virtual void RotateRight()
+        public virtual MinoRotationTransition RotateRight()
         {
             Transpose();
             ReverseEachRow();
-            Rotation.RotateRight();
+            return Rotation.RotateRight();
         }
 
-        public virtual void RotateLeft()
+        public virtual MinoRotationTransition RotateLeft()
         {
             ReverseEachRow();
             Transpose();
-            Rotation.RotateLeft();
+            return Rotation.RotateLeft();
         }
 
         private void ReverseEachRow()

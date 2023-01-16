@@ -1,6 +1,6 @@
 ﻿namespace CMDblockbuster.Tetrominoes
 {
-    internal enum MinoRotaion
+    public enum MinoRotation
     {
         Rotation_0 = 0,
         Rotation_R = 1,

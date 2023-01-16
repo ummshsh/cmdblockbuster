@@ -235,17 +235,19 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            currentTetromino.RotateLeft();
+            var rotationTransition = currentTetromino.RotateLeft();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
                 rotated = true;
             }
-            else if (CheckIfCanBePlacedOnCoordinateWithKick(
-                currentTetromino,
-                currentTetromino.HeightLocation,
-                currentTetromino.WidthLocation,
-                out int newRowCoordinate,
-                out int newRowItemCoordinate))
+            else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
+                CheckIfCanBePlacedOnCoordinateWithKick(
+                    currentTetromino,
+                    rotationTransition,
+                    currentTetromino.HeightLocation,
+                    currentTetromino.WidthLocation,
+                    out int newRowCoordinate,
+                    out int newRowItemCoordinate))
             {
                 currentTetromino.HeightLocation = newRowCoordinate;
                 currentTetromino.WidthLocation = newRowItemCoordinate;
@@ -273,17 +275,19 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            currentTetromino.RotateRight();
+            var rotationTransition = currentTetromino.RotateRight();
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
             {
                 rotated = true;
             }
-            else if (CheckIfCanBePlacedOnCoordinateWithKick(
-                currentTetromino,
-                currentTetromino.HeightLocation,
-                currentTetromino.WidthLocation,
-                out int newRowCoordinate,
-                out int newRowItemCoordinate))
+            else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
+                CheckIfCanBePlacedOnCoordinateWithKick(
+                    currentTetromino,
+                    rotationTransition,
+                    currentTetromino.HeightLocation,
+                    currentTetromino.WidthLocation,
+                    out int newRowCoordinate,
+                    out int newRowItemCoordinate))
             {
                 currentTetromino.HeightLocation = newRowCoordinate;
                 currentTetromino.WidthLocation = newRowItemCoordinate;
@@ -515,8 +519,25 @@ namespace cmdblockbuster.Game
         /// <summary>
         /// This one will try kick tetromino according to the rules and use <seealso cref="CheckIfCanBePlacedOnCoordinate(int, int)"/>
         /// </summary>
-        private bool CheckIfCanBePlacedOnCoordinateWithKick(Tetromino tetromino, int rowCoordinate, int rowItemCoordinate, out int newRowCoordinate, out int newRowItemCoordinate)
+        private bool CheckIfCanBePlacedOnCoordinateWithKick(
+            Tetromino tetromino,
+            MinoRotationTransition minoRotationTransition,
+            int rowCoordinate,
+            int rowItemCoordinate,
+            out int newRowCoordinate,
+            out int newRowItemCoordinate)
         {
+            var kicksForThisRotatioin = tetromino.wallKicks[minoRotationTransition];
+            foreach (var kick in kicksForThisRotatioin)
+            {
+                if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + kick.Item1, rowItemCoordinate + kick.Item2))
+                {
+                    newRowCoordinate = rowCoordinate + kick.Item1;
+                    newRowItemCoordinate = rowItemCoordinate + kick.Item2;
+                    return true;
+                }
+            }
+
             newRowCoordinate = rowCoordinate;
             newRowItemCoordinate = rowItemCoordinate;
             return false;

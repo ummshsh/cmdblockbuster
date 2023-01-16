@@ -20,14 +20,16 @@ namespace CMDblockbuster.Tetrominoes
             };
         }
 
-        public override void RotateLeft()
+        public override MinoRotationTransition RotateLeft()
         {
             // In SRS O mino have only 1 rotation
+            return MinoRotationTransition.Rotation_0_0;
         }
 
-        public override void RotateRight()
+        public override MinoRotationTransition RotateRight()
         {
             // In SRS O mino have only 1 rotation
+            return MinoRotationTransition.Rotation_0_0;
         }
     }
 }
