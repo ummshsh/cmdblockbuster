@@ -26,7 +26,7 @@ namespace cmdblockbuster.Game
         private Tetromino currentTetromino = null;
         private Tetromino currentTetrominoGhost = null;
 
-        private readonly GameState gameState;
+        internal readonly GameState gameState;
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -46,32 +46,40 @@ namespace cmdblockbuster.Game
 
             return Task.Run(() =>
             {
-                while (gameState.State == State.Running)
+                while (true)
                 {
-                    Tick();
-                    Task.Delay(Variables.TickRate).Wait();
+                    if (gameState.State == State.Running)
+                    {
+                        Tick();
+                        Task.Delay(Variables.TickRate).Wait();
+                    }
+                    else if (gameState.State == State.Stopped || gameState.State == State.GameOver)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        Task.Delay(Variables.TickRate).Wait();
+                    }
                 }
             });
         }
 
         private void Tick()
         {
-            if (gameState.State == State.Running)
+            SpawnTetromino();
+            Gravity();
+            UpdateGhost();
+            DestroyRows();
+
+            if ((gameState.LastTimePlayfieldWasUpdated + Variables.RenderUpdateRate) < DateTime.Now)
             {
-                SpawnTetromino();
-                Gravity();
-                UpdateGhost();
-                DestroyRows();
-
-                if ((gameState.LastTimePlayfieldWasUpdated + Variables.RenderUpdateRate) < DateTime.Now)
-                {
-                    UpdateFieldToDisplay(currentTetromino, currentTetrominoGhost);
-                    PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
-                    gameState.LastTimePlayfieldWasUpdated = DateTime.Now;
-                }
-
-                GameStateUpdated?.Invoke(this, gameState);
+                UpdateFieldToDisplay(currentTetromino, currentTetrominoGhost);
+                PlayFieldUpdated?.Invoke(this, playfieldToDisplay);
+                gameState.LastTimePlayfieldWasUpdated = DateTime.Now;
             }
+
+            GameStateUpdated?.Invoke(this, gameState);
         }
         private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
         {
@@ -171,10 +179,9 @@ namespace cmdblockbuster.Game
         {
             gameState.State = State.GameOver;
             SoundTriggered?.Invoke(this, TetrisSound.GameOver);
-            throw new NotImplementedException("GAME OVER!");
         }
 
-        public void Pause() => gameState.State = State.Paused;
+        public void Pause(bool pause) => gameState.State = pause ? State.Paused : State.Running;
 
         #endregion
 
@@ -213,7 +220,7 @@ namespace cmdblockbuster.Game
                     break;
 
                 case InputType.Pause:
-                    Pause();
+                    Pause(true);
                     break;
 
                 case InputType.None:

@@ -10,20 +10,52 @@ namespace BlockBuster
     public partial class MainWindow : Window
     {
         private WpfInputHandler wpfInputHandler;
+        private Tetris tetris;
+        private bool paused = false;
+        private bool gameStarted = false;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        async void OnLoad(object sender, RoutedEventArgs e)
+        private async void NewGame_Click(object sender, RoutedEventArgs e)
         {
+            GameOver.Visibility = Visibility.Collapsed;
+
+            tetris = null;
             wpfInputHandler = new WpfInputHandler();
-            var Tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid, this.DockStats), new WpfSoundPlayer());
-            await Tetris.Start();
+            tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid, this.DockStats, this.HoldGrid, this.NextGrid), new WpfSoundPlayer());
+            paused = false;
+            gameStarted = true;
+            MenuStack.Visibility = Visibility.Collapsed;
+            await tetris.Start();
+            gameStarted = false;
+            MenuStack.Visibility = Visibility.Visible;
+            GameOver.Visibility = Visibility.Visible;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            tetris.Pause(true);
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape & gameStarted)
+            {
+                paused = !paused;
+                MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+                Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+                tetris.Pause(paused);
+                return;
+            }
+
+            if (MenuStack.Visibility == Visibility.Visible)
+            {
+                return;
+            }
+
             CMDblockbuster.InputController.InputType inputToReturn;
 
             if (e.Key == Key.J | e.Key == Key.RightAlt)
@@ -60,6 +92,29 @@ namespace BlockBuster
             }
 
             wpfInputHandler.InputFromWpf(inputToReturn);
+        }
+
+        private void Canvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            Unpause.Visibility = Visibility.Collapsed;
+        }
+
+        private void Unpause_Click(object sender, RoutedEventArgs e)
+        {
+            paused = !paused;
+            MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            tetris.Pause(paused);
+        }
+
+        private void Window_Deactivated(object sender, System.EventArgs e)
+        {
+            if (gameStarted)
+            {
+                paused = true;
+                MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+                Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+                tetris.Pause(paused);
+            }
         }
     }
 }

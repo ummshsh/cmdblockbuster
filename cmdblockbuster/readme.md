@@ -19,13 +19,18 @@ Features:
  - [x] Sound events
  - [x] Implement wallkicks
  - [x] Constrained(time/repetition) infinity(With toggle) https://tetris.fandom.com/wiki/Infinity
- - [ ] Xaml menu and restart game
- - [ ] Make xaml next queue preview
- - [ ] Xaml hold preview
- - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
+ - [x] Fix windows spawn location
+ - [x] Make xaml next queue preview
+ - [x] Xaml hold preview
+ - [x] Xaml menu: start\restart\pause on esc
+ - [ ] Check infinity, looks like after hard drop it waits for some time to spawn next mino and check that kick triggers infinity
  - [ ] Implement basic scoring
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
+ - [ ] Level switched to 2 only after 20th mino
+ - [ ] Check performance
+ - [ ] Create readme
+
+ ## TODO Low priority 
+ - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
  - [ ] Playtest variable levels up
  - [ ] Tests (maybe?)
- - [ ] Create readme
- - [ ] Check infinity, looks like after hard drop it waits for some time to spawn next mino and check that kick triggers infinity
