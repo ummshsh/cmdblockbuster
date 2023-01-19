@@ -5,9 +5,9 @@ namespace BlockBuster
 {
     public class WpfInputHandler : IInputHandler
     {
-        public event EventHandler<CMDblockbuster.InputController.InputType> InputProvided;
+        public event EventHandler<InputType> InputProvided;
 
-        public void InputFromWpf(CMDblockbuster.InputController.InputType input)
+        public void InputFromWpf(InputType input)
         {
             InputProvided?.Invoke(this, input);
         }

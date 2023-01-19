@@ -103,13 +103,13 @@ namespace BlockBuster
 
         private void Window_Deactivated(object sender, System.EventArgs e)
         {
-            //if (gameStarted)
-            //{
-            //    paused = true;
-            //    MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-            //    Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-            //    tetris.Pause(paused);
-            //}
+            ////if (gameStarted)
+            ////{
+            ////    paused = true;
+            ////    MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            ////    Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            ////    tetris.Pause(paused);
+            ////}
         }
     }
 }

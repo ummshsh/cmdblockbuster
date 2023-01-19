@@ -1,4 +1,5 @@
 ﻿using cmdblockbuster.Field;
+using cmdblockbuster.State;
 using cmdblockbuster.Sound;
 using cmdblockbuster.Tetrominoes;
 using cmdblockbuster.Utils;
@@ -41,18 +42,18 @@ namespace cmdblockbuster.Game
 
         public Task Start()
         {
-            gameState.State = State.Running;
+            gameState.State = State.State.Running;
 
             return Task.Run(() =>
             {
                 while (true)
                 {
-                    if (gameState.State == State.Running)
+                    if (gameState.State == State.State.Running)
                     {
                         Tick();
                         Task.Delay(Variables.TickRate).Wait();
                     }
-                    else if (gameState.State == State.Stopped || gameState.State == State.GameOver)
+                    else if (gameState.State == State.State.Stopped || gameState.State == State.State.GameOver)
                     {
                         return;
                     }
@@ -177,13 +178,13 @@ namespace cmdblockbuster.Game
 
         private void GameOver()
         {
-            gameState.State = State.GameOver;
+            gameState.State = State.State.GameOver;
             SoundTriggered?.Invoke(this, TetrisSound.GameOver);
         }
 
-        public void Pause(bool pause) => gameState.State = pause ? State.Paused : State.Running;
+        public void Pause(bool pause) => gameState.State = pause ? State.State.Paused : State.State.Running;
 
-        public void Stop() => gameState.State = State.Stopped;
+        public void Stop() => gameState.State = State.State.Stopped;
 
         #endregion
 

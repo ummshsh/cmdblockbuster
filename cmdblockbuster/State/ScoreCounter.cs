@@ -1,4 +1,4 @@
-﻿using cmdblockbuster.Game;
+﻿using cmdblockbuster.State;
 
 namespace cmdblockbuster.Score
 {
@@ -13,7 +13,7 @@ namespace cmdblockbuster.Score
 
         public int LinesCleared { get; private set; } = 0;
 
-        public Level Level => (Level)(LinesCleared / 10);
+        public Level Level => (Level)((LinesCleared / 10) + 1 > 15 ? 15 : (LinesCleared / 10) + 1);
 
         internal void AddLinesCleared(int count) => LinesCleared += count;
 
