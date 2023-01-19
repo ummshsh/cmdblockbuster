@@ -29,10 +29,13 @@ namespace BlockBuster
             paused = false;
             gameStarted = true;
             MenuStack.Visibility = Visibility.Collapsed;
+
             await tetris.Start();
+
             gameStarted = false;
             MenuStack.Visibility = Visibility.Visible;
             GameOver.Visibility = Visibility.Visible;
+            Unpause.Visibility = Visibility.Collapsed;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
