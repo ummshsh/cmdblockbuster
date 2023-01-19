@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace cmdblockbuster.Game
 {
+    /// <summary>
+    /// 7-Bag spawn system
+    /// </summary>
     public class TetrominoQueue
     {
         public Type NextTetromino => queue.Peek();

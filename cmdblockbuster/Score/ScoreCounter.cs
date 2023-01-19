@@ -15,6 +15,11 @@ namespace cmdblockbuster.Score
 
         public Level Level => (Level)(LinesCleared / 10);
 
-        public void AddLinesCleared(int count) => LinesCleared += count;
+        internal void AddLinesCleared(int count) => LinesCleared += count;
+
+        internal void RegisterAction()
+        {
+
+        }
     }
 }
