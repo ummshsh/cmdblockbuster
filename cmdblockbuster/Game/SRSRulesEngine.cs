@@ -6,7 +6,6 @@ using CMDblockbuster.Field;
 using CMDblockbuster.InputController;
 using CMDblockbuster.Tetrominoes;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace cmdblockbuster.Game
@@ -81,6 +80,7 @@ namespace cmdblockbuster.Game
 
             GameStateUpdated?.Invoke(this, gameState);
         }
+
         private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
         {
             // Add all static elements to playfield to display
@@ -379,7 +379,7 @@ namespace cmdblockbuster.Game
                 return false;
             }
 
-            bool infinity = gameState.TimeInfinityTriggered + Variables.InfinityTime > DateTime.Now && gameState.ThisMinoInfinityAvailable;
+            bool infinity = gameState.TimeInfinityTriggered + Variables.InfinityTime > DateTime.Now && gameState.ThisMinoInfinityAvailable & !hardDrop;
             if (IfTouchedFoundationOrAnotherTetrominoUnderneath(currentTetromino) &&
                 (hardDrop || gameState.LastTimeTetrominoMovedDown.Add(Variables.LockDelayTimeout) < DateTime.Now))
             {
