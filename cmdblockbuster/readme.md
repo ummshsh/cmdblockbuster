@@ -23,7 +23,7 @@ Features:
  - [x] Make xaml next queue preview
  - [x] Xaml hold preview
  - [x] Xaml menu: start\restart\pause on esc
- - [ ] Check infinity, looks like after hard drop it waits for some time to spawn next mino and make sure that kick triggers infinity
+ - [x] Check infinity, looks like after hard drop it waits for some time to spawn next mino and make sure that kick triggers infinity
  - [ ] Implement basic scoring
  - [ ] SpawnTetromino(): Implement 7 pack spawn system
  - [ ] Level switched to 2 only after 20th mino
