@@ -183,6 +183,8 @@ namespace cmdblockbuster.Game
 
         public void Pause(bool pause) => gameState.State = pause ? State.Paused : State.Running;
 
+        public void Stop() => gameState.State = State.Stopped;
+
         #endregion
 
         #region HandleMovement

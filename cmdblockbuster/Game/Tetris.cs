@@ -35,5 +35,10 @@ namespace CMDblockbuster.Game
         {
             rulesEngine.Pause(pause);
         }
+
+        public void Stop()
+        {
+            rulesEngine.Stop();
+        }
     }
 }

@@ -109,8 +109,8 @@ namespace BlockBuster
 
                 if (cachedNextMino != e.Queue.NextTetromino)
                 {
-                    FillGridWithMinoImage(nextGrid, e.Queue.NextQueuePreview.First());
-                    cachedNextMino = e.Queue.NextQueuePreview.First();
+                    FillGridWithMinoImage(nextGrid, e.Queue.NextTetromino);
+                    cachedNextMino = e.Queue.NextTetromino;
                 }
             });
         }
@@ -125,7 +125,6 @@ namespace BlockBuster
             grid.Children.Clear();
             var mino = Activator.CreateInstance(minoType) as Tetromino;
 
-            // Draw hold grid
             for (int row = 0; row < 4; row++)
             {
                 for (int rowItemIndex = 0; rowItemIndex < 4; rowItemIndex++)

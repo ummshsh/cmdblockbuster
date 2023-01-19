@@ -21,26 +21,18 @@ namespace BlockBuster
 
         private async void NewGame_Click(object sender, RoutedEventArgs e)
         {
-            GameOver.Visibility = Visibility.Collapsed;
-
-            tetris = null;
+            tetris?.Stop();
             wpfInputHandler = new WpfInputHandler();
             tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.PlayfieldGrid, this.DockStats, this.HoldGrid, this.NextGrid), new WpfSoundPlayer());
             paused = false;
             gameStarted = true;
             MenuStack.Visibility = Visibility.Collapsed;
-
             await tetris.Start();
-
-            gameStarted = false;
-            MenuStack.Visibility = Visibility.Visible;
-            GameOver.Visibility = Visibility.Visible;
-            Unpause.Visibility = Visibility.Collapsed;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            tetris.Pause(true);
+            tetris.Stop();
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
@@ -111,13 +103,13 @@ namespace BlockBuster
 
         private void Window_Deactivated(object sender, System.EventArgs e)
         {
-            if (gameStarted)
-            {
-                paused = true;
-                MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-                Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-                tetris.Pause(paused);
-            }
+            //if (gameStarted)
+            //{
+            //    paused = true;
+            //    MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            //    Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            //    tetris.Pause(paused);
+            //}
         }
     }
 }

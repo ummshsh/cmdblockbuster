@@ -7,17 +7,15 @@ namespace cmdblockbuster.Game
 {
     public class TetrominoQueue
     {
-        public Type NextTetromino => stack.Peek();
+        public Type NextTetromino => queue.Peek();
 
-        public IEnumerable<Type> NextQueuePreview => stack.Take(5);
+        public IEnumerable<Type> NextQueuePreview => queue.Take(5);
 
-
-        public Tetromino HoldTetrominoInstance =>
-            Activator.CreateInstance(HoldTetrominoType) as Tetromino;
+        private readonly Random random = new Random();
 
         public Type HoldTetrominoType { get; private set; }
 
-        public readonly Stack<Type> stack;
+        public readonly Queue<Type> queue;
 
         // Tetromino types
         public Type[] tetrominoes = new[] {
@@ -31,36 +29,33 @@ namespace cmdblockbuster.Game
 
         public TetrominoQueue()
         {
-            stack = new Stack<Type>();
+            queue = new Queue<Type>();
             GenerateInitialQueue();
             RegenerateQueue();
         }
 
         private void GenerateInitialQueue()
         {
-            var random = new Random();
             Enumerable.Range(0, tetrominoes.Length)
                 .OrderBy(x => random.Next())
                 .ToList()
-                .ForEach(t => stack.Push(tetrominoes[t]));
+                .ForEach(t => queue.Enqueue(tetrominoes[t]));
         }
-
-        // TODO: make actuall 7pack spawn here
+        
         private void RegenerateQueue()
         {
-            if (stack.Count < 8)
+            if (queue.Count < 8)
             {
-                var random = new Random();
                 Enumerable.Range(0, tetrominoes.Length)
                     .OrderBy(x => random.Next())
                     .ToList()
-                    .ForEach(t => stack.Push(tetrominoes[t]));
+                    .ForEach(t => queue.Enqueue(tetrominoes[t]));
             }
         }
 
         public Tetromino GetTetrominoFromQueue()
         {
-            var tetromino = Activator.CreateInstance(/*typeof(TetrominoJ)*/ stack.Pop()) as Tetromino;
+            var tetromino = Activator.CreateInstance(/*typeof(TetrominoJ)*/ queue.Dequeue()) as Tetromino;
             RegenerateQueue();
             return tetromino;
         }
@@ -70,7 +65,7 @@ namespace cmdblockbuster.Game
             Type typeToReturn;
             if (HoldTetrominoType == null)
             {
-                typeToReturn = stack.Pop();
+                typeToReturn = queue.Dequeue();
                 HoldTetrominoType = tetrominoToStoreInstead;
             }
             else

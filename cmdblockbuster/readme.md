@@ -31,6 +31,8 @@ Features:
  - [ ] Create readme
 
  ## TODO Low priority 
+ - [ ] Figure out snake sequences and what to do with them
+ - [x] Clicking on 'New game' after another game started causes +50mb ram
  - [ ] Probably I do too many checks and code can be simplified
  - [ ] Icon
  - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
