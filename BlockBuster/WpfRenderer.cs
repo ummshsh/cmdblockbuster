@@ -156,7 +156,7 @@ namespace BlockBuster
         private SolidColorBrush GetColor(Cell tetrominoCellType)
         {
             var color = new SolidColorBrush(
-                System.Windows.Media.Color.FromArgb(
+                Color.FromArgb(
                     tetrominoCellType.Color.A,
                     tetrominoCellType.Color.R,
                     tetrominoCellType.Color.G,
