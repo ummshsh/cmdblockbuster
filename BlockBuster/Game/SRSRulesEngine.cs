@@ -1,13 +1,13 @@
-﻿using BlockBusterXaml.Field;
-using BlockBusterXaml.State;
-using BlockBusterXaml.Sound;
-using BlockBusterXaml.Tetrominoes;
-using BlockBusterXaml.Utils;
-using BlockBusterXaml.InputHandler;
+﻿using BlockBuster.Field;
+using BlockBuster.State;
+using BlockBuster.Sound;
+using BlockBuster.Tetrominoes;
+using BlockBuster.Utils;
+using BlockBuster.InputHandler;
 using System;
 using System.Threading.Tasks;
 
-namespace BlockBusterXaml.Game;
+namespace BlockBuster.Game;
 
 /// <summary>
 /// Super Rotation System Engine
@@ -585,7 +585,7 @@ internal class SRSRulesEngine : IRulesEngine
         return false;
     }
 
-    private bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>
+    private static bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>
         (int)fieldCell > 0 && (int)tetrominoeCell > 0;
 
     #endregion

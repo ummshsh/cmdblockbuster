@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace BlockBusterXaml.Utils;
+namespace BlockBuster.Utils;
 
 public static class ObjectCopier
 {

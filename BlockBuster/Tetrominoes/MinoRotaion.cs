@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.Tetrominoes;
+﻿namespace BlockBuster.Tetrominoes;
 
 public enum MinoRotation
 {

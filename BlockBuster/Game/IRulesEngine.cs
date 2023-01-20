@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.Game;
+﻿namespace BlockBuster.Game;
 
 internal interface IRulesEngine
 {

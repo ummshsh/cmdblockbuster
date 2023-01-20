@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlockBusterXaml.Game;
+namespace BlockBuster.Game;
 
 public static class Variables
 {

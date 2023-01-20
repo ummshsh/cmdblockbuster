@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.Field;
+﻿namespace BlockBuster.Field;
 
 internal interface IPlayefield
 {

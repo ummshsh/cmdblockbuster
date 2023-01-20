@@ -1,6 +1,6 @@
-﻿using BlockBusterXaml.Tetrominoes;
+﻿using BlockBuster.Tetrominoes;
 
-namespace BlockBusterXaml.Field;
+namespace BlockBuster.Field;
 
 /// <summary>
 /// Passed to renderer and contains Tetromino and Ghost tetromino

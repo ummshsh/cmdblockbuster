@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BlockBusterXaml.Tetrominoes;
+namespace BlockBuster.Tetrominoes;
 
 [Serializable]
 public class TetrominoI : Tetromino

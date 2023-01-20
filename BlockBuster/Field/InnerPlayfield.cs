@@ -1,6 +1,6 @@
-﻿using BlockBusterXaml.Tetrominoes;
+﻿using BlockBuster.Tetrominoes;
 
-namespace BlockBusterXaml.Field;
+namespace BlockBuster.Field;
 
 internal class InnerPlayfield : IPlayefield
 {

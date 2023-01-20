@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.InputHandler;
+﻿namespace BlockBuster.InputHandler;
 
 public enum InputType
 {

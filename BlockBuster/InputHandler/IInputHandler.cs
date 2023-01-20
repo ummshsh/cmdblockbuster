@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlockBusterXaml.InputHandler;
+namespace BlockBuster.InputHandler;
 
 public interface IInputHandler
 {

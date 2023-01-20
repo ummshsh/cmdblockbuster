@@ -1,7 +1,7 @@
-﻿using BlockBusterXaml.Field;
-using BlockBusterXaml.State;
+﻿using BlockBuster.Field;
+using BlockBuster.State;
 
-namespace BlockBusterXaml.Renderer;
+namespace BlockBuster.Renderer;
 
 public interface ITetrisRenderer
 {

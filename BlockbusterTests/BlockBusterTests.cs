@@ -1,5 +1,5 @@
-using BlockBusterXaml.Game;
-using BlockBusterXaml.Tetrominoes;
+using BlockBuster.Game;
+using BlockBuster.Tetrominoes;
 
 namespace CmdBlockbusterTests;
 
@@ -25,11 +25,11 @@ public class BlockBusterTests
 
             minoChecked++;
         }
-    }
 
-    private static bool IsSnake(Type mino)
-    {
-        return mino == typeof(TetrominoS) ||
-                mino == typeof(TetrominoZ);
+        static bool IsSnake(Type mino)
+        {
+            return mino == typeof(TetrominoS) ||
+                    mino == typeof(TetrominoZ);
+        }
     }
 }

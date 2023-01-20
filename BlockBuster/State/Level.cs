@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.State;
+﻿namespace BlockBuster.State;
 
 public enum Level
 {

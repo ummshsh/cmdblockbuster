@@ -1,4 +1,4 @@
-﻿namespace BlockBusterXaml.Sound;
+﻿namespace BlockBuster.Sound;
 
 public interface ISoundPlayer
 {
