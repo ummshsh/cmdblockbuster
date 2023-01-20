@@ -22,3 +22,8 @@ internal class ScoreCounter
 
     }
 }
+
+public enum ScoreAction // https://tetris.wiki/Scoring
+{
+
+}
