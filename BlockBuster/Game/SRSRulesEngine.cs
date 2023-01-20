@@ -3,9 +3,7 @@ using BlockBusterXaml.State;
 using BlockBusterXaml.Sound;
 using BlockBusterXaml.Tetrominoes;
 using BlockBusterXaml.Utils;
-using BlockBusterXaml.Field;
 using BlockBusterXaml.InputHandler;
-using BlockBusterXaml.Tetrominoes;
 using System;
 using System.Threading.Tasks;
 
