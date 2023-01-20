@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Sounds\GameOver.wav" />
+    <None Remove="Sounds\Hold.wav" />
+    <None Remove="Sounds\Landing.wav" />
+    <None Remove="Sounds\LineClear.wav" />
+    <None Remove="Sounds\Locking.wav" />
+    <None Remove="Sounds\Movement.wav" />
+    <None Remove="Sounds\Rotation.wav" />
+    <None Remove="Sounds\TouchignWall.wav" />
+    <None Remove="Sounds\TouchingWall.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlockBuster\BlockBuster.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Sounds\GameOver.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Hold.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Landing.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\LineClear.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Locking.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Movement.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\Rotation.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\TouchingWall.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

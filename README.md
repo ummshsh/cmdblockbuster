@@ -47,6 +47,7 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
 - [ ] Icon
+- [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
 - [ ] Playtest variable levels up
 - [ ] Delayed Auto Shift: the amount of time before an input is repeated/ARR is engaged.(Auto Repeat Rate)
