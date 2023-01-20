@@ -1,8 +1,8 @@
-﻿using BlockBusterXaml.Game;
-using BlockBusterXaml.Score;
+﻿using BlockBuster.Game;
+using BlockBuster.Score;
 using System;
 
-namespace BlockBusterXaml.State;
+namespace BlockBuster.State;
 
 public class GameState
 {

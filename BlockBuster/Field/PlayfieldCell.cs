@@ -1,7 +1,7 @@
-﻿using BlockBusterXaml.Tetrominoes;
+﻿using BlockBuster.Tetrominoes;
 using System.Drawing;
 
-namespace BlockBusterXaml.Field;
+namespace BlockBuster.Field;
 
 public class Cell : IPlayfieldCell
 {

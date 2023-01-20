@@ -1,5 +1,5 @@
-using BlockBusterXaml.Game;
-using BlockBusterXaml.Tetrominoes;
+using BlockBuster.Game;
+using BlockBuster.Tetrominoes;
 
 namespace CmdBlockbusterTests;
 

@@ -1,7 +1,4 @@
-﻿using BlockBusterXaml.Field;
-using BlockBusterXaml.Tetrominoes;
-
-namespace BlockBusterXaml.Field;
+﻿namespace BlockBuster.Field;
 
 internal interface IPlayefield
 {

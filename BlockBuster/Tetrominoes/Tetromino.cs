@@ -1,9 +1,8 @@
-﻿using BlockBusterXaml.Tetrominoes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlockBusterXaml.Tetrominoes;
+namespace BlockBuster.Tetrominoes;
 
 [Serializable]
 public abstract class Tetromino

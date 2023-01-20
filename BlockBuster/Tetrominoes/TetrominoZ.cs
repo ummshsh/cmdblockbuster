@@ -1,7 +1,6 @@
-﻿using BlockBusterXaml.Tetrominoes;
-using System;
+﻿using System;
 
-namespace BlockBusterXaml.Tetrominoes;
+namespace BlockBuster.Tetrominoes;
 
 [Serializable]
 class TetrominoZ : Tetromino

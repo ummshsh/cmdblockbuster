@@ -1,9 +1,9 @@
-﻿using BlockBusterXaml.Tetrominoes;
+﻿using BlockBuster.Tetrominoes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlockBusterXaml.Game;
+namespace BlockBuster.Game;
 
 /// <summary>
 /// 7-Bag spawn system

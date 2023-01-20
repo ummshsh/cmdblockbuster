@@ -1,9 +1,9 @@
-﻿using BlockBusterXaml.InputHandler;
-using BlockBusterXaml.Renderer;
-using BlockBusterXaml.Sound;
+﻿using BlockBuster.InputHandler;
+using BlockBuster.Renderer;
+using BlockBuster.Sound;
 using System.Threading.Tasks;
 
-namespace BlockBusterXaml.Game;
+namespace BlockBuster.Game;
 
 public class Tetris
 {

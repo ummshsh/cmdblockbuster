@@ -1,6 +1,6 @@
-﻿using BlockBusterXaml.State;
+﻿using BlockBuster.State;
 
-namespace BlockBusterXaml.Score;
+namespace BlockBuster.Score;
 
 // Increase score on soft drop
 // T-Spin
