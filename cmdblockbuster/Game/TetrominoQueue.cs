@@ -33,32 +33,75 @@ namespace cmdblockbuster.Game
         public TetrominoQueue()
         {
             queue = new Queue<Type>();
-            GenerateInitialQueue();
+            GenerateInitialBag();
             RegenerateQueue();
         }
 
-        private void GenerateInitialQueue()
+        private void GenerateInitialBag()
         {
             Enumerable.Range(0, tetrominoes.Length)
                 .OrderBy(x => random.Next())
                 .ToList()
                 .ForEach(t => queue.Enqueue(tetrominoes[t]));
+
+            // Make sure queue starts not form S\Z\O to avoid forced overhang
+            while (queue.First() == typeof(TetrominoS) ||
+                queue.First() == typeof(TetrominoZ) ||
+                queue.First() == typeof(TetrominoO))
+            {
+                var newOrder = queue.OrderBy(t => random.Next()).ToList();
+                queue.Clear();
+                newOrder.ToList().ForEach(t => queue.Enqueue(t));
+            }
         }
-        
+
         private void RegenerateQueue()
         {
             if (queue.Count < 8)
             {
-                Enumerable.Range(0, tetrominoes.Length)
+                // Generate new 7 bag
+                var newBag = Enumerable.Range(0, tetrominoes.Length)
                     .OrderBy(x => random.Next())
                     .ToList()
-                    .ForEach(t => queue.Enqueue(tetrominoes[t]));
+                    .Select(t => tetrominoes[t]);
+
+
+                // Detect and break snake sequence 
+                while (ContainsSnakeSequenceLongerThanTwo(queue, newBag))
+                {
+                    var newOrder = newBag.OrderBy(x => random.Next()).ToList();
+                    newBag = newOrder;
+                }
+                newBag.ToList().ForEach(t => queue.Enqueue(t));
             }
         }
 
+        /// <summary>
+        /// Detects snake sequence longer than 2 on seam between 7bags
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <param name="newBag"></param>
+        /// <returns></returns>
+        private bool ContainsSnakeSequenceLongerThanTwo(Queue<Type> queue, IEnumerable<Type> newBag)
+        {
+            var listToCheck = new List<Type>();
+            listToCheck.AddRange(queue.TakeLast(2));
+            listToCheck.AddRange(newBag.Take(2));
+
+            var concequentSnakes = 0;
+
+            foreach (var t in listToCheck)
+            {
+                concequentSnakes = (t == typeof(TetrominoS) || t == typeof(TetrominoZ)) ? ++concequentSnakes : 0;
+            }
+
+            return concequentSnakes > 2;
+        }
+
+
         public Tetromino GetTetrominoFromQueue()
         {
-            var tetromino = Activator.CreateInstance(/*typeof(TetrominoJ)*/ queue.Dequeue()) as Tetromino;
+            var tetromino = Activator.CreateInstance( queue.Dequeue()) as Tetromino;
             RegenerateQueue();
             return tetromino;
         }

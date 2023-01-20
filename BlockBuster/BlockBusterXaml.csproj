@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\cmdblockbuster\cmdblockbuster.csproj" />
+    <ProjectReference Include="..\cmdblockbuster\BlockBuster.csproj" />
   </ItemGroup>
 
   <ItemGroup>
