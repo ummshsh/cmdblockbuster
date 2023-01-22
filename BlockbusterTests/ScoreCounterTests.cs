@@ -10,16 +10,107 @@ public class ScoreCounterTests
     public void CheckScoreForActionsThatAreNotRequireHistory()
     {
         var counter = new ScoreCounter();
-        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single)
-        {
-            LinesCleared = 1
-        });
-        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single)
-        {
-            LinesCleared = 1
-        });
 
-        Assert.IsTrue(counter.Score > 0);
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(250, counter.Score);
+        Assert.AreEqual(1, counter.ComboCounter);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(2, counter.ComboCounter);
+        Assert.AreEqual(450, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(3, counter.ComboCounter);
+        Assert.AreEqual(700, counter.Score);
+
+        // Breaking combo
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(700, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(800, counter.Score);
+
+        // Actions that not award points, just break BTB and Combo
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(800, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Tetris) { LinesCleared = 4 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(1600, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Tetris) { LinesCleared = 4 });
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(3250, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(3250, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(3350, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedRight));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedRight));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedRight));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedRight));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.RotatedLeft));
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(3350, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(3350, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.TSpinDouble) { LinesCleared = 2 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(4550, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(4650, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.SoftDrop) { DroppedLines = 5 });
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(4655, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.SoftDrop) { DroppedLines = 5 });
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.HardDrop) { DroppedLines = 5 });
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+
+        Assert.AreEqual(-1, counter.ComboCounter);
+        Assert.AreEqual(4670, counter.Score);
+
     }
 
     [TestMethod("Check back to back scoring")]

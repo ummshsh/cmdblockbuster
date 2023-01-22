@@ -7,7 +7,8 @@ using System.Linq;
 namespace BlockBuster.Score;
 
 /// <summary>
-/// Impemented according to <see cref="https://tetris.wiki/Scoring"/>
+/// Impemented according to <see cref="https://tetris.wiki/Scoring"/> <para/>
+/// https://tetris.wiki/Combo
 /// </summary>
 public class ScoreCounter
 {
@@ -17,10 +18,7 @@ public class ScoreCounter
 
     private readonly HistoryStack<ScoreablePlayfieldAction> actionsHistory = new(100);
 
-    /// <summary>
-    /// https://tetris.wiki/Combo
-    /// </summary>
-    private int ComboCounter { get; set; } = -1; // Default value
+    public int ComboCounter { get; set; } = -1; // Default value
 
     /// <summary>
     /// Level is always considered to be the level before the line clear. 
@@ -37,7 +35,7 @@ public class ScoreCounter
     /// <param name="playfieldMinoAction"></param>
     internal void RegisterAction(ScoreablePlayfieldAction action)
     {
-        if ((int)action.Action < 0)
+        if ((int)action.Action < 0 && action.Action != ScoreAction.Landed)
         {
             // Ignore trivial move like love down, left, right as they not impact scoring for B2B and Combos
             // They can be used for futere(maybe) Finesse mode
@@ -45,6 +43,11 @@ public class ScoreCounter
         }
         else
         {
+            if (action.Action == ScoreAction.Landed)
+            {
+                ComboCounter = -1;
+            }
+
             actionsHistory.Push(action);
         }
 
@@ -52,45 +55,70 @@ public class ScoreCounter
         var indexHistoryForCombo = 0;
         while (true)
         {
-            var scoreAction = actionsHistory.Peek(indexHistoryForCombo);
+            var scoreActionFromHistory = actionsHistory.Peek(indexHistoryForCombo);
 
-            if (scoreAction == null)
+            if (scoreActionFromHistory == null)
             {
                 break;
             }
 
-            if (scoreAction.LinesCleared > 0)
+            if (/*scoreActionFromHistory.LinesCleared > 0 &&*/ !scoreActionFromHistory.ScoreAddedAlready && scoreActionFromHistory.Action != ScoreAction.Landed)
             {
-                Score += GetScore(scoreAction.Action, Level, action.LinesCleared);
-                ComboCounter++;
+                scoreActionFromHistory.ScoreAddedAlready = true;
+                Score += GetScore(scoreActionFromHistory.Action, Level, action.DroppedLines);
+
+                if (scoreActionFromHistory.Action != ScoreAction.SoftDrop && 
+                    scoreActionFromHistory.Action != ScoreAction.HardDrop)
+                {
+                    ComboCounter++;
+                }
                 indexHistoryForCombo++;
             }
             else
             {
-                ComboCounter = -1;
                 break;
             }
         }
 
+        if (ComboCounter > 0)
+        {
+            Score += GetScore(ScoreAction.Combo, Level);
+        }
+
         // Go back inhistory and check for BTB
         var indexHistoryForBtb = 0;
+        var lastScoreActionFromHistory = actionsHistory.Peek(indexHistoryForBtb);
+
+        if (lastScoreActionFromHistory != null && !lastScoreActionFromHistory.IsDifficult)
+        {
+            return;
+        }
+
+        indexHistoryForBtb++;
+
         while (true)
         {
-            var scoreAction = actionsHistory.Peek(indexHistoryForBtb);
+            var scoreActionFromHistory = actionsHistory.Peek(indexHistoryForBtb);
 
-            if (scoreAction == null)
+            if (scoreActionFromHistory is null)
             {
-                break;
+                return;
             }
 
-            if ((int)scoreAction.Action >= 100)
+            // if not difficult and not breaks the BTB, then search again
+            if (scoreActionFromHistory.LinesCleared > 0 && !scoreActionFromHistory.IsDifficult)
             {
-                Score += GetScore(scoreAction.Action, Level, action.LinesCleared);
-                indexHistoryForBtb++;
+                return; // Broken
+            }
+            else if (scoreActionFromHistory.IsDifficult)
+            {
+                Score += GetScore(actionsHistory.Peek(indexHistoryForBtb - 1).Action, Level, action.LinesCleared);
+                return;
             }
             else
             {
-                break;
+                indexHistoryForBtb++; // Check next
+                continue;
             }
         }
     }
@@ -174,24 +202,20 @@ public class ScoreablePlayfieldAction
 
     public int LinesCleared { get; set; } = 0;
 
-    public TSpin TSpin { get; set; } = TSpin.Not;
-
     public int DroppedLines { get; set; } = 0; // Hard and Soft
 
     public int ScoreAwarded { get; set; } = 0;
+
+    public bool ScoreAddedAlready { get; set; } = false;
+
+    public bool PerfectClear { get; set; } = false;
+
 
     public ScoreablePlayfieldAction(Tetromino tetromino, ScoreAction playfieldActionsEnum)
     {
         this.Tetromino = tetromino;
         this.Action = playfieldActionsEnum;
     }
-}
-
-public enum TSpin
-{
-    Not,
-    Mini,
-    Full
 }
 
 /// <summary>
@@ -237,8 +261,9 @@ public enum ScoreAction
     PerfectClearTripleLine = 108,
     PerfectClearTetris = 109,
 
+    // By mino history, no value assigned, actions consists of actions above:
+
     /// <summary>
-    /// By mino history, no value assigned, actions consists of actions above
     /// Back to back registered only if previous move was difficult and then another difficult move was made  <para/>
     /// Only a Single, Double, or Triple line clear can break a Back-to-Back chain, T-Spin with no lines will not break the chain. <para/>
     /// Regular mino landings(without clear) don't break BTB
@@ -246,14 +271,12 @@ public enum ScoreAction
     BackToBack,
 
     /// <summary>
-    /// By mino history, no value assigned, actions consists of actions above <para/>
     /// Achived through any clears <para/>
     /// Breaked by landing without line clear
     /// </summary>
     Combo,
 
     /// <summary>
-    /// By mino history, no value assigned, actions consists of actions above <para/>
     /// By several tetromino consecutive actions and playfield state
     /// </summary>
     BackToBackPerfectClearTetris
