@@ -56,35 +56,35 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.J | e.Key == Key.RightAlt)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.RotateLeft;
+            inputToReturn = InputHandler.InputType.RotateLeft;
         }
         else if (e.Key == Key.K | e.Key == Key.RightCtrl)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.RotateRight;
+            inputToReturn = InputHandler.InputType.RotateRight;
         }
         else if (e.Key == Key.S | e.Key == Key.Down)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.SoftDrop;
+            inputToReturn = InputHandler.InputType.SoftDrop;
         }
         else if (e.Key == Key.RightShift)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.Hold;
+            inputToReturn = InputHandler.InputType.Hold;
         }
         else if (e.Key == Key.W | e.Key == Key.Up)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.HardDrop;
+            inputToReturn = InputHandler.InputType.HardDrop;
         }
         else if (e.Key == Key.A | e.Key == Key.Left)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.Left;
+            inputToReturn = InputHandler.InputType.Left;
         }
         else if (e.Key == Key.D | e.Key == Key.Right)
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.Right;
+            inputToReturn = InputHandler.InputType.Right;
         }
         else
         {
-            inputToReturn = BlockBuster.InputHandler.InputType.None;
+            inputToReturn = InputHandler.InputType.None;
         }
 
         wpfInputHandler.InputFromWpf(inputToReturn);

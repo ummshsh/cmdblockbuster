@@ -13,7 +13,6 @@ public class TetrominoRotation
         Rotation = (int)Rotation + 1 > 3 ? MinoRotation.Rotation_0 : Rotation + 1;
         var newRotation = Rotation.ToString().Replace("Rotation_", "");
 
-
         return Enum.Parse<MinoRotationTransition>($"Rotation_{originalRotation}_{newRotation}");
     }
 

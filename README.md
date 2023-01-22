@@ -35,6 +35,9 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [x] Check performance
 - [x] Create readme
 - [ ] Implement basic scoring
+- [ ] Implement debug playfield states
+- [ ] Implement scoring tests
+- [ ] Check that soft drop does not lock mino
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
@@ -47,6 +50,7 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
 - [ ] Icon
+- [ ] Read about fourht kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
 - [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
 - [ ] Playtest variable levels up

@@ -4,7 +4,7 @@ using BlockBuster.Tetrominoes;
 namespace CmdBlockbusterTests;
 
 [TestClass]
-public class BlockBusterTests
+public class QueueTests
 {
     [TestMethod("Check Queue For Absence Of Snake Sequences Longer Than Two")]
     public void CheckQueueForAbsenceOfSnakeSequencesLongerThanTwo()

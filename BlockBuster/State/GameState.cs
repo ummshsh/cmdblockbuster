@@ -28,5 +28,5 @@ public class GameState
 
     internal bool CanUseHold { get; set; } = true;
 
-    internal ScoreCounter ScoreCounter { get; } = new ScoreCounter();
+    public ScoreCounter ScoreCounter { get; } = new ScoreCounter();
 }

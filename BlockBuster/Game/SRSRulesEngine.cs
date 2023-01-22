@@ -1,9 +1,9 @@
 ﻿using BlockBuster.Field;
-using BlockBuster.State;
+using BlockBuster.InputHandler;
 using BlockBuster.Sound;
+using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using BlockBuster.Utils;
-using BlockBuster.InputHandler;
 using System;
 using System.Threading.Tasks;
 
@@ -393,7 +393,6 @@ internal class SRSRulesEngine : IRulesEngine
                 AddCurrentTetrominoToInnerState();
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
                 return false;
-
             }
         }
 
