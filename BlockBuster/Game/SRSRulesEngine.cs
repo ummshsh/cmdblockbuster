@@ -1,5 +1,6 @@
 ﻿using BlockBuster.Field;
 using BlockBuster.InputHandler;
+using BlockBuster.Score;
 using BlockBuster.Sound;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
@@ -209,11 +210,11 @@ internal class SRSRulesEngine : IRulesEngine
                 break;
 
             case InputType.HardDrop:
-                HardFall();
+                HardDrop();
                 break;
 
             case InputType.SoftDrop:
-                SoftFall();
+                SoftDrop();
                 break;
 
             case InputType.Hold:
@@ -391,6 +392,7 @@ internal class SRSRulesEngine : IRulesEngine
             else
             {
                 AddCurrentTetrominoToInnerState();
+                //gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
                 return false;
             }
@@ -406,9 +408,9 @@ internal class SRSRulesEngine : IRulesEngine
         return false;
     }
 
-    private void SoftFall() => MoveDown();
+    private void SoftDrop() => MoveDown();
 
-    private void HardFall()
+    private void HardDrop()
     {
         while (MoveDown(true))
         {
@@ -474,7 +476,8 @@ internal class SRSRulesEngine : IRulesEngine
 
         if (rowsDestroyed > 0)
         {
-            gameState.ScoreCounter.AddLinesCleared(rowsDestroyed);
+            //gameState.ScoreCounter.RegisterAction(new Score.ScoreablePlayfieldAction(currentTetromino, Score.ScoreAction.));
+            //gameState.ScoreCounter.AddLinesCleared(rowsDestroyed);
             SoundTriggered?.Invoke(this, TetrisSound.LineClear);
         }
     }

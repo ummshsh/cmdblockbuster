@@ -51,6 +51,8 @@ public class ScoreCounter
             actionsHistory.Push(action);
         }
 
+        LinesCleared += action.LinesCleared;
+
         // Go back inhistory and check for Combo
         var indexHistoryForCombo = 0;
         while (true)
@@ -62,12 +64,12 @@ public class ScoreCounter
                 break;
             }
 
-            if (/*scoreActionFromHistory.LinesCleared > 0 &&*/ !scoreActionFromHistory.ScoreAddedAlready && scoreActionFromHistory.Action != ScoreAction.Landed)
+            if (!scoreActionFromHistory.ScoreAddedAlready && scoreActionFromHistory.Action != ScoreAction.Landed)
             {
                 scoreActionFromHistory.ScoreAddedAlready = true;
                 Score += GetScore(scoreActionFromHistory.Action, Level, action.DroppedLines);
 
-                if (scoreActionFromHistory.Action != ScoreAction.SoftDrop && 
+                if (scoreActionFromHistory.Action != ScoreAction.SoftDrop &&
                     scoreActionFromHistory.Action != ScoreAction.HardDrop)
                 {
                     ComboCounter++;
@@ -233,8 +235,8 @@ public enum ScoreAction
     RotatedRight = -5,
     Landed = -6, // not sure if I need this one
 
-    // Will be used to break combo counters:
-    None = 0,
+    // Default value:
+    None = 0, 
 
     // By cleared lines count:
     Single = 1,

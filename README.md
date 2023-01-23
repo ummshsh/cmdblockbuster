@@ -34,7 +34,8 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [x] SpawnTetromino(): Implement 7 pack spawn system
 - [x] Check performance
 - [x] Create readme
-- [ ] Implement basic scoring
+- [x] Implement basic scoring
+- [ ] Report actions to scoring counter
 - [ ] Implement debug playfield states
 - [ ] Implement scoring tests
 - [ ] Check that soft drop does not lock mino

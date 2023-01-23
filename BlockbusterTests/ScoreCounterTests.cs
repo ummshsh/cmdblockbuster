@@ -6,8 +6,8 @@ namespace CmdBlockbusterTests;
 [TestClass]
 public class ScoreCounterTests
 {
-    [TestMethod("Check score for action that are not require history")]
-    public void CheckScoreForActionsThatAreNotRequireHistory()
+    [TestMethod("Check score case: 1")]
+    public void CheckScoreCounterCaseOne()
     {
         var counter = new ScoreCounter();
 
@@ -111,20 +111,24 @@ public class ScoreCounterTests
         Assert.AreEqual(-1, counter.ComboCounter);
         Assert.AreEqual(4670, counter.Score);
 
-    }
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.PerfectClearSingleLine) { LinesCleared = 1 });
 
-    [TestMethod("Check back to back scoring")]
-    public void CheckScoreForBackToBack()
-    {
-        var counter = new ScoreCounter();
-        Assert.Fail();
-    }
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(5470, counter.Score);
 
-    [TestMethod("Check combo scoring")]
-    public void CheckScoreForCombo()
-    {
-        var counter = new ScoreCounter();
-        Assert.Fail();
+        // Level 2
+        counter.AddLinesCleared(10);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+
+        Assert.AreEqual(0, counter.ComboCounter);
+        Assert.AreEqual(5670, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.PerfectClearDoubleLine) { LinesCleared = 2 });
+
+        Assert.AreEqual(1, counter.ComboCounter);
+        Assert.AreEqual(8170, counter.Score);
     }
 
     [TestMethod("Check History Stack")]
