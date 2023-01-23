@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BlockBuster.Game;
+namespace BlockBuster.Queue;
 
 /// <summary>
 /// 7-Bag spawn system
@@ -92,7 +92,7 @@ public class TetrominoQueue
 
         foreach (var t in listToCheck)
         {
-            concequentSnakes = (t == typeof(TetrominoS) || t == typeof(TetrominoZ)) ? ++concequentSnakes : 0;
+            concequentSnakes = t == typeof(TetrominoS) || t == typeof(TetrominoZ) ? ++concequentSnakes : 0;
         }
 
         return concequentSnakes > 2;
@@ -101,7 +101,7 @@ public class TetrominoQueue
 
     public Tetromino GetTetrominoFromQueue()
     {
-        var tetromino = Activator.CreateInstance( queue.Dequeue()) as Tetromino;
+        var tetromino = Activator.CreateInstance(queue.Dequeue()) as Tetromino;
         RegenerateQueue();
         return tetromino;
     }

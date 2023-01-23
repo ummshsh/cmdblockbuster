@@ -6,6 +6,8 @@ using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using BlockBuster.Utils;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlockBuster.Game;
@@ -27,6 +29,8 @@ internal class SRSRulesEngine : IRulesEngine
 
     internal readonly GameState gameState;
 
+    private readonly HistoryStack<ScoreablePlayfieldAction> history = new(200);
+
     public SRSRulesEngine(IInputHandler inputHandler)
     {
         inputHandler.InputProvided += InputProvided; // Set input handler
@@ -41,18 +45,18 @@ internal class SRSRulesEngine : IRulesEngine
 
     public Task Start()
     {
-        gameState.State = State.State.Running;
+        gameState.State = Common.EngineState.Running;
 
         return Task.Run(() =>
         {
             while (true)
             {
-                if (gameState.State == State.State.Running)
+                if (gameState.State == Common.EngineState.Running)
                 {
                     Tick();
                     Task.Delay(Variables.TickRate).Wait();
                 }
-                else if (gameState.State == State.State.Stopped || gameState.State == State.State.GameOver)
+                else if (gameState.State == Common.EngineState.Stopped || gameState.State == Common.EngineState.GameOver)
                 {
                     return;
                 }
@@ -69,7 +73,8 @@ internal class SRSRulesEngine : IRulesEngine
         SpawnTetromino();
         Gravity();
         UpdateGhost();
-        DestroyRows();
+        var rowsDestroyed = DestroyRows();
+        PushEventsFromHistoryToScoreCounter(rowsDestroyed);
 
         if ((gameState.LastTimePlayfieldWasUpdated + Variables.RenderUpdateRate) < DateTime.Now)
         {
@@ -79,6 +84,161 @@ internal class SRSRulesEngine : IRulesEngine
         }
 
         GameStateUpdated?.Invoke(this, gameState);
+    }
+
+    // Interpret moves and send them to counter
+    private void PushEventsFromHistoryToScoreCounter(int linesCleared)
+    {
+        // Return If nothing to report
+        if (currentTetromino is null || !(history.Peek(0)?.Tetromino.IsLanded ?? false))
+        {
+            return;
+        }
+
+        Debug.WriteLineIf(linesCleared > 0, "Lines cleared:" + linesCleared);
+
+        // Report: By lines cleared + T-Spin
+        var previousActionBeforeLanding = history.Peek(1);
+        bool lastActionBeforeLandingWasRotation =
+            previousActionBeforeLanding.Action == ScoreAction.RotatedLeft ||
+            previousActionBeforeLanding.Action == ScoreAction.RotatedRight;
+        if (currentTetromino is TetrominoT && lastActionBeforeLandingWasRotation)
+        {
+            ScoreAction action;
+
+            // T-Spin
+            if (previousActionBeforeLanding.TSpin == TSpin.Normal)
+            {
+                if (linesCleared == 0)
+                {
+                    action = ScoreAction.TSpinNoLines;
+                }
+                else if (linesCleared == 1)
+                {
+                    action = ScoreAction.TSpinSingle;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.TSpinDouble;
+                }
+                else if (linesCleared == 3)
+                {
+                    action = ScoreAction.TSpinTriple;
+                }
+                else
+                {
+                    throw new AggregateException("Not supported");
+                }
+            }
+            // T-Spin upgrade by last kick
+            else if (previousActionBeforeLanding.TSpin == TSpin.Mini && history.Peek(0).WithLastKick)
+            {
+                if (linesCleared == 0)
+                {
+                    action = ScoreAction.TSpinNoLines;
+                }
+                else if (linesCleared == 1)
+                {
+                    action = ScoreAction.TSpinSingle;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.TSpinDouble;
+                }
+                else
+                {
+                    throw new AggregateException("Not supported");
+                }
+            }
+            // T-Spin mini
+            else if (previousActionBeforeLanding.TSpin == TSpin.Mini)
+            {
+                if (linesCleared == 0)
+                {
+                    action = ScoreAction.TSpinMiniNoLines;
+                }
+                else if (linesCleared == 1)
+                {
+                    action = ScoreAction.TSpinMiniSingle;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.TSpinMiniDouble;
+                }
+                else
+                {
+                    throw new AggregateException("Not supported");
+                }
+            }
+            else
+            {
+                throw new AggregateException("Should not be here");
+            }
+
+            gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+        }
+
+        // Report: By lines cleared(1-4)
+        else if (linesCleared > 0)
+        {
+            ScoreAction action;
+
+            if (linesCleared == 1)
+            {
+                action = ScoreAction.Single;
+            }
+            else if (linesCleared == 2)
+            {
+                action = ScoreAction.Double;
+            }
+            else if (linesCleared == 3)
+            {
+                action = ScoreAction.Triple;
+            }
+            else if (linesCleared == 4)
+            {
+                action = ScoreAction.Tetris;
+            }
+            else
+            {
+                throw new AggregateException("Not supported");
+            }
+
+            gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+        }
+
+
+        // Report: By playfield state(perfect clears)
+        if (playfieldInnerState.IsEmpty && linesCleared > 0)
+        {
+            ScoreAction action;
+            if (linesCleared == 1)
+            {
+                action = ScoreAction.PerfectClearSingleLine;
+            }
+            else if (linesCleared == 2)
+            {
+                action = ScoreAction.PerfectClearDoubleLine;
+            }
+            else if (linesCleared == 3)
+            {
+                action = ScoreAction.PerfectClearTripleLine;
+            }
+            else if (linesCleared == 2)
+            {
+                action = ScoreAction.PerfectClearTetris;
+            }
+            else
+            {
+                throw new AggregateException("Not supported");
+            }
+
+            gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+        }
+
+
+        // Clear history or mino
+        history.Items.Clear();
     }
 
     private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
@@ -143,7 +303,7 @@ internal class SRSRulesEngine : IRulesEngine
                 return false;
             }
 
-            gameState.ThisMinoInfinityAvailable = true;
+            //gameState.ThisMinoInfinityAvailable = true;
             currentTetromino = gameState.Queue.GetTetrominoFromQueue();
             gameState.CanUseHold = true;
         }
@@ -177,13 +337,13 @@ internal class SRSRulesEngine : IRulesEngine
 
     private void GameOver()
     {
-        gameState.State = State.State.GameOver;
+        gameState.State = Common.EngineState.GameOver;
         SoundTriggered?.Invoke(this, TetrisSound.GameOver);
     }
 
-    public void Pause(bool pause) => gameState.State = pause ? State.State.Paused : State.State.Running;
+    public void Pause(bool pause) => gameState.State = pause ? Common.EngineState.Paused : Common.EngineState.Running;
 
-    public void Stop() => gameState.State = State.State.Stopped;
+    public void Stop() => gameState.State = Common.EngineState.Stopped;
 
     #endregion
 
@@ -244,7 +404,11 @@ internal class SRSRulesEngine : IRulesEngine
         }
     }
 
-    private bool RotateLeft()
+    private bool RotateLeft() => RotateLeftOrRight(false);
+
+    private bool RotateRight() => RotateLeftOrRight(true);
+
+    private bool RotateLeftOrRight(bool right)
     {
         var rotated = false;
         if (currentTetromino.IsLanded)
@@ -252,12 +416,15 @@ internal class SRSRulesEngine : IRulesEngine
             return false;
         }
 
-        var rotationTransition = currentTetromino.RotateLeft();
+        // Try rotate piece
+        var rotationTransition = right ? currentTetromino.RotateRight() : currentTetromino.RotateLeft();
         if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
         {
             gameState.TimeInfinityTriggered = DateTime.Now;
             rotated = true;
         }
+
+        // Try rotate piece if have rotations(all, except O)
         else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
             CheckIfCanBePlacedOnCoordinateWithKick(
                 currentTetromino,
@@ -265,18 +432,21 @@ internal class SRSRulesEngine : IRulesEngine
                 currentTetromino.HeightLocation,
                 currentTetromino.WidthLocation,
                 out int newRowCoordinate,
-                out int newRowItemCoordinate))
+                out int newRowItemCoordinate,
+                out bool lastKick))
         {
             currentTetromino.HeightLocation = newRowCoordinate;
             currentTetromino.WidthLocation = newRowItemCoordinate;
 
             rotated = true;
+            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = CalculateTspinType() });
             gameState.TimeInfinityTriggered = DateTime.Now;
-
         }
+
+        // Rotate mino back on failure to rotate
         else
         {
-            currentTetromino.RotateRight();
+            var _ = (right ? currentTetromino.RotateLeft() : currentTetromino.RotateRight());
         }
 
         if (rotated)
@@ -292,53 +462,9 @@ internal class SRSRulesEngine : IRulesEngine
         return rotated;
     }
 
-    private bool RotateRight()
+    private TSpin CalculateTspinType()
     {
-        var rotated = false;
-        if (currentTetromino.IsLanded)
-        {
-            return false;
-        }
-
-        var rotationTransition = currentTetromino.RotateRight();
-        if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, currentTetromino.WidthLocation))
-        {
-            rotated = true;
-            gameState.TimeInfinityTriggered = DateTime.Now;
-
-        }
-        else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
-            CheckIfCanBePlacedOnCoordinateWithKick(
-                currentTetromino,
-                rotationTransition,
-                currentTetromino.HeightLocation,
-                currentTetromino.WidthLocation,
-                out int newRowCoordinate,
-                out int newRowItemCoordinate))
-        {
-            currentTetromino.HeightLocation = newRowCoordinate;
-            currentTetromino.WidthLocation = newRowItemCoordinate;
-
-            rotated = true;
-            gameState.TimeInfinityTriggered = DateTime.Now;
-
-        }
-        else
-        {
-            currentTetromino.RotateLeft();
-        }
-
-        if (rotated)
-        {
-            if (gameState.ThisMinoInfinityAvailable)
-            {
-                gameState.TimeInfinityTriggered = DateTime.Now;
-                gameState.ThisMinoInfinityAvailable = false;
-            }
-            SoundTriggered?.Invoke(this, TetrisSound.Rotation);
-        }
-
-        return rotated;
+        throw new NotImplementedException();
     }
 
     private bool MoveLeft()
@@ -352,6 +478,7 @@ internal class SRSRulesEngine : IRulesEngine
         if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
         {
             currentTetromino.WidthLocation = newLocation;
+            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
             SoundTriggered?.Invoke(this, TetrisSound.Movement);
             return true;
         }
@@ -368,13 +495,14 @@ internal class SRSRulesEngine : IRulesEngine
         if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
         {
             currentTetromino.WidthLocation = newLocation;
+            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
             SoundTriggered?.Invoke(this, TetrisSound.Movement);
             return true;
         }
         return false;
     }
 
-    private bool MoveDown(bool hardDrop = false)
+    private bool MoveMinoDown(bool hardDrop = false)
     {
         if (currentTetromino.IsLanded)
         {
@@ -392,7 +520,7 @@ internal class SRSRulesEngine : IRulesEngine
             else
             {
                 AddCurrentTetrominoToInnerState();
-                //gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
+
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
                 return false;
             }
@@ -408,14 +536,20 @@ internal class SRSRulesEngine : IRulesEngine
         return false;
     }
 
-    private void SoftDrop() => MoveDown();
+    private void SoftDrop()
+    {
+        MoveMinoDown();
+        gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
+    }
 
     private void HardDrop()
     {
-        while (MoveDown(true))
+        var before = currentTetromino.HeightLocation;
+        while (MoveMinoDown(true))
         {
             // Empty
         }
+        gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.HardDrop) { DroppedLines = currentTetromino.HeightLocation - before });
         SoundTriggered?.Invoke(this, TetrisSound.Locking);
     }
 
@@ -423,7 +557,7 @@ internal class SRSRulesEngine : IRulesEngine
     {
         if (DateTime.Now > gameState.LastTimeTetrominoMovedDown + gameState.CurrentPerRowInterval)
         {
-            MoveDown();
+            MoveMinoDown();
             gameState.LastTimeTetrominoMovedDown = DateTime.Now;
         }
     }
@@ -461,7 +595,7 @@ internal class SRSRulesEngine : IRulesEngine
         return false;
     }
 
-    private void DestroyRows()
+    private int DestroyRows()
     {
         var rowsDestroyed = 0;
         for (int row = playfieldInnerState.Height - 1; row >= 0; row--)
@@ -476,10 +610,11 @@ internal class SRSRulesEngine : IRulesEngine
 
         if (rowsDestroyed > 0)
         {
-            //gameState.ScoreCounter.RegisterAction(new Score.ScoreablePlayfieldAction(currentTetromino, Score.ScoreAction.));
-            //gameState.ScoreCounter.AddLinesCleared(rowsDestroyed);
+            Debug.WriteLine($"Removed rows:{rowsDestroyed} with mino: {history.Peek(0).Tetromino.GetType()}");
             SoundTriggered?.Invoke(this, TetrisSound.LineClear);
         }
+
+        return rowsDestroyed;
     }
 
     private void MoveTopRowsToRow(int rowToMoveTo)
@@ -496,7 +631,6 @@ internal class SRSRulesEngine : IRulesEngine
                 playfieldInnerState[row + 1, rowItem] = playfieldInnerState[row, rowItem];
             }
         }
-
     }
 
     private void DestroyRow(int row)
@@ -569,21 +703,24 @@ internal class SRSRulesEngine : IRulesEngine
         int rowCoordinate,
         int rowItemCoordinate,
         out int newRowCoordinate,
-        out int newRowItemCoordinate)
+        out int newRowItemCoordinate,
+        out bool lastKick)
     {
         var kicksForThisRotatioin = tetromino.wallKicks[minoRotationTransition];
-        foreach (var kick in kicksForThisRotatioin)
+        foreach (var kick in kicksForThisRotatioin.Select((value, i) => new { i, value }))
         {
-            if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + -(kick.Item2), rowItemCoordinate + kick.Item1))
+            if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + -(kick.value.Item2), rowItemCoordinate + kick.value.Item1))
             {
-                newRowCoordinate = rowCoordinate + -(kick.Item2);
-                newRowItemCoordinate = rowItemCoordinate + kick.Item1;
+                newRowCoordinate = rowCoordinate + -(kick.value.Item2);
+                newRowItemCoordinate = rowItemCoordinate + kick.value.Item1;
+                lastKick = kick.i == kicksForThisRotatioin.Count - 1;
                 return true;
             }
         }
 
         newRowCoordinate = rowCoordinate;
         newRowItemCoordinate = rowItemCoordinate;
+        lastKick = false;
         return false;
     }
 

@@ -1,4 +1,4 @@
-using BlockBuster.Game;
+using BlockBuster.Queue;
 using BlockBuster.Tetrominoes;
 
 namespace CmdBlockbusterTests;

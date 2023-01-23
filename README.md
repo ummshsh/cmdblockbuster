@@ -45,6 +45,9 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [ ] Settings class with defaults in txt file
 
 ## TODO Low priority
+- [ ] use Debug.WriteLineIf everywhere and look at config for toggle
+- [ ] Move all basic moves (<0) to separate enum to use in playfield history
+- [ ] In playfield history use Action.Landed instaed of mino property
 - [x] Figure out snake sequences and what to do with them in spawn queue (more than 2 snakes consequently not permited)
 - [x] Tests (maybe?)
 - [ ] Fix unit tests

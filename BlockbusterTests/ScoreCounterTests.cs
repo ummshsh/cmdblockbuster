@@ -116,19 +116,16 @@ public class ScoreCounterTests
         Assert.AreEqual(0, counter.ComboCounter);
         Assert.AreEqual(5470, counter.Score);
 
-        // Level 2
-        counter.AddLinesCleared(10);
-
         counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
         counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
 
         Assert.AreEqual(0, counter.ComboCounter);
-        Assert.AreEqual(5670, counter.Score);
+        Assert.AreEqual(5570, counter.Score);
 
         counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.PerfectClearDoubleLine) { LinesCleared = 2 });
 
         Assert.AreEqual(1, counter.ComboCounter);
-        Assert.AreEqual(8170, counter.Score);
+        Assert.AreEqual(7970, counter.Score);
     }
 
     [TestMethod("Check History Stack")]

@@ -22,6 +22,25 @@ internal class InnerPlayfield : IPlayefield
         }
     }
 
+    public bool IsEmpty
+    {
+        get
+        {
+            for (int row = 0; row < Height; row++)
+            {
+                for (int rowItemIndex = 0; rowItemIndex < Width; rowItemIndex++)
+                {
+                    if (Cells[row, rowItemIndex] != TetrominoCellType.Empty)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }
+
     public InnerPlayfield(int width, int height)
     {
         Width = width;

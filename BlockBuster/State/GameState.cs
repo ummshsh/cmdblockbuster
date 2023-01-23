@@ -1,12 +1,13 @@
-﻿using BlockBuster.Game;
+﻿using BlockBuster.Queue;
 using BlockBuster.Score;
 using System;
+using BlockBuster.Common;
 
 namespace BlockBuster.State;
 
 public class GameState
 {
-    public State State { get; set; } = State.Stopped;
+    public EngineState State { get; set; } = EngineState.Stopped;
 
     public int Score => ScoreCounter.Score;
 
