@@ -102,7 +102,10 @@ internal class SRSRulesEngine : IRulesEngine
         bool lastActionBeforeLandingWasRotation =
             previousActionBeforeLanding.Action == ScoreAction.RotatedLeft ||
             previousActionBeforeLanding.Action == ScoreAction.RotatedRight;
-        if (currentTetromino is TetrominoT && lastActionBeforeLandingWasRotation)
+
+        if (previousActionBeforeLanding is not null && 
+            currentTetromino is TetrominoT && 
+            lastActionBeforeLandingWasRotation)
         {
             ScoreAction action;
 
@@ -711,7 +714,7 @@ internal class SRSRulesEngine : IRulesEngine
                 newRowCoordinate = rowCoordinate + -(kick.value.Item2); // Invert this value, because I use default SRS kick table, but I count rows from top to bottom
                 newRowItemCoordinate = rowItemCoordinate + kick.value.Item1;
                 lastKick = kick.i == kicksForThisRotatioin.Count - 1;
-                tSpin = CalculateTspinType(tetromino);
+                tSpin = CalculateTSpinType(tetromino);
                 return true;
             }
         }
@@ -723,14 +726,74 @@ internal class SRSRulesEngine : IRulesEngine
         return false;
     }
 
-    private TSpin CalculateTspinType(Tetromino tetromino)
+
+    /// <summary>
+    /// <see cref="https://tetris.wiki/T-Spin"/>
+    /// </summary>
+    /// <param name="tetromino"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private TSpin CalculateTSpinType(Tetromino tetromino)
     {
         if (tetromino is not TetrominoT)
         {
             return TSpin.None;
         }
 
-        tetromino.Rotation.Rotation
+        var topCornerCells = tetromino.Rotation.Rotation switch
+        {
+            MinoRotation.Rotation_0 => ((0, 0), (0, 1)),
+            MinoRotation.Rotation_R => ((0, 2), (2, 2)),
+            MinoRotation.Rotation_2 => ((2, 0), (2, 2)),
+            MinoRotation.Rotation_L => ((0, 0), (2, 0)),
+            _ => throw new NotImplementedException(),
+        };
+
+        var bottomCornerCells = tetromino.Rotation.Rotation switch
+        {
+            MinoRotation.Rotation_0 => ((2, 0), (2, 2)),
+            MinoRotation.Rotation_R => ((0, 0), (2, 0)),
+            MinoRotation.Rotation_2 => ((0, 0), (0, 2)),
+            MinoRotation.Rotation_L => ((0, 2), (2, 2)),
+            _ => throw new NotImplementedException(),
+        };
+
+        var topCell1 = IsCellFilledOrOutsidePlayfield(topCornerCells.Item1);
+        var topCell2 = IsCellFilledOrOutsidePlayfield(topCornerCells.Item2);
+        var bottomCell1 = IsCellFilledOrOutsidePlayfield(bottomCornerCells.Item1);
+        var bottomCell2 = IsCellFilledOrOutsidePlayfield(bottomCornerCells.Item2);
+
+
+        if (topCell1 & topCell2 & (bottomCell1 || bottomCell2))
+        {
+            return TSpin.Normal;
+        }
+        else if ((topCell1 || topCell2) & (bottomCell1 & bottomCell2))
+        {
+            return TSpin.Mini;
+        }
+        else
+        {
+            return TSpin.None;
+        }
+
+        //continue debugging this method
+        bool IsCellFilledOrOutsidePlayfield((int, int) coordinate)
+        {
+            var heightToCheck = tetromino.HeightLocation + coordinate.Item1;
+            var widthToCheck = tetromino.WidthLocation + coordinate.Item2;
+
+            // If empty cell outside playfield, then it is cosidered filled
+            // For T mino possible only from bottom
+            if (widthToCheck < 0 || // left side
+                tetromino.WidthLocation > tetromino.WidthLocation + tetromino.ColumnsLenght - 1 - tetromino.EmptyColumnsOnRightSideCount || // right side
+                tetromino.HeightLocation > tetromino.HeightLocation + tetromino.RowsLenght - 1 - tetromino.EmptyRowsOnBottomSideCount) // bottom
+            {
+                return true;
+            }
+
+            return playfieldInnerState.Cells[heightToCheck, widthToCheck] != TetrominoCellType.Empty;
+        }
     }
 
     private static bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>
