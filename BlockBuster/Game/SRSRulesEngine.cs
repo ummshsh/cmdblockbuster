@@ -433,13 +433,14 @@ internal class SRSRulesEngine : IRulesEngine
                 currentTetromino.WidthLocation,
                 out int newRowCoordinate,
                 out int newRowItemCoordinate,
+                out TSpin tSpin,
                 out bool lastKick))
         {
             currentTetromino.HeightLocation = newRowCoordinate;
             currentTetromino.WidthLocation = newRowItemCoordinate;
 
             rotated = true;
-            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = CalculateTspinType() });
+            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
             gameState.TimeInfinityTriggered = DateTime.Now;
         }
 
@@ -462,10 +463,6 @@ internal class SRSRulesEngine : IRulesEngine
         return rotated;
     }
 
-    private TSpin CalculateTspinType()
-    {
-        throw new NotImplementedException();
-    }
 
     private bool MoveLeft()
     {
@@ -539,7 +536,7 @@ internal class SRSRulesEngine : IRulesEngine
     private void SoftDrop()
     {
         MoveMinoDown();
-        gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
+        gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.SoftDrop) { DroppedLines = 1 });
     }
 
     private void HardDrop()
@@ -672,8 +669,7 @@ internal class SRSRulesEngine : IRulesEngine
                 }
 
                 // Check if not empty cell is outside field
-                if (/*rowItemIndex == 0 & rowItemIndex + tetromino.EmptyColumnsOnLeftSideCount == 0 ||*/
-                    (rowItemIndex < 0 & rowItemCoordinate + tetromino.EmptyColumnsOnLeftSideCount < 0) ||
+                if ((rowItemIndex < 0 & rowItemCoordinate + tetromino.EmptyColumnsOnLeftSideCount < 0) ||
                     rowItemCoordinate + currentTetromino.ColumnsLenght - 1 - currentTetromino.EmptyColumnsOnRightSideCount >= playfieldInnerState.Width ||
                     rowIndex > playfieldInnerState.Height - 1)
                 {
@@ -704,6 +700,7 @@ internal class SRSRulesEngine : IRulesEngine
         int rowItemCoordinate,
         out int newRowCoordinate,
         out int newRowItemCoordinate,
+        out TSpin tSpin,
         out bool lastKick)
     {
         var kicksForThisRotatioin = tetromino.wallKicks[minoRotationTransition];
@@ -711,9 +708,10 @@ internal class SRSRulesEngine : IRulesEngine
         {
             if (CheckIfCanBePlacedOnCoordinate(tetromino, rowCoordinate + -(kick.value.Item2), rowItemCoordinate + kick.value.Item1))
             {
-                newRowCoordinate = rowCoordinate + -(kick.value.Item2);
+                newRowCoordinate = rowCoordinate + -(kick.value.Item2); // Invert this value, because I use default SRS kick table, but I count rows from top to bottom
                 newRowItemCoordinate = rowItemCoordinate + kick.value.Item1;
                 lastKick = kick.i == kicksForThisRotatioin.Count - 1;
+                tSpin = CalculateTspinType(tetromino);
                 return true;
             }
         }
@@ -721,7 +719,18 @@ internal class SRSRulesEngine : IRulesEngine
         newRowCoordinate = rowCoordinate;
         newRowItemCoordinate = rowItemCoordinate;
         lastKick = false;
+        tSpin = TSpin.None;
         return false;
+    }
+
+    private TSpin CalculateTspinType(Tetromino tetromino)
+    {
+        if (tetromino is not TetrominoT)
+        {
+            return TSpin.None;
+        }
+
+        tetromino.Rotation.Rotation
     }
 
     private static bool CheckIfCellsIntersect(TetrominoCellType fieldCell, TetrominoCellType tetrominoeCell) =>

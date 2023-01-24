@@ -16,7 +16,7 @@ Actual tetris designed as class library that can be used anywhere. I plan to tes
 - Wall kicks
 
 ## Field
-It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
+It have 2 top rows to spawn tetrominoes that are intended to be invisible, they are visible in XAML project for debug though
 
 ## TODO
 - [x] Implement SRS rotation
@@ -43,17 +43,19 @@ It have 2 invisible top rows to spawn tetrominoes, it is enough for SRS system
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
 - [ ] Settings class with defaults in txt file
+- [ ] RotateLeftOrRight(): Make default rotation as part of kicks table so this methodd can be simplified
 
 ## TODO Low priority
 - [ ] use Debug.WriteLineIf everywhere and look at config for toggle
 - [ ] Move all basic moves (<0) to separate enum to use in playfield history
 - [ ] In playfield history use Action.Landed instaed of mino property
+- [ ] Check that T spin wil be rewarded if teromino not lands and disappears(contininues moving)
 - [x] Figure out snake sequences and what to do with them in spawn queue (more than 2 snakes consequently not permited)
 - [x] Tests (maybe?)
 - [ ] Fix unit tests
 - [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
-- [ ] Icon
+- [ ] Icon for xaml project
 - [ ] Read about fourht kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
 - [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
