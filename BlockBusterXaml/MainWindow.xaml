@@ -11,6 +11,7 @@
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
         Deactivated="Window_Deactivated">
+    
     <Canvas Loaded="Canvas_Loaded" 
             Background="Black">
 
@@ -23,8 +24,8 @@
               Background="Black">
             <StackPanel Margin="0 300 0 0">
                 <TextBlock x:Name="GameOver" Foreground="#a76e7f" Visibility="Collapsed" d:Visibility="Visible" HorizontalAlignment="Center" FontSize="40">Game over!</TextBlock>
-                <Button x:Name="Unpause" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  Margin="0 20 0 50" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="Unpause_Click">Unpause</Button>
-                <Button x:Name="NewGame" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="NewGame_Click">New Game</Button>
+                <Button x:Name="Unpause" Style="{StaticResource RoundedButton}" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  Margin="0 20 0 50" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="Unpause_Click">Unpause</Button>
+                <Button x:Name="NewGame" Style="{StaticResource RoundedButton}" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="NewGame_Click">New Game</Button>
             </StackPanel>
         </StackPanel>
 

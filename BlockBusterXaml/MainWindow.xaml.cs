@@ -29,9 +29,6 @@ public partial class MainWindow : Window
         gameStarted = true;
         MenuStack.Visibility = Visibility.Collapsed;
         await tetris.Start();
-        gameStarted= false;
-        paused = false;
-        MenuStack.Visibility = paused & gameStarted ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

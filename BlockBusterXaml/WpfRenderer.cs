@@ -72,15 +72,29 @@ public class WpfRenderer : ITetrisRenderer
                         Cell cell = e[row, rowItemIndex];
                         SolidColorBrush solidColorBrush = GetColor(cell);
 
-                        var border = new Border
+                        Border borderToSet;
+                        if (cell.Ghost)
                         {
-                            BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#2f4858"),
-                            Background = cell.Ghost ? Brushes.LightGray : solidColorBrush,
-                            BorderThickness = new Thickness(0.5)
-                        };
-                        Grid.SetRow(border, row);
-                        Grid.SetColumn(border, rowItemIndex);
-                        this.playfieldGrid.Children.Add(border);
+                            borderToSet = new Border
+                            {
+                                //BorderBrush = Brushes.White,
+                                Background = Brushes.White,
+                                BorderThickness = new Thickness(0.5)
+                            };
+                        }
+                        else
+                        {
+                            borderToSet = new Border
+                            {
+                                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#365178"),
+                                Background = solidColorBrush,
+                                BorderThickness = new Thickness(0.5)
+                            };
+                        }
+
+                        Grid.SetRow(borderToSet, row);
+                        Grid.SetColumn(borderToSet, rowItemIndex);
+                        this.playfieldGrid.Children.Add(borderToSet);
                     }
                 }
             }
