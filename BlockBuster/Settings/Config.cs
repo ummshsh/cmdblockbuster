@@ -1,8 +1,10 @@
-﻿using System;
+﻿using BlockBuster.Field;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace BlockBuster.Settings;
+
 public static class Config
 {
     public static bool EnableWallKick => TryGetValueFromTextConfigOrSetDefalut("EnableWallKick", true);
@@ -24,6 +26,8 @@ public static class Config
             return _settings;
         }
     }
+
+    internal static InnerPlayfield DebugPlayfieldState => DebugPlayfields.GetPlayfield(DebugPlayfieldStateType);
 
     private static bool TryGetValueFromTextConfigOrSetDefalut(string valueToGetFromConfig, bool defalutValue)
     {

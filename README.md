@@ -36,7 +36,7 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Create readme
 - [x] Implement basic scoring
 - [x] Settings class with defaults in txt file
-- [ ] Report actions to scoring counter
+- [x] Report actions to scoring counter
 - [ ] Implement debug playfield states
 - [ ] Tspin is broken now
 - [ ] Implement scoring tests

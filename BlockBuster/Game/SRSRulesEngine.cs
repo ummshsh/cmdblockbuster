@@ -36,8 +36,8 @@ internal class SRSRulesEngine : IRulesEngine
     {
         inputHandler.InputProvided += InputProvided; // Set input handler
 
-        playfieldToDisplay = new VisiblePlayfield(10, 22);
-        playfieldInnerState = new InnerPlayfield(playfieldToDisplay.Width, playfieldToDisplay.Height);
+        playfieldInnerState = Config.EnableDebugPlayfieldState ? Config.DebugPlayfieldState : new InnerPlayfield(10, 22);
+        playfieldToDisplay = new VisiblePlayfield(playfieldInnerState.Width, playfieldInnerState.Height);
 
         gameState = new GameState();
     }
@@ -104,8 +104,8 @@ internal class SRSRulesEngine : IRulesEngine
             previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
             previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
 
-        if (previousActionBeforeLanding is not null && 
-            currentTetromino is TetrominoT && 
+        if (previousActionBeforeLanding is not null &&
+            currentTetromino is TetrominoT &&
             lastActionBeforeLandingWasRotation)
         {
             ScoreAction action;
