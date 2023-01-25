@@ -1,0 +1,6 @@
+﻿# Player settings
+EnableWallKick=Y
+
+# Developer settings
+EnableDebugPlayfieldState=N
+DebugPlayfieldStateType=A

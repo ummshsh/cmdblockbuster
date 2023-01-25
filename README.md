@@ -35,14 +35,15 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Check performance
 - [x] Create readme
 - [x] Implement basic scoring
+- [x] Settings class with defaults in txt file
 - [ ] Report actions to scoring counter
 - [ ] Implement debug playfield states
+- [ ] Tspin is broken now
 - [ ] Implement scoring tests
 - [ ] Check that soft drop does not lock mino
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
-- [ ] Settings class with defaults in txt file
 - [ ] RotateLeftOrRight(): Make default rotation as part of kicks table so this methodd can be simplified
 
 ## TODO Low priority

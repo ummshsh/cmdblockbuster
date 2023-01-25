@@ -1,6 +1,7 @@
 ﻿using BlockBuster.Field;
 using BlockBuster.InputHandler;
 using BlockBuster.Score;
+using BlockBuster.Settings;
 using BlockBuster.Sound;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
@@ -428,7 +429,8 @@ internal class SRSRulesEngine : IRulesEngine
         }
 
         // Try rotate piece if have rotations(all, except O)
-        else if (rotationTransition != MinoRotationTransition.Rotation_0_0 &
+        else if (Config.EnableWallKick &
+            rotationTransition != MinoRotationTransition.Rotation_0_0 &
             CheckIfCanBePlacedOnCoordinateWithKick(
                 currentTetromino,
                 rotationTransition,
