@@ -11,18 +11,20 @@
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
         Deactivated="Window_Deactivated">
-    <Canvas Loaded="Canvas_Loaded">
+    <Canvas Loaded="Canvas_Loaded" 
+            Background="Black">
 
         <StackPanel x:Name="MenuStack"
               Visibility="Visible"
-              Panel.ZIndex="5" 
-              Background="White"
+              d:Visibility="Visible"
+              Panel.ZIndex="5"
               Width="660"
-              Height="900">
+              Height="900"
+              Background="Black">
             <StackPanel Margin="0 300 0 0">
-            <TextBlock x:Name="GameOver" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="40">Game over!</TextBlock>
-            <Button x:Name="Unpause" Width="210"  Margin="0 20 0 50" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="Unpause_Click">Unpause</Button>
-            <Button x:Name="NewGame" Width="210"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="NewGame_Click">New Game</Button>
+                <TextBlock x:Name="GameOver" Foreground="#a76e7f" Visibility="Collapsed" d:Visibility="Visible" HorizontalAlignment="Center" FontSize="40">Game over!</TextBlock>
+                <Button x:Name="Unpause" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  Margin="0 20 0 50" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="Unpause_Click">Unpause</Button>
+                <Button x:Name="NewGame" Background="#a76e7f" Foreground="#ffe4e5" Width="210"  HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Click="NewGame_Click">New Game</Button>
             </StackPanel>
         </StackPanel>
 
@@ -34,11 +36,11 @@
             Margin="30 30 30 30">
 
             <StackPanel x:Name="DockStats" Width="150" Margin="0 0 30 0">
-                <TextBlock x:Name="Score" HorizontalAlignment="Left" FontSize="19">Score</TextBlock>
-                <TextBlock x:Name="LinesCleared" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
-                <TextBlock x:Name="Level" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
-
-                <TextBlock x:Name="Hold" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 30 0 0">Hold</TextBlock>
+                <TextBlock x:Name="Score" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Score</TextBlock>
+                <TextBlock x:Name="LinesCleared" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
+                <TextBlock x:Name="Level" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
+                
+                <TextBlock x:Name="Hold" Foreground="#a76e7f" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 30 0 0">Hold</TextBlock>
                 <Border 
                 BorderBrush="Black" 
                 BorderThickness="1"
@@ -59,7 +61,7 @@
                     </Grid>
                 </Border>
 
-                <TextBlock x:Name="Next" HorizontalAlignment="Center"  FontSize="20" FontWeight="Bold">Next</TextBlock>
+                <TextBlock x:Name="Next" Foreground="#a76e7f" HorizontalAlignment="Center"  FontSize="20" FontWeight="Bold">Next</TextBlock>
                 <Border 
                 BorderBrush="Black" 
                 BorderThickness="1"
@@ -80,51 +82,56 @@
                     </Grid>
 
                 </Border>
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom">Esc to pause</TextBlock>
+                <TextBlock HorizontalAlignment="Center" Foreground="#a76e7f" VerticalAlignment="Bottom">Esc to pause</TextBlock>
             </StackPanel>
 
-            <Grid 
+            <Border 
+                BorderBrush="#a76e7f" 
+                BorderThickness="1">
+                <Grid 
+            Background="Black"
             ShowGridLines="False" 
             Name="PlayfieldGrid" 
             Height="800" 
             Width="400">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-            </Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                </Grid>
+            </Border>
         </StackPanel>
     </Canvas>
 </Window>

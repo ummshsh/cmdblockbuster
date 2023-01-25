@@ -101,8 +101,8 @@ internal class SRSRulesEngine : IRulesEngine
         // Report: By lines cleared + T-Spin
         var previousActionBeforeLanding = history.Peek(1);
         bool lastActionBeforeLandingWasRotation =
-            previousActionBeforeLanding.Action == ScoreAction.RotatedLeft ||
-            previousActionBeforeLanding.Action == ScoreAction.RotatedRight;
+            previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
+            previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
 
         if (previousActionBeforeLanding is not null && 
             currentTetromino is TetrominoT && 

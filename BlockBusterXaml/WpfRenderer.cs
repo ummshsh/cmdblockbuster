@@ -74,7 +74,7 @@ public class WpfRenderer : ITetrisRenderer
 
                         var border = new Border
                         {
-                            BorderBrush = Brushes.Black,
+                            BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#2f4858"),
                             Background = cell.Ghost ? Brushes.LightGray : solidColorBrush,
                             BorderThickness = new Thickness(0.5)
                         };
@@ -154,14 +154,18 @@ public class WpfRenderer : ITetrisRenderer
 
     private SolidColorBrush GetColor(Cell tetrominoCellType)
     {
-        var color = new SolidColorBrush(
-            Color.FromArgb(
-                tetrominoCellType.Color.A,
-                tetrominoCellType.Color.R,
-                tetrominoCellType.Color.G,
-                tetrominoCellType.Color.B));
-
-        return color;
+        return tetrominoCellType.TetrominoCellType switch
+        {
+            TetrominoCellType.Empty => (SolidColorBrush)new BrushConverter().ConvertFrom("#000000"),
+            TetrominoCellType.Red => (SolidColorBrush)new BrushConverter().ConvertFrom("#eb3158"),
+            TetrominoCellType.Cyan => (SolidColorBrush)new BrushConverter().ConvertFrom("#59bab7"),
+            TetrominoCellType.Purple => (SolidColorBrush)new BrushConverter().ConvertFrom("#5d528f"),
+            TetrominoCellType.Green => (SolidColorBrush)new BrushConverter().ConvertFrom("#00894b"),
+            TetrominoCellType.Yellow => (SolidColorBrush)new BrushConverter().ConvertFrom("#937500"),
+            TetrominoCellType.Orange => (SolidColorBrush)new BrushConverter().ConvertFrom("#ca590e"),
+            TetrominoCellType.Blue => (SolidColorBrush)new BrushConverter().ConvertFrom("#365178"),
+            _ => throw new NotImplementedException(),
+        };
     }
 
     private bool SequenceEquals<T>(T[,] a, T[,] b)

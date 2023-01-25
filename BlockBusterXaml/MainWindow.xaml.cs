@@ -29,6 +29,9 @@ public partial class MainWindow : Window
         gameStarted = true;
         MenuStack.Visibility = Visibility.Collapsed;
         await tetris.Start();
+        gameStarted= false;
+        paused = false;
+        MenuStack.Visibility = paused & gameStarted ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -43,6 +46,7 @@ public partial class MainWindow : Window
             paused = !paused;
             MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
             Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+            GameOver.Visibility = paused ? Visibility.Collapsed : Visibility.Visible;
             tetris.Pause(paused);
             return;
         }
@@ -99,6 +103,7 @@ public partial class MainWindow : Window
     {
         paused = !paused;
         MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        GameOver.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
         tetris.Pause(paused);
     }
 

@@ -7,17 +7,20 @@ public class Cell : IPlayfieldCell
 {
     public Color Color { get; set; } = Color.Empty;
 
+    public TetrominoCellType TetrominoCellType { get; private set; }
+
     public bool Ghost { get; set; } = false;
 
     public bool IsEmpty { get; set; } = true;
 
     public static EmptyPlayfieldCell EmptyCell => new EmptyPlayfieldCell();
 
-    public Cell(Color colorColor, bool ghost, bool isEmpty)
+    public Cell(Color colorColor, bool ghost, bool isEmpty, TetrominoCellType tetrominoCellType)
     {
         Color = colorColor;
         Ghost = ghost;
         IsEmpty = isEmpty;
+        TetrominoCellType = tetrominoCellType;
     }
 
     public static Cell FromInnerCell(TetrominoCellType type, bool ghost)
@@ -34,13 +37,13 @@ public class Cell : IPlayfieldCell
             _ => Color.White,
         };
 
-        return new Cell(color, ghost, type == 0);
+        return new Cell(color, ghost, type == 0, type);
     }
 }
 
 public class EmptyPlayfieldCell : Cell
 {
-    public EmptyPlayfieldCell() : base(Color.White, false, true)
+    public EmptyPlayfieldCell() : base(Color.White, false, true, TetrominoCellType.Empty)
     {
     }
 }
