@@ -1,4 +1,5 @@
 ﻿using BlockBuster.Tetrominoes;
+using System;
 using System.Drawing;
 
 namespace BlockBuster.Field;
@@ -13,7 +14,7 @@ public class Cell : IPlayfieldCell
 
     public bool IsEmpty { get; set; } = true;
 
-    public static EmptyPlayfieldCell EmptyCell => new EmptyPlayfieldCell();
+    public static EmptyPlayfieldCell EmptyCell => new();
 
     public Cell(Color colorColor, bool ghost, bool isEmpty, TetrominoCellType tetrominoCellType)
     {
@@ -43,8 +44,13 @@ public class Cell : IPlayfieldCell
     public override bool Equals(object obj)
     {
         return obj is not null & 
-            (obj as Cell).Ghost == this.Ghost;
+            (obj as Cell).Ghost == this.Ghost &
             (obj as Cell).TetrominoCellType.Equals(this.TetrominoCellType);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Color, TetrominoCellType, Ghost, IsEmpty);
     }
 }
 

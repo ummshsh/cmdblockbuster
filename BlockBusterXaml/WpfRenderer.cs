@@ -3,6 +3,7 @@ using BlockBuster.Renderer;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +18,7 @@ public class WpfRenderer : ITetrisRenderer
     private Canvas canvasGrid;
     private Grid holdGrid;
     private readonly Grid nextGrid;
-    private Cell[,] lastUpdatedField;
+    private Cell[,] lastFieldUpdate;
     private System.Windows.Shapes.Rectangle[,] rectangleFiledMapping;
     private double canvasHeightStep;
     private double canvasWidthStep;
@@ -31,7 +32,7 @@ public class WpfRenderer : ITetrisRenderer
         this.canvasGrid = canvas;
         this.holdGrid = holdGrid;
         this.nextGrid = nextGrid;
-        this.lastUpdatedField = new Cell[22, 10];
+        this.lastFieldUpdate = new Cell[22, 10];
         this.rectangleFiledMapping = new System.Windows.Shapes.Rectangle[22, 10];
 
         canvasHeightStep = this.canvasGrid.ActualHeight / 22;
@@ -60,7 +61,7 @@ public class WpfRenderer : ITetrisRenderer
             {
                 for (int rowItemIndex = 0; rowItemIndex < width; rowItemIndex++)
                 {
-                    if (lastUpdatedField[row, rowItemIndex] is not null && lastUpdatedField[row, rowItemIndex].Equals(e[row, rowItemIndex]))
+                    if (lastFieldUpdate[row, rowItemIndex] is not null && lastFieldUpdate[row, rowItemIndex].Equals(e[row, rowItemIndex]))
                     {
                         continue; // Do not update cells that are already up to date
                     }
@@ -102,7 +103,7 @@ public class WpfRenderer : ITetrisRenderer
                 }
             }
 
-            lastUpdatedField = (Cell[,])e.Cells.Clone();
+            lastFieldUpdate = (Cell[,])e.Cells.Clone();
         });
     }
 
