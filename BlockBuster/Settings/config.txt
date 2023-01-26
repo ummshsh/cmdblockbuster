@@ -4,3 +4,4 @@ EnableWallKick=Y
 # Developer settings
 EnableDebugPlayfieldState=N
 DebugPlayfieldStateType=A
+SkipMenuInXaml=Y

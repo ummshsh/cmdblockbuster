@@ -7,12 +7,21 @@ namespace BlockBuster.Settings;
 
 public static class Config
 {
+    #region GameplayToggles
+
     public static bool EnableWallKick => TryGetValueFromTextConfigOrSetDefalut("EnableWallKick", true);
 
     public static bool EnableDebugPlayfieldState =>TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
 
+    #endregion
+
+    #region DebugToggles
+
     public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "a");
 
+    public static bool SkipMenuInXaml => TryGetValueFromTextConfigOrSetDefalut("SkipMenuInXaml", false);
+
+    #endregion
     private static Dictionary<string, string> _settings = null;
     private static Dictionary<string, string> Settings
     {

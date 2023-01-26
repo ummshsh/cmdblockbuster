@@ -14,48 +14,45 @@ namespace BlockBusterXaml;
 public class WpfRenderer : ITetrisRenderer
 {
     private StackPanel dockStats;
-    private Grid playfieldGrid;
+    private Canvas canvasGrid;
     private Grid holdGrid;
     private readonly Grid nextGrid;
     private Cell[,] lastUpdatedField;
+    private System.Windows.Shapes.Rectangle[,] rectangleFiledMapping;
+    private double canvasHeightStep;
+    private double canvasWidthStep;
     private Type cachedHoldMino;
     private Type cachedNextMino;
     private string cachedTextStats;
-    private readonly bool DisplayFirstTime = true;
 
-    public WpfRenderer(Grid playfieldGrid, StackPanel dockStats, Grid holdGrid, Grid nextGrid)
+    public WpfRenderer(Canvas canvas, StackPanel dockStats, Grid holdGrid, Grid nextGrid)
     {
         this.dockStats = dockStats;
-        this.playfieldGrid = playfieldGrid;
+        this.canvasGrid = canvas;
         this.holdGrid = holdGrid;
         this.nextGrid = nextGrid;
-        lastUpdatedField = new Cell[22, 10];
-
         this.lastUpdatedField = new Cell[22, 10];
+        this.rectangleFiledMapping = new System.Windows.Shapes.Rectangle[22, 10];
 
-        var rowsCount = this.lastUpdatedField.GetLength(0);
-        var rowLength = this.lastUpdatedField.GetLength(1);
+        canvasHeightStep = this.canvasGrid.ActualHeight / 22;
+        canvasWidthStep = this.canvasGrid.ActualWidth / 10;
 
-        for (int row = 0; row < rowsCount; row++)
-        {
-            for (int rowItemIndex = 0; rowItemIndex < rowLength; rowItemIndex++)
-            {
-                this.lastUpdatedField[row, rowItemIndex] = Cell.EmptyCell;
-            }
-        }
+        //var rowsCount = this.lastUpdatedField.GetLength(0);
+        //var rowLength = this.lastUpdatedField.GetLength(1);
+
+        //for (int row = 0; row < rowsCount; row++)
+        //{
+        //    for (int rowItemIndex = 0; rowItemIndex < rowLength; rowItemIndex++)
+        //    {
+        //        this.lastUpdatedField[row, rowItemIndex] = Cell.EmptyCell;
+        //    }
+        //}
     }
 
     public void RenderPlayfield(object sender, VisiblePlayfield e)
     {
-        if (SequenceEquals(lastUpdatedField, e.Cells) && !DisplayFirstTime)
-        {
-            return; // Exit if playfield updated already
-        }
-
         DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
         {
-            this.playfieldGrid.Children.Clear();
-
             var height = e.Height;
             var width = e.Width;
 
@@ -63,41 +60,49 @@ public class WpfRenderer : ITetrisRenderer
             {
                 for (int rowItemIndex = 0; rowItemIndex < width; rowItemIndex++)
                 {
-                    if (lastUpdatedField[row, rowItemIndex].Equals(e[row, rowItemIndex]) && !DisplayFirstTime)
+                    if (lastUpdatedField[row, rowItemIndex] is not null && lastUpdatedField[row, rowItemIndex].Equals(e[row, rowItemIndex]))
                     {
-                        continue; // Do not update what is already up to date
+                        continue; // Do not update cells that are already up to date
+                    }
+
+                    canvasGrid.Children.Remove(rectangleFiledMapping[row, rowItemIndex]);
+                    rectangleFiledMapping[row, rowItemIndex] = null;
+
+                    Cell cell = e[row, rowItemIndex];
+
+                    System.Windows.Shapes.Rectangle rect;
+                    if (cell.Ghost)
+                    {
+                        rect = new System.Windows.Shapes.Rectangle
+                        {
+                            Stroke = GetColor(cell),
+                            Fill = Brushes.White,
+                            Width = canvasWidthStep,
+                            Height = canvasHeightStep,
+                            StrokeThickness = cell.IsEmpty ? 0.2 : 1
+                        };
                     }
                     else
                     {
-                        Cell cell = e[row, rowItemIndex];
-                        SolidColorBrush solidColorBrush = GetColor(cell);
-
-                        Border borderToSet;
-                        if (cell.Ghost)
+                        rect = new System.Windows.Shapes.Rectangle
                         {
-                            borderToSet = new Border
-                            {
-                                //BorderBrush = Brushes.White,
-                                Background = Brushes.White,
-                                BorderThickness = new Thickness(0.5)
-                            };
-                        }
-                        else
-                        {
-                            borderToSet = new Border
-                            {
-                                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#365178"),
-                                Background = solidColorBrush,
-                                BorderThickness = new Thickness(0.5)
-                            };
-                        }
-
-                        Grid.SetRow(borderToSet, row);
-                        Grid.SetColumn(borderToSet, rowItemIndex);
-                        this.playfieldGrid.Children.Add(borderToSet);
+                            Stroke = (SolidColorBrush)new BrushConverter().ConvertFrom("#365178"),
+                            Fill = GetColor(cell),
+                            Width = canvasWidthStep,
+                            Height = canvasHeightStep,
+                            StrokeThickness = cell.IsEmpty ? 0.2 : 1
+                        };
                     }
+
+                    rectangleFiledMapping[row, rowItemIndex] = rect;
+
+                    Canvas.SetLeft(rect, rowItemIndex * canvasWidthStep);
+                    Canvas.SetTop(rect, row * canvasHeightStep);
+                    canvasGrid.Children.Add(rect);
                 }
             }
+
+            lastUpdatedField = (Cell[,])e.Cells.Clone();
         });
     }
 

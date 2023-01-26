@@ -39,6 +39,13 @@ public class Cell : IPlayfieldCell
 
         return new Cell(color, ghost, type == 0, type);
     }
+
+    public override bool Equals(object obj)
+    {
+        return obj is not null & 
+            (obj as Cell).Ghost == this.Ghost;
+            (obj as Cell).TetrominoCellType.Equals(this.TetrominoCellType);
+    }
 }
 
 public class EmptyPlayfieldCell : Cell

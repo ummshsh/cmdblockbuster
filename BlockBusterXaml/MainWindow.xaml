@@ -11,13 +11,13 @@
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
         Deactivated="Window_Deactivated">
-    
+
     <Canvas Loaded="Canvas_Loaded" 
             Background="Black">
 
         <StackPanel x:Name="MenuStack"
               Visibility="Visible"
-              d:Visibility="Visible"
+              d:Visibility="Collapsed"
               Panel.ZIndex="5"
               Width="660"
               Height="900"
@@ -40,12 +40,12 @@
                 <TextBlock x:Name="Score" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Score</TextBlock>
                 <TextBlock x:Name="LinesCleared" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
                 <TextBlock x:Name="Level" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
-                
+
                 <TextBlock x:Name="Hold" Foreground="#a76e7f" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 30 0 0">Hold</TextBlock>
                 <Border 
-                BorderBrush="Black" 
-                BorderThickness="1"
-                Height="150" Width="150">
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
                     <Grid ShowGridLines="False" Name="HoldGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -64,9 +64,9 @@
 
                 <TextBlock x:Name="Next" Foreground="#a76e7f" HorizontalAlignment="Center"  FontSize="20" FontWeight="Bold">Next</TextBlock>
                 <Border 
-                BorderBrush="Black" 
-                BorderThickness="1"
-                Height="150" Width="150">
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
                     <Grid ShowGridLines="False" Name="NextGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -89,12 +89,16 @@
             <Border 
                 BorderBrush="#a76e7f" 
                 BorderThickness="1">
-                <Grid 
-            Background="Black"
-            ShowGridLines="False" 
-            Name="PlayfieldGrid" 
-            Height="800" 
-            Width="400">
+                <Canvas Height="800" Width="400" Name="CanvasGrid">
+                    
+                </Canvas>
+                
+                <!--<Grid 
+                    Background="Black"
+                    ShowGridLines="False" 
+                    Name="PlayfieldGrid" 
+                    Height="800" 
+                    Width="400">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -131,7 +135,7 @@
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                </Grid>
+                </Grid>-->
             </Border>
         </StackPanel>
     </Canvas>
