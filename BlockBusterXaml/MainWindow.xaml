@@ -10,7 +10,8 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
-        Deactivated="Window_Deactivated">
+        Deactivated="Window_Deactivated"
+        Icon="appIcon.ico">
 
     <Canvas Loaded="Canvas_Loaded" 
             Background="Black">

@@ -14,9 +14,10 @@ public static class Config
     #endregion
 
     #region DebugToggles
+
     public static bool EnableDebugPlayfieldState =>TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
 
-    public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "a");
+    public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "tspinsingle");
 
     public static bool SkipMenuInXaml => TryGetValueFromTextConfigOrSetDefalut("SkipMenuInXaml", false);
 

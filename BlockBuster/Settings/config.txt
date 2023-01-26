@@ -2,8 +2,8 @@
 EnableWallKick=Y
 
 # Developer settings
-EnableDebugPlayfieldState=N
-DebugPlayfieldStateType=A
+EnableDebugPlayfieldState=Y
+DebugPlayfieldStateType=tspindouble
 
 # Developer XAML project settings
 SkipMenuInXaml=Y

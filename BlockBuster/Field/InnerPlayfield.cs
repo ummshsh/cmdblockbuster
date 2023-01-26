@@ -8,7 +8,7 @@ internal class InnerPlayfield : IPlayefield
 
     public int Height { get; private set; }
 
-    public TetrominoCellType[,] Cells { get; private set; }
+    public TetrominoCellType[,] Cells { get; set; }
 
     public TetrominoCellType this[int row, int rowItem]
     {
