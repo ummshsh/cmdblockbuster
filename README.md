@@ -38,9 +38,9 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Settings class with defaults in txt file
 - [x] Report actions to scoring counter
 - [x] Implement debug playfield states
+- [ ] Implement scoring tests
 - [ ] Tspin is broken now
 - [ ] Check infinity again
-- [ ] Implement scoring tests
 - [ ] Check that soft drop does not lock mino
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
@@ -51,6 +51,7 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Icon for xaml project
 - [x] Tests (maybe?)
 - [x] Make more appropriate layout in xaml
+- [x] Read about fourth kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
 - [ ] RotateLeftOrRight(): Make default rotation as part of kicks table so this methodd can be simplified
 - [ ] use Debug.WriteLineIf everywhere and look at config for toggle
 - [ ] Make XAML window resizable
@@ -60,7 +61,6 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [ ] Fix unit tests
 - [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
-- [ ] Read about fourht kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
 - [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
 - [ ] Playtest variable levels up

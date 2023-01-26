@@ -1,5 +1,6 @@
 ﻿using BlockBuster.Field;
 using BlockBuster.Renderer;
+using BlockBuster.Score;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using BlockBuster.Utils;
@@ -97,36 +98,45 @@ public class WpfRenderer : ITetrisRenderer
         });
     }
 
-    public void RenderGameState(object sender, GameState e)
+    public void RenderGameState(object sender, GameState gameState)
     {
         DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
         {
-
-            if (cachedHoldMino != e.Queue.HoldTetrominoType)
+            if (cachedHoldMino != gameState.Queue.HoldTetrominoType)
             {
-                FillGridWithMinoImage((stackLeft.Children[1] as Border).Child as Grid, e.Queue.HoldTetrominoType);
-                cachedHoldMino = e.Queue.HoldTetrominoType;
+                FillGridWithMinoImage((stackLeft.Children[1] as Border).Child as Grid, gameState.Queue.HoldTetrominoType);
+                cachedHoldMino = gameState.Queue.HoldTetrominoType;
             }
 
-            if (cachedTextStats != "" + e.Score + e.LinesCleared + e.Level)
+            if (cachedTextStats != "" + gameState.Score + gameState.LinesCleared + gameState.Level)
             {
                 var children = stackLeft.Children;
-                (stackLeft.Children[2] as TextBlock).Text = "Score: " + e.Score;
-                (stackLeft.Children[3] as TextBlock).Text = "Lines Cleared: " + e.LinesCleared;
-                (stackLeft.Children[4] as TextBlock).Text = "Level: " + (int)e.Level;
-                cachedTextStats = "" + e.Score + e.LinesCleared + e.Level;
+                (stackLeft.Children[2] as TextBlock).Text = "Score: " + gameState.Score;
+                (stackLeft.Children[3] as TextBlock).Text = "Lines Cleared: " + gameState.LinesCleared;
+                (stackLeft.Children[4] as TextBlock).Text = "Level: " + (int)gameState.Level;
+                cachedTextStats = "" + gameState.Score + gameState.LinesCleared + gameState.Level;
             }
 
-            if (cachedNextMino is null || !cachedNextMino.SequenceEqual(e.Queue.NextQueuePreview))
+            if (cachedNextMino is null || !cachedNextMino.SequenceEqual(gameState.Queue.NextQueuePreview))
             {
-                var array = e.Queue.NextQueuePreview.ToArray();
+                var array = gameState.Queue.NextQueuePreview.ToArray();
                 FillGridWithMinoImage((stackRight.Children[1] as Border).Child as Grid, array[0]);
                 FillGridWithMinoImage((stackRight.Children[2] as Border).Child as Grid, array[1]);
                 FillGridWithMinoImage((stackRight.Children[3] as Border).Child as Grid, array[2]);
                 FillGridWithMinoImage((stackRight.Children[4] as Border).Child as Grid, array[3]);
                 FillGridWithMinoImage((stackRight.Children[5] as Border).Child as Grid, array[4]);
-                cachedNextMino = e.Queue.NextQueuePreview.ToArray();
+                cachedNextMino = gameState.Queue.NextQueuePreview.ToArray();
             }
+        });
+    }
+
+    public void RenderTextualFeedback(HistoryStack<Tuple<string, string>> historyStack)
+    {
+        DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
+        {
+            IEnumerable<string> values = historyStack.Items.Select(t => $"{t.Item1}: Points:{t.Item2}");
+            values.Reverse();
+            (stackLeft.Children[5] as TextBlock).Text = string.Join(Environment.NewLine, values);
         });
     }
 
@@ -183,4 +193,5 @@ public class WpfRenderer : ITetrisRenderer
             _ => throw new NotImplementedException(),
         };
     }
+
 }

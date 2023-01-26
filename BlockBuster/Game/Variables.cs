@@ -22,7 +22,7 @@ public static class Variables
     /// <summary>
     /// Time during which tetromino locks after rotation
     /// </summary>
-    public static TimeSpan InfinityTime { get; set; } = TimeSpan.FromMilliseconds(1500);
+    public static TimeSpan InfinityTime { get; set; } = TimeSpan.FromMilliseconds(2500);
 
     public static TimeSpan GetFallRate(int gameLevel)
     {

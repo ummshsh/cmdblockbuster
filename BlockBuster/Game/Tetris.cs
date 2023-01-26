@@ -25,6 +25,7 @@ public class Tetris
         this.rulesEngine = new SRSRulesEngine(this.inputController);
         this.rulesEngine.PlayFieldUpdated += this.tetrisRenderer.RenderPlayfield;
         this.rulesEngine.GameStateUpdated += this.tetrisRenderer.RenderGameState;
+        this.rulesEngine.gameState.ScoreCounter.ScoreTextFeedbackUpdated += this.tetrisRenderer.RenderTextualFeedback;
         this.rulesEngine.SoundTriggered += this.soundPlayer.PlaySound;
 
         return rulesEngine.Start();

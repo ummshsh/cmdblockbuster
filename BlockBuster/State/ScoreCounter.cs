@@ -25,6 +25,11 @@ public class ScoreCounter
     /// </summary>
     public Level Level => (Level)((LinesCleared / 10) + 1 > 15 ? 15 : (LinesCleared / 10) + 1);
 
+
+    private readonly HistoryStack<Tuple<string, string>> textualFeedback = new(10);
+    public delegate void ScoreTextFeedbackHandler(HistoryStack<Tuple<string, string>> historyStack);
+    public event ScoreTextFeedbackHandler ScoreTextFeedbackUpdated;
+
     /// <summary>
     /// Registers multiple mino actions<para/>
     /// Populates <see cref="actionsHistory"/> with actions, and empties <see cref="actionsHistory"/> if breaker registered
@@ -63,7 +68,11 @@ public class ScoreCounter
             if (!scoreActionFromHistory.ScoreAddedAlready && scoreActionFromHistory.Action != ScoreAction.Landed)
             {
                 scoreActionFromHistory.ScoreAddedAlready = true;
-                Score += GetScore(scoreActionFromHistory.Action, Level, action.DroppedLines);
+                int points = GetScore(scoreActionFromHistory.Action, Level, action.DroppedLines);
+                Score += points;
+
+                textualFeedback.Push(new Tuple<string, string>(scoreActionFromHistory.Action.ToString(), points.ToString()));
+                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
 
                 if (scoreActionFromHistory.Action != ScoreAction.SoftDrop &&
                     scoreActionFromHistory.Action != ScoreAction.HardDrop)
@@ -80,7 +89,11 @@ public class ScoreCounter
 
         if (ComboCounter > 0)
         {
-            Score += GetScore(ScoreAction.Combo, Level);
+            int points = GetScore(ScoreAction.Combo, Level);
+            Score += points;
+            textualFeedback.Push(new Tuple<string, string>($"Combo {ComboCounter}", points.ToString()));
+            ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
+
         }
 
         // Go back inhistory and check for BTB
@@ -110,7 +123,10 @@ public class ScoreCounter
             }
             else if (scoreActionFromHistory.IsDifficult)
             {
-                Score += GetScore(actionsHistory.Peek(indexHistoryForBtb - 1).Action, Level, action.LinesCleared);
+                int points = GetScore(actionsHistory.Peek(indexHistoryForBtb - 1).Action, Level, action.LinesCleared);
+                Score += points;
+                textualFeedback.Push(new Tuple<string, string>($"BTB {ComboCounter}", points.ToString()));
+                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
                 return;
             }
             else
