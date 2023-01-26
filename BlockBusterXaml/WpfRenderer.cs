@@ -2,6 +2,7 @@
 using BlockBuster.Renderer;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
+using BlockBuster.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,29 +15,28 @@ namespace BlockBusterXaml;
 
 public class WpfRenderer : ITetrisRenderer
 {
-    private readonly StackPanel dockStats;
     private readonly Canvas canvasGrid;
-    private readonly Grid holdGrid;
-    private readonly Grid nextGrid;
+    private readonly StackPanel stackLeft;
+    private readonly StackPanel stackRight;
     private Cell[,] lastFieldUpdate;
     private readonly System.Windows.Shapes.Rectangle[,] rectangleFiledMapping;
     private readonly double canvasHeightStep;
     private readonly double canvasWidthStep;
     private Type cachedHoldMino;
-    private Type cachedNextMino;
+    private Type[] cachedNextMino;
     private string cachedTextStats;
 
-    public WpfRenderer(Canvas canvas, StackPanel dockStats, Grid holdGrid, Grid nextGrid)
+    public WpfRenderer(Canvas canvas, StackPanel stackLeft, StackPanel stackRight)
     {
-        this.dockStats = dockStats;
-        this.canvasGrid = canvas;
-        this.holdGrid = holdGrid;
-        this.nextGrid = nextGrid;
-        this.lastFieldUpdate = new Cell[22, 10];
-        this.rectangleFiledMapping = new System.Windows.Shapes.Rectangle[22, 10];
+        this.stackLeft = stackLeft;
+        this.stackRight = stackRight;
 
+        this.canvasGrid = canvas;
         canvasHeightStep = this.canvasGrid.ActualHeight / 22;
         canvasWidthStep = this.canvasGrid.ActualWidth / 10;
+
+        this.lastFieldUpdate = new Cell[22, 10];
+        this.rectangleFiledMapping = new System.Windows.Shapes.Rectangle[22, 10];
 
     }
 
@@ -101,32 +101,38 @@ public class WpfRenderer : ITetrisRenderer
     {
         DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
         {
-            if (cachedTextStats != "" + e.Score + e.LinesCleared + e.Level)
-            {
-                var children = dockStats.Children;
-                (dockStats.Children[0] as TextBlock).Text = "Score: " + e.Score;
-                (dockStats.Children[1] as TextBlock).Text = "Lines Cleared: " + e.LinesCleared;
-                (dockStats.Children[2] as TextBlock).Text = "Level: " + (int)e.Level;
-                cachedTextStats = "" + e.Score + e.LinesCleared + e.Level;
-            }
 
             if (cachedHoldMino != e.Queue.HoldTetrominoType)
             {
-                FillGridWithMinoImage(holdGrid, e.Queue.HoldTetrominoType);
+                FillGridWithMinoImage((stackLeft.Children[1] as Border).Child as Grid, e.Queue.HoldTetrominoType);
                 cachedHoldMino = e.Queue.HoldTetrominoType;
             }
 
-            if (cachedNextMino != e.Queue.NextTetromino)
+            if (cachedTextStats != "" + e.Score + e.LinesCleared + e.Level)
             {
-                FillGridWithMinoImage(nextGrid, e.Queue.NextTetromino);
-                cachedNextMino = e.Queue.NextTetromino;
+                var children = stackLeft.Children;
+                (stackLeft.Children[2] as TextBlock).Text = "Score: " + e.Score;
+                (stackLeft.Children[3] as TextBlock).Text = "Lines Cleared: " + e.LinesCleared;
+                (stackLeft.Children[4] as TextBlock).Text = "Level: " + (int)e.Level;
+                cachedTextStats = "" + e.Score + e.LinesCleared + e.Level;
+            }
+
+            if (cachedNextMino is null || !cachedNextMino.SequenceEqual(e.Queue.NextQueuePreview))
+            {
+                var array = e.Queue.NextQueuePreview.ToArray();
+                FillGridWithMinoImage((stackRight.Children[1] as Border).Child as Grid, array[0]);
+                FillGridWithMinoImage((stackRight.Children[2] as Border).Child as Grid, array[1]);
+                FillGridWithMinoImage((stackRight.Children[3] as Border).Child as Grid, array[2]);
+                FillGridWithMinoImage((stackRight.Children[4] as Border).Child as Grid, array[3]);
+                FillGridWithMinoImage((stackRight.Children[5] as Border).Child as Grid, array[4]);
+                cachedNextMino = e.Queue.NextQueuePreview.ToArray();
             }
         });
     }
 
     private void FillGridWithMinoImage(Grid grid, Type minoType)
     {
-        if (minoType is null)
+        if (minoType is null || grid is null)
         {
             return;
         }

@@ -30,7 +30,20 @@ internal class SRSRulesEngine : IRulesEngine
 
     internal readonly GameState gameState;
 
-    private readonly HistoryStack<ScoreablePlayfieldAction> history = new(200);
+    private readonly HistoryStack<ScoreablePlayfieldAction> _history = new(200);
+
+    private HistoryStack<ScoreablePlayfieldAction> History
+    {
+        get
+        {
+            lock (historyLock)
+            {
+                return _history;
+            }
+        }
+    }
+
+    private readonly object historyLock = new();
 
     public SRSRulesEngine(IInputHandler inputHandler)
     {
@@ -91,7 +104,7 @@ internal class SRSRulesEngine : IRulesEngine
     private void PushEventsFromHistoryToScoreCounter(int linesCleared)
     {
         // Return If nothing to report
-        if (currentTetromino is null || !(history.Peek(0)?.Tetromino.IsLanded ?? false))
+        if (currentTetromino is null || !(History.Peek(0)?.Tetromino.IsLanded ?? false))
         {
             return;
         }
@@ -99,7 +112,7 @@ internal class SRSRulesEngine : IRulesEngine
         Debug.WriteLineIf(linesCleared > 0, "Lines cleared:" + linesCleared);
 
         // Report: By lines cleared + T-Spin
-        var previousActionBeforeLanding = history.Peek(1);
+        var previousActionBeforeLanding = History.Peek(1);
         bool lastActionBeforeLandingWasRotation =
             previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
             previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
@@ -135,7 +148,7 @@ internal class SRSRulesEngine : IRulesEngine
                 }
             }
             // T-Spin upgrade by last kick
-            else if (previousActionBeforeLanding.TSpin == TSpin.Mini && history.Peek(0).WithLastKick)
+            else if (previousActionBeforeLanding.TSpin == TSpin.Mini && History.Peek(0).WithLastKick)
             {
                 if (linesCleared == 0)
                 {
@@ -241,8 +254,8 @@ internal class SRSRulesEngine : IRulesEngine
         }
 
 
-        // Clear history or mino
-        history.Items.Clear();
+        // Clear mino history
+        History.Items.Clear();
     }
 
     private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
@@ -445,7 +458,7 @@ internal class SRSRulesEngine : IRulesEngine
             currentTetromino.WidthLocation = newRowItemCoordinate;
 
             rotated = true;
-            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
+            History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
             gameState.TimeInfinityTriggered = DateTime.Now;
         }
 
@@ -480,7 +493,7 @@ internal class SRSRulesEngine : IRulesEngine
         if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
         {
             currentTetromino.WidthLocation = newLocation;
-            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
+            History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
             SoundTriggered?.Invoke(this, TetrisSound.Movement);
             return true;
         }
@@ -497,7 +510,7 @@ internal class SRSRulesEngine : IRulesEngine
         if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
         {
             currentTetromino.WidthLocation = newLocation;
-            history.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
+            History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
             SoundTriggered?.Invoke(this, TetrisSound.Movement);
             return true;
         }
@@ -612,7 +625,7 @@ internal class SRSRulesEngine : IRulesEngine
 
         if (rowsDestroyed > 0)
         {
-            Debug.WriteLine($"Removed rows:{rowsDestroyed} with mino: {history.Peek(0).Tetromino.GetType()}");
+            Debug.WriteLine($"Removed rows:{rowsDestroyed} with mino: {History.Peek(0).Tetromino.GetType()}");
             SoundTriggered?.Invoke(this, TetrisSound.LineClear);
         }
 

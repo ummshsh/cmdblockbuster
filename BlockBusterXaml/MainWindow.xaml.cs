@@ -25,7 +25,7 @@ public partial class MainWindow : Window
     {
         tetris?.Stop();
         wpfInputHandler = new WpfInputHandler();
-        tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.CanvasGrid, this.DockStats, this.HoldGrid, this.NextGrid), new WpfSoundPlayer());
+        tetris = new Tetris(wpfInputHandler, new WpfRenderer(this.CanvasGrid, this.StackLeft, this.StackRight), new WpfSoundPlayer());
         paused = false;
         gameStarted = true;
         MenuStack.Visibility = Visibility.Collapsed;

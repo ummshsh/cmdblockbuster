@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BlockBuster"
         mc:Ignorable="d"
         KeyDown="OnKeyDownHandler"
-        Title="MainWindow" Height="900" Width="660"
+        Title="MainWindow" Height="900" Width="830"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
@@ -19,7 +19,7 @@
               Visibility="Visible"
               d:Visibility="Collapsed"
               Panel.ZIndex="5"
-              Width="660"
+              Width="830"
               Height="900"
               Background="Black">
             <StackPanel Margin="0 300 0 0">
@@ -36,12 +36,8 @@
             Height="Auto" 
             Margin="30 30 30 30">
 
-            <StackPanel x:Name="DockStats" Width="150" Margin="0 0 30 0">
-                <TextBlock x:Name="Score" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Score</TextBlock>
-                <TextBlock x:Name="LinesCleared" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
-                <TextBlock x:Name="Level" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
-
-                <TextBlock x:Name="Hold" Foreground="#a76e7f" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 30 0 0">Hold</TextBlock>
+            <StackPanel x:Name="StackLeft" Width="150" Margin="0 0 30 0">                
+                <TextBlock x:Name="Hold" Foreground="#a76e7f" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 10 0 10">Hold</TextBlock>
                 <Border 
                     BorderBrush="Black" 
                     BorderThickness="1"
@@ -61,13 +57,28 @@
                         </Grid.RowDefinitions>
                     </Grid>
                 </Border>
+                <TextBlock x:Name="Score" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19" Margin="0 10 0 0">Score</TextBlock>
+                <TextBlock x:Name="LinesCleared" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
+                <TextBlock x:Name="Level" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
 
-                <TextBlock x:Name="Next" Foreground="#a76e7f" HorizontalAlignment="Center"  FontSize="20" FontWeight="Bold">Next</TextBlock>
+                <TextBlock HorizontalAlignment="Center" Foreground="#a76e7f" VerticalAlignment="Bottom" Margin="0 10 0 0">Esc to pause</TextBlock>
+            </StackPanel>
+
+            <Border 
+                BorderBrush="#a76e7f" 
+                BorderThickness="1">
+                <Canvas Height="800" Width="400" Name="CanvasGrid">                   
+                </Canvas>
+            </Border>
+            
+            
+            <StackPanel x:Name="StackRight" Width="150" Margin="30 0 30 0">
+                <TextBlock x:Name="Next" Foreground="#a76e7f" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0 10 0 10">Next</TextBlock>
                 <Border 
                     BorderBrush="Black" 
                     BorderThickness="1"
                     Height="150" Width="150">
-                    <Grid ShowGridLines="False" Name="NextGrid">
+                    <Grid ShowGridLines="False" Name="Next1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
@@ -81,62 +92,84 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
                     </Grid>
-
                 </Border>
-                <TextBlock HorizontalAlignment="Center" Foreground="#a76e7f" VerticalAlignment="Bottom">Esc to pause</TextBlock>
+                <Border 
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
+                    <Grid ShowGridLines="False" Name="Next2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </Border>
+                <Border 
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
+                    <Grid ShowGridLines="False" Name="Next3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </Border>
+                <Border 
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
+                    <Grid ShowGridLines="False" Name="Next4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </Border>
+                <Border 
+                    BorderBrush="Black" 
+                    BorderThickness="1"
+                    Height="150" Width="150">
+                    <Grid ShowGridLines="False" Name="Next5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </Border>
             </StackPanel>
-
-            <Border 
-                BorderBrush="#a76e7f" 
-                BorderThickness="1">
-                <Canvas Height="800" Width="400" Name="CanvasGrid">
-                    
-                </Canvas>
-                
-                <!--<Grid 
-                    Background="Black"
-                    ShowGridLines="False" 
-                    Name="PlayfieldGrid" 
-                    Height="800" 
-                    Width="400">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                </Grid>-->
-            </Border>
         </StackPanel>
     </Canvas>
 </Window>
