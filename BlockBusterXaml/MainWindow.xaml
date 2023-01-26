@@ -62,7 +62,7 @@
                 <TextBlock x:Name="LinesCleared" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Lines Cleared</TextBlock>
                 <TextBlock x:Name="Level" Foreground="#a76e7f" HorizontalAlignment="Left" FontSize="19">Level</TextBlock>
 
-                <TextBlock x:Name="TextPointFeedback" HorizontalAlignment="Center" Foreground="#a76e7f" VerticalAlignment="Bottom" Margin="0 10 0 0">Way to go!</TextBlock>
+                <TextBlock x:Name="TextPointFeedback" FontSize="15" HorizontalAlignment="Left" Foreground="#a76e7f" VerticalAlignment="Bottom" Margin="0 10 0 0">Hard drop</TextBlock>
             </StackPanel>
 
             <Border 
