@@ -48,6 +48,8 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 
 ## TODO Low priority
 - [ ] use Debug.WriteLineIf everywhere and look at config for toggle
+- [ ] Make more appropriate layout in xaml
+- [ ] Make XAML window resizable
 - [ ] Move all basic moves (<0) to separate enum to use in playfield history
 - [ ] In playfield history use Action.Landed instaed of mino property
 - [ ] Check that T spin wil be rewarded if teromino not lands and disappears(contininues moving)

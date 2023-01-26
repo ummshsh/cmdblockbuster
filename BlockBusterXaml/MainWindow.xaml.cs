@@ -95,6 +95,11 @@ public partial class MainWindow : Window
     private void Canvas_Loaded(object sender, RoutedEventArgs e)
     {
         Unpause.Visibility = Visibility.Collapsed;
+
+        if (Config.SkipMenuInXaml)
+        {
+            NewGame_Click(null, null);
+        }
     }
 
     private void Unpause_Click(object sender, RoutedEventArgs e)

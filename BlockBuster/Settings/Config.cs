@@ -11,26 +11,23 @@ public static class Config
 
     public static bool EnableWallKick => TryGetValueFromTextConfigOrSetDefalut("EnableWallKick", true);
 
-    public static bool EnableDebugPlayfieldState =>TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
-
     #endregion
 
     #region DebugToggles
+    public static bool EnableDebugPlayfieldState =>TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
 
     public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "a");
 
     public static bool SkipMenuInXaml => TryGetValueFromTextConfigOrSetDefalut("SkipMenuInXaml", false);
 
     #endregion
+
     private static Dictionary<string, string> _settings = null;
     private static Dictionary<string, string> Settings
     {
         get
         {
-            if (_settings is null)
-            {
-                _settings = ReadValuesFromConfig("Settings/config.txt");
-            }
+            _settings ??= ReadValuesFromConfig("Settings/config.txt");
 
             return _settings;
         }

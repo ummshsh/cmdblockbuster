@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace BlockBuster.Utils;
 
@@ -10,5 +11,12 @@ internal static class Extensions
         {
             yield return items[i];
         }
+    }
+
+    public static bool SequenceEquals<T>(this T[,] a, T[,] b) where T : IEnumerable<T>
+    {
+        return a?.Rank == b?.Rank
+        && Enumerable.Range(0, a.Rank).All(d => a.GetLength(d) == b.GetLength(d))
+        && a.Cast<T>().SequenceEqual(b.Cast<T>());
     }
 }

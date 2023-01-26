@@ -3,7 +3,7 @@ using BlockBuster.Renderer;
 using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,14 +14,14 @@ namespace BlockBusterXaml;
 
 public class WpfRenderer : ITetrisRenderer
 {
-    private StackPanel dockStats;
-    private Canvas canvasGrid;
-    private Grid holdGrid;
+    private readonly StackPanel dockStats;
+    private readonly Canvas canvasGrid;
+    private readonly Grid holdGrid;
     private readonly Grid nextGrid;
     private Cell[,] lastFieldUpdate;
-    private System.Windows.Shapes.Rectangle[,] rectangleFiledMapping;
-    private double canvasHeightStep;
-    private double canvasWidthStep;
+    private readonly System.Windows.Shapes.Rectangle[,] rectangleFiledMapping;
+    private readonly double canvasHeightStep;
+    private readonly double canvasWidthStep;
     private Type cachedHoldMino;
     private Type cachedNextMino;
     private string cachedTextStats;
@@ -38,16 +38,6 @@ public class WpfRenderer : ITetrisRenderer
         canvasHeightStep = this.canvasGrid.ActualHeight / 22;
         canvasWidthStep = this.canvasGrid.ActualWidth / 10;
 
-        //var rowsCount = this.lastUpdatedField.GetLength(0);
-        //var rowLength = this.lastUpdatedField.GetLength(1);
-
-        //for (int row = 0; row < rowsCount; row++)
-        //{
-        //    for (int rowItemIndex = 0; rowItemIndex < rowLength; rowItemIndex++)
-        //    {
-        //        this.lastUpdatedField[row, rowItemIndex] = Cell.EmptyCell;
-        //    }
-        //}
     }
 
     public void RenderPlayfield(object sender, VisiblePlayfield e)
@@ -186,12 +176,5 @@ public class WpfRenderer : ITetrisRenderer
             TetrominoCellType.Blue => (SolidColorBrush)new BrushConverter().ConvertFrom("#365178"),
             _ => throw new NotImplementedException(),
         };
-    }
-
-    private bool SequenceEquals<T>(T[,] a, T[,] b)
-    {
-        return a?.Rank == b?.Rank
-        && Enumerable.Range(0, a.Rank).All(d => a.GetLength(d) == b.GetLength(d))
-        && a.Cast<T>().SequenceEqual(b.Cast<T>());
     }
 }
