@@ -1,7 +1,7 @@
 ﻿# `BlockBusterXaml` project  
 This is just xaml based debugger for playtesting
 
-![Screen](readme/screen.jpg?raw=true "Title")
+![Screen](readme/screen.jpg?raw=true "Main window screenshot")
 
 
 # `BlockBuster` project  
@@ -45,6 +45,11 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
+- [ ] Make replay funcionality: 
+    - [ ] Check if engine determenistic somehow
+    - [ ] each frame(or more frequent) store game inputs
+    - [ ] create ReplaytInputHandler 
+    - [ ] create ReplayWriter, to write to stream(game inputs, tetromino order, timestamps delta, hold, hext, level, mode)
 
 ## TODO Low priority
 - [x] Figure out snake sequences and what to do with them in spawn queue (more than 2 snakes consequently not permited)
