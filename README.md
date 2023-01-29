@@ -38,10 +38,10 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Settings class with defaults in txt file
 - [x] Report actions to scoring counter
 - [x] Implement debug playfield states
+- [x] Check infinity again
+- [x] Check that soft drop does not lock mino
 - [ ] Implement scoring tests
-- [ ] Tspin is broken now
-- [ ] Check infinity again
-- [ ] Check that soft drop does not lock mino
+- [ ] Tspin is not recognized by Score counter
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 

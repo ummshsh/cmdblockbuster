@@ -23,7 +23,7 @@ public class GameState
 
     internal DateTime TimeInfinityTriggered { get; set; } = DateTime.Now;
 
-    internal bool ThisMinoInfinityAvailable { get; set; } = true;
+    internal bool ThisMinoInfinityTriggered { get; set; } = true;
 
     internal TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow(0.8 - ((int)Level - 1) * 0.007, (int)Level - 1));
 
