@@ -9,7 +9,7 @@ public class GameState
 {
     public EngineState State { get; set; } = EngineState.Stopped;
 
-    public int Score => ScoreCounter.Score;
+    public double Score => ScoreCounter.Score;
 
     public int LinesCleared => ScoreCounter.LinesCleared;
 

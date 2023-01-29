@@ -558,6 +558,10 @@ internal class SRSRulesEngine : IRulesEngine
 
         bool LockMino()
         {
+            lock (historyLock)
+            {
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
+            }
             AddCurrentTetrominoToInnerState();
             SoundTriggered?.Invoke(this, TetrisSound.Locking);
             return false;
@@ -752,7 +756,6 @@ internal class SRSRulesEngine : IRulesEngine
         tSpin = TSpin.None;
         return false;
     }
-
 
     /// <summary>
     /// <see cref="https://tetris.wiki/T-Spin"/>

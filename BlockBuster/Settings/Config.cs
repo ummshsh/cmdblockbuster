@@ -15,12 +15,13 @@ public static class Config
 
     #region DebugToggles
 
-    public static bool EnableDebugPlayfieldState =>TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
+    public static bool EnableDebugPlayfieldState => TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
 
     public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "tspinsingle");
 
     public static bool SkipMenuInXaml => TryGetValueFromTextConfigOrSetDefalut("SkipMenuInXaml", false);
 
+    public static bool EnableDebugOutput { get; internal set; } = true;
     #endregion
 
     private static Dictionary<string, string> _settings = null;
@@ -35,6 +36,7 @@ public static class Config
     }
 
     internal static InnerPlayfield DebugPlayfieldState => DebugPlayfields.GetPlayfield(DebugPlayfieldStateType);
+
 
     private static bool TryGetValueFromTextConfigOrSetDefalut(string valueToGetFromConfig, bool defalutValue)
     {

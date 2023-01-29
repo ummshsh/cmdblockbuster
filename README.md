@@ -40,8 +40,11 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Implement debug playfield states
 - [x] Check infinity again
 - [x] Check that soft drop does not lock mino
-- [ ] Implement scoring tests
+- [x] Before assigning regular score I need to check if it is BTB, if so, then score BTB(actionScore*1.5) instead
+- [ ] Make HistoryStack concurrent
+- [ ] Recongnize different BTB's
 - [ ] Tspin is not recognized by Score counter
+- [ ] Implement scoring tests
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
@@ -64,7 +67,6 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [ ] In playfield history use Action.Landed instaed of mino property
 - [ ] Check that T spin wil be rewarded if teromino not lands and disappears(contininues moving)
 - [ ] Fix unit tests
-- [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
 - [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block
