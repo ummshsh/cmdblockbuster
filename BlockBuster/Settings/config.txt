@@ -4,8 +4,8 @@ EnableWallKick=Y
 # Developer settings
 EnableDebugPlayfieldState=Y
 
-# tspinsingle \ minitspinsingle \ tspindouble
-DebugPlayfieldStateType=tspinsingle
+# tspinsingle \ minitspinsingle \ tspindouble \ tetris
+DebugPlayfieldStateType=tetris
 
 # Developer XAML project settings
 SkipMenuInXaml=Y

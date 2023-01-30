@@ -68,11 +68,11 @@ public partial class MainWindow : Window
         {
             inputToReturn = InputHandler.InputType.SoftDrop;
         }
-        else if (e.Key == Key.RightShift)
+        else if (e.Key == Key.RightShift | e.Key == Key.LeftShift)
         {
             inputToReturn = InputHandler.InputType.Hold;
         }
-        else if (e.Key == Key.W | e.Key == Key.Up)
+        else if (e.Key == Key.W | e.Key == Key.Up | e.Key == Key.Space)
         {
             inputToReturn = InputHandler.InputType.HardDrop;
         }

@@ -42,7 +42,6 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Check that soft drop does not lock mino
 - [x] Before assigning regular score I need to check if it is BTB, if so, then score BTB(actionScore*1.5) instead
 - [ ] Make HistoryStack concurrent
-- [ ] Recongnize different BTB's
 - [ ] Tspin is not recognized by Score counter
 - [ ] Implement scoring tests
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
@@ -60,6 +59,7 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Tests (maybe?)
 - [x] Make more appropriate layout in xaml
 - [x] Read about fourth kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
+- [ ] (?) Recongnize different BTB's
 - [ ] RotateLeftOrRight(): Make default rotation as part of kicks table so this methodd can be simplified
 - [ ] use Debug.WriteLineIf everywhere and look at config for toggle
 - [ ] Make XAML window resizable

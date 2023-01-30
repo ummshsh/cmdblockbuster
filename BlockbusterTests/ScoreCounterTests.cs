@@ -142,7 +142,6 @@ public class ScoreCounterTests
         Assert.AreEqual(9970, counter.Score);
     }
 
-
     [TestMethod("Check score case: BTB into Perfect clear")]
     public void CheckScoreBtbPerfectClear()
     {
