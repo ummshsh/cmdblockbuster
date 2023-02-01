@@ -3,31 +3,33 @@ using BlockBuster.Score;
 using System;
 using BlockBuster.Common;
 
-namespace BlockBuster.State;
-
-public class GameState
+namespace BlockBuster.State
 {
-    public EngineState State { get; set; } = EngineState.Stopped;
 
-    public double Score => ScoreCounter.Score;
+    public class GameState
+    {
+        public EngineState State { get; set; } = EngineState.Stopped;
 
-    public int LinesCleared => ScoreCounter.LinesCleared;
+        public double Score => ScoreCounter.Score;
 
-    public Level Level => ScoreCounter.Level;
+        public int LinesCleared => ScoreCounter.LinesCleared;
 
-    public TetrominoQueue Queue { get; } = new TetrominoQueue();
+        public Level Level => ScoreCounter.Level;
 
-    internal DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
+        public TetrominoQueue Queue { get; } = new TetrominoQueue();
 
-    internal DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
+        internal DateTime LastTimePlayfieldWasUpdated { get; set; } = DateTime.Now;
 
-    internal DateTime TimeInfinityTriggered { get; set; } = DateTime.Now;
+        internal DateTime LastTimeTetrominoMovedDown { get; set; } = DateTime.Now;
 
-    internal bool ThisMinoInfinityTriggered { get; set; } = true;
+        internal DateTime TimeInfinityTriggered { get; set; } = DateTime.Now;
 
-    internal TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow(0.8 - ((int)Level - 1) * 0.007, (int)Level - 1));
+        internal bool ThisMinoInfinityTriggered { get; set; } = true;
 
-    internal bool CanUseHold { get; set; } = true;
+        internal TimeSpan CurrentPerRowInterval => TimeSpan.FromSeconds(Math.Pow(0.8 - ((int)Level - 1) * 0.007, (int)Level - 1));
 
-    public ScoreCounter ScoreCounter { get; } = new ScoreCounter();
+        internal bool CanUseHold { get; set; } = true;
+
+        public ScoreCounter ScoreCounter { get; } = new ScoreCounter();
+    }
 }

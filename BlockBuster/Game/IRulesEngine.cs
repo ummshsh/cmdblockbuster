@@ -1,5 +1,7 @@
-﻿namespace BlockBuster.Game;
-
-internal interface IRulesEngine
+﻿namespace BlockBuster.Game
 {
+
+    internal interface IRulesEngine
+    {
+    }
 }

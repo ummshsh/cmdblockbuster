@@ -1,6 +1,8 @@
-﻿namespace BlockBuster.Sound;
-
-public interface ISoundPlayer
+﻿namespace BlockBuster.Sound
 {
-    public void PlaySound(object sender, TetrisSound sound);
+
+    public interface ISoundPlayer
+    {
+        public void PlaySound(object sender, TetrisSound sound);
+    }
 }

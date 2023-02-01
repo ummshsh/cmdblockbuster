@@ -1,36 +1,36 @@
 ﻿using System;
 
-namespace BlockBuster.Game;
-
-public static class Variables
+namespace BlockBuster.Game
 {
-    /// <summary>
-    /// Logic update interval
-    /// </summary>
-    public static TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(1);
-
-    /// <summary>
-    /// 60 updates per second
-    /// </summary>
-    public static TimeSpan RenderUpdateRate { get; } = TimeSpan.FromMilliseconds(16.7);
-
-    /// <summary>
-    /// Timeout to during which tetromino still can be moved if it is in motion even if it touched another tetromino or foundation bellow
-    /// </summary>
-    public static TimeSpan LockDelayTimeout = TimeSpan.FromMilliseconds(500);
-
-    /// <summary>
-    /// Time during which tetromino locks after rotation
-    /// </summary>
-    public static TimeSpan InfinityTime { get; set; } = TimeSpan.FromMilliseconds(1500);
-
-    public static TimeSpan GetFallRate(int gameLevel)
+    public static class Variables
     {
-        // 15 levels of fall rate. Fall rates are expressed in G <para/>
-        // 1G = 1 cell per frame <para/>
-        // Values are true as long as RenderUpdateRate equals 16.7
-        var FallRatesCurve = new[]
+        /// <summary>
+        /// Logic update interval
+        /// </summary>
+        public static TimeSpan TickRate { get; } = TimeSpan.FromMilliseconds(1);
+
+        /// <summary>
+        /// 60 updates per second
+        /// </summary>
+        public static TimeSpan RenderUpdateRate { get; } = TimeSpan.FromMilliseconds(16.7);
+
+        /// <summary>
+        /// Timeout to during which tetromino still can be moved if it is in motion even if it touched another tetromino or foundation bellow
+        /// </summary>
+        public static TimeSpan LockDelayTimeout = TimeSpan.FromMilliseconds(500);
+
+        /// <summary>
+        /// Time during which tetromino locks after rotation
+        /// </summary>
+        public static TimeSpan InfinityTime { get; set; } = TimeSpan.FromMilliseconds(1500);
+
+        public static TimeSpan GetFallRate(int gameLevel)
         {
+            // 15 levels of fall rate. Fall rates are expressed in G <para/>
+            // 1G = 1 cell per frame <para/>
+            // Values are true as long as RenderUpdateRate equals 16.7
+            var FallRatesCurve = new[]
+            {
             0.01667,
             0.021017,
             0.026977,
@@ -48,6 +48,7 @@ public static class Variables
             2.36
         };
 
-        return TimeSpan.FromSeconds(FallRatesCurve[gameLevel]);
+            return TimeSpan.FromSeconds(FallRatesCurve[gameLevel]);
+        }
     }
 }

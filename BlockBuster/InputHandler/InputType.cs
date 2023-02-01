@@ -1,14 +1,16 @@
-﻿namespace BlockBuster.InputHandler;
-
-public enum InputType
+﻿namespace BlockBuster.InputHandler
 {
-    None,
-    Left,
-    Right,
-    SoftDrop,
-    HardDrop,
-    RotateLeft,
-    RotateRight,
-    Hold,
-    Pause
+
+    public enum InputType
+    {
+        None,
+        Left,
+        Right,
+        SoftDrop,
+        HardDrop,
+        RotateLeft,
+        RotateRight,
+        Hold,
+        Pause
+    }
 }

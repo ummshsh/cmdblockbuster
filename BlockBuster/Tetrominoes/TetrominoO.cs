@@ -1,33 +1,35 @@
 ﻿using System;
 
-namespace BlockBuster.Tetrominoes;
-
-[Serializable]
-class TetrominoO : Tetromino
+namespace BlockBuster.Tetrominoes
 {
-    public TetrominoO()
+
+    [Serializable]
+    class TetrominoO : Tetromino
     {
-        SpawnLocation = new System.Tuple<int, int>(0, 3);
+        public TetrominoO()
+        {
+            SpawnLocation = new System.Tuple<int, int>(0, 3);
 
-        var empty = TetrominoCellType.Empty;
-        var filled = TetrominoCellType.Yellow;
+            var empty = TetrominoCellType.Empty;
+            var filled = TetrominoCellType.Yellow;
 
-        Cells = new TetrominoCellType[,] {
+            Cells = new TetrominoCellType[,] {
             {empty,filled,filled,empty},
             {empty,filled,filled,empty},
             {empty,empty,empty,empty}
         };
-    }
+        }
 
-    public override MinoRotationTransition RotateLeft()
-    {
-        // In SRS O mino have only 1 rotation
-        return MinoRotationTransition.Rotation_0_0;
-    }
+        public override MinoRotationTransition RotateLeft()
+        {
+            // In SRS O mino have only 1 rotation
+            return MinoRotationTransition.Rotation_0_0;
+        }
 
-    public override MinoRotationTransition RotateRight()
-    {
-        // In SRS O mino have only 1 rotation
-        return MinoRotationTransition.Rotation_0_0;
+        public override MinoRotationTransition RotateRight()
+        {
+            // In SRS O mino have only 1 rotation
+            return MinoRotationTransition.Rotation_0_0;
+        }
     }
 }

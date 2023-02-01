@@ -1,27 +1,29 @@
 ﻿using System;
 
-namespace BlockBuster.Tetrominoes;
-
-[Serializable]
-public class TetrominoRotation
+namespace BlockBuster.Tetrominoes
 {
-    public MinoRotation Rotation { get; private set; } = MinoRotation.Rotation_0;
 
-    public MinoRotationTransition RotateRight()
+    [Serializable]
+    public class TetrominoRotation
     {
-        var originalRotation = Rotation.ToString().Replace("Rotation_", "");
-        Rotation = (int)Rotation + 1 > 3 ? MinoRotation.Rotation_0 : Rotation + 1;
-        var newRotation = Rotation.ToString().Replace("Rotation_", "");
+        public MinoRotation Rotation { get; private set; } = MinoRotation.Rotation_0;
 
-        return Enum.Parse<MinoRotationTransition>($"Rotation_{originalRotation}_{newRotation}");
-    }
+        public MinoRotationTransition RotateRight()
+        {
+            var originalRotation = Rotation.ToString().Replace("Rotation_", "");
+            Rotation = (int)Rotation + 1 > 3 ? MinoRotation.Rotation_0 : Rotation + 1;
+            var newRotation = Rotation.ToString().Replace("Rotation_", "");
 
-    public MinoRotationTransition RotateLeft()
-    {
-        var originalRotation = Rotation.ToString().Replace("Rotation_", "");
-        Rotation = (int)Rotation - 1 < 0 ? MinoRotation.Rotation_L : Rotation - 1;
-        var newRotation = Rotation.ToString().Replace("Rotation_", "");
+            return Enum.Parse<MinoRotationTransition>($"Rotation_{originalRotation}_{newRotation}");
+        }
 
-        return Enum.Parse<MinoRotationTransition>($"Rotation_{originalRotation}_{newRotation}");
+        public MinoRotationTransition RotateLeft()
+        {
+            var originalRotation = Rotation.ToString().Replace("Rotation_", "");
+            Rotation = (int)Rotation - 1 < 0 ? MinoRotation.Rotation_L : Rotation - 1;
+            var newRotation = Rotation.ToString().Replace("Rotation_", "");
+
+            return Enum.Parse<MinoRotationTransition>($"Rotation_{originalRotation}_{newRotation}");
+        }
     }
 }

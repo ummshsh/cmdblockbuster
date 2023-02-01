@@ -1,5 +1,7 @@
-﻿namespace BlockBuster.Field;
-
-internal interface IPlayefield
+﻿namespace BlockBuster.Field
 {
+
+    internal interface IPlayefield
+    {
+    }
 }

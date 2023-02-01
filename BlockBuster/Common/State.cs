@@ -1,4 +1,4 @@
-﻿namespace BlockBuster.Common;
+﻿namespace BlockBuster.Common { 
 
 public enum EngineState
 {
@@ -6,4 +6,5 @@ public enum EngineState
     Paused,
     Stopped,
     GameOver
+}
 }

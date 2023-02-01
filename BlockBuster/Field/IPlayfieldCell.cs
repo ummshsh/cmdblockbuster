@@ -1,5 +1,6 @@
-﻿namespace BlockBuster.Field;
-
-public class IPlayfieldCell
+﻿namespace BlockBuster.Field
 {
+        public class IPlayfieldCell
+    {
+    }
 }

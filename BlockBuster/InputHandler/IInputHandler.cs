@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace BlockBuster.InputHandler;
-
-public interface IInputHandler
+namespace BlockBuster.InputHandler
 {
-    public event EventHandler<InputType> InputProvided;
+    public interface IInputHandler
+    {
+        public event EventHandler<InputType> InputProvided;
+    }
 }

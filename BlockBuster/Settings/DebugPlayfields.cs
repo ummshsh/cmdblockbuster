@@ -1,32 +1,33 @@
 ﻿using BlockBuster.Field;
 using BlockBuster.Tetrominoes;
 
-namespace BlockBuster.Settings;
-internal class DebugPlayfields
+namespace BlockBuster.Settings
 {
-    internal static InnerPlayfield GetPlayfield(string name)
+    internal class DebugPlayfields
     {
-        var fieldToReturn = new InnerPlayfield(10, 22);
-
-        var debugField = GetField(name);
-
-        for (int row = 0; row < 22; row++)
+        internal static InnerPlayfield GetPlayfield(string name)
         {
-            for (int rowItemIndex = 0; rowItemIndex < 10; rowItemIndex++)
+            var fieldToReturn = new InnerPlayfield(10, 22);
+
+            var debugField = GetField(name);
+
+            for (int row = 0; row < 22; row++)
             {
-                fieldToReturn[row, rowItemIndex] = debugField[row, rowItemIndex] > 0 ? TetrominoCellType.Blue : TetrominoCellType.Empty;
+                for (int rowItemIndex = 0; rowItemIndex < 10; rowItemIndex++)
+                {
+                    fieldToReturn[row, rowItemIndex] = debugField[row, rowItemIndex] > 0 ? TetrominoCellType.Blue : TetrominoCellType.Empty;
+                }
             }
+
+            return fieldToReturn;
         }
 
-        return fieldToReturn;
-    }
-
-    private static int[,] GetField(string name)
-    {
-        return name switch
+        private static int[,] GetField(string name)
         {
-            "tetris" => new int[,]
+            return name switch
             {
+                "tetris" => new int[,]
+                {
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
@@ -49,9 +50,9 @@ internal class DebugPlayfields
                 {1,1,1,1,1,1,1,1,1,0},
                 {1,1,1,1,1,1,1,1,1,0},
                 {1,1,1,1,1,1,1,1,1,0},
-            },
-            "tspinsingle" => new int[,]
-            {
+                },
+                "tspinsingle" => new int[,]
+                {
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
@@ -74,9 +75,9 @@ internal class DebugPlayfields
                 {0,0,0,0,0,0,1,1,0,0},
                 {0,0,0,1,0,0,0,1,1,0},
                 {1,1,1,1,1,0,1,1,1,1},
-            },
-            "minitspinsingle" => new int[,]
-            {
+                },
+                "minitspinsingle" => new int[,]
+                {
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
@@ -99,9 +100,9 @@ internal class DebugPlayfields
                 {0,0,0,0,1,1,0,0,1,1},
                 {1,1,1,1,1,0,0,0,1,1},
                 {1,1,1,1,1,1,1,1,1,0},
-            },
-            "tspindouble" => new int[,]
-            {
+                },
+                "tspindouble" => new int[,]
+                {
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0},
@@ -124,8 +125,9 @@ internal class DebugPlayfields
                 {1,1,1,1,1,1,1,0,0,1},
                 {1,1,1,1,1,1,1,0,0,1},
                 {1,1,1,1,1,1,1,0,0,1},
-            },
-            _ => throw new System.Exception("Debug playfield state was not found"),
-        };
+                },
+                _ => throw new System.Exception("Debug playfield state was not found"),
+            };
+        }
     }
 }

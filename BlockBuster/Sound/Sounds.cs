@@ -1,14 +1,16 @@
-﻿namespace BlockBuster.Sound;
-
-public enum TetrisSound
+﻿namespace BlockBuster.Sound
 {
-    // Required by guidelines
-    Rotation,
-    Movement,
-    LandingOnSurface,
-    TouchingWall,
-    Locking,
-    LineClear,
-    GameOver,
-    Hold
+
+    public enum TetrisSound
+    {
+        // Required by guidelines
+        Rotation,
+        Movement,
+        LandingOnSurface,
+        TouchingWall,
+        Locking,
+        LineClear,
+        GameOver,
+        Hold
+    }
 }
