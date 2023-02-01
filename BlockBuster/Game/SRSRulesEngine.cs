@@ -90,7 +90,7 @@ namespace BlockBuster.Game
             GameStateUpdated?.Invoke(this, gameState);
         }
 
-        // Interpret moves and send them to score counter
+        // Interpret current mino moves and send result to score counter
         private void PushEventsFromHistoryToScoreCounter(int linesCleared)
         {
             lock (historyLock)
@@ -216,7 +216,6 @@ namespace BlockBuster.Game
                     gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
                 }
 
-
                 // Report: By playfield state(perfect clears)
                 if (playfieldInnerState.IsEmpty && linesCleared > 0)
                 {
@@ -244,7 +243,6 @@ namespace BlockBuster.Game
 
                     gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
                 }
-
 
                 // Clear mino history
                 History.Items.Clear();

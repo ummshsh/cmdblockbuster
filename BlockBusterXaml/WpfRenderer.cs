@@ -134,8 +134,11 @@ public class WpfRenderer : ITetrisRenderer
     {
         DispatcherExtensions.BeginInvoke(Application.Current.Dispatcher, () =>
         {
-            IEnumerable<string> values = historyStack.Items.Select(t => $"{t.Item1}: Points:{t.Item2}");
-            (stackLeft.Children[5] as TextBlock).Text = string.Join(Environment.NewLine, values.Reverse());
+            lock (historyStack._lockObject)
+            {
+                IEnumerable<string> values = historyStack.Items.Select(t => $"{t.Item1}: Points:{t.Item2}");
+                (stackLeft.Children[5] as TextBlock).Text = string.Join(Environment.NewLine, values.Reverse());
+            }
         });
     }
 

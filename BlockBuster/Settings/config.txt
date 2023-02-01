@@ -2,7 +2,7 @@
 EnableWallKick=Y
 
 # Developer settings
-EnableDebugPlayfieldState=Y
+EnableDebugPlayfieldState=N
 
 # tspinsingle \ minitspinsingle \ tspindouble \ tetris
 DebugPlayfieldStateType=tetris

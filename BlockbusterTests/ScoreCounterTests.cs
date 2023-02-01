@@ -147,8 +147,19 @@ public class ScoreCounterTests
     {
         var counter = new ScoreCounter();
 
-        //counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
-        //Assert.AreEqual(100, counter.Score);
+        Assert.AreEqual(-1, counter.ComboCounter);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+        Assert.AreEqual(100, counter.Score);
+        Assert.AreEqual(0, counter.ComboCounter);
+
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Single) { LinesCleared = 1 });
+        Assert.AreEqual(1, counter.ComboCounter);
+        Assert.AreEqual(250, counter.Score);
+
+        counter.RegisterAction(new ScoreablePlayfieldAction(new TetrominoI(), ScoreAction.Landed));
+        Assert.AreEqual(-1, counter.ComboCounter);
     }
 
     [TestMethod("Check History Stack")]
@@ -180,5 +191,11 @@ public class ScoreCounterTests
         Assert.AreEqual("3", stack.Pop());
         Assert.AreEqual("2", stack.Pop());
         Assert.AreEqual(null, stack.Pop());
+    }
+
+    [TestMethod("Check History Stack with multiple threads")]
+    public void CheckHistoryStackMultipleThreads()
+    {
+
     }
 }

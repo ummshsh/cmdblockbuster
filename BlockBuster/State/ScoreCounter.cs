@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 namespace BlockBuster.Score
 {
-
     /// <summary>
     /// Impemented according to <see cref="https://tetris.wiki/Scoring"/> <para/>
     /// https://tetris.wiki/Combo
@@ -16,7 +15,7 @@ namespace BlockBuster.Score
 
         public int LinesCleared { get; private set; } = 0;
 
-        private readonly HistoryStack<ScoreablePlayfieldAction> actionsHistory = new(400);
+        private readonly HistoryStack<ScoreablePlayfieldAction> actionsHistory = new(900);
 
         private int comboCounter = -1;
         public int ComboCounter
@@ -57,72 +56,75 @@ namespace BlockBuster.Score
         /// <param name="playfieldMinoAction"></param>
         internal void RegisterAction(ScoreablePlayfieldAction action)
         {
-            var levelBefroreRegisteringAction = Level;
-            var btbAwardedAlready = false;
-
-            // Add action to history
-            actionsHistory.Push(action);
-            LinesCleared += action.LinesCleared;
-            if (action.Action == ScoreAction.Landed)
+            lock (actionsHistory._lockObject)
             {
-                // If mino landed without line clear, break combo
-                ComboCounter = -1;
-            }
+                var levelBefroreRegisteringAction = Level;
+                var btbAwardedAlready = false;
 
-            var lastScoreActionFromHistory = actionsHistory.Peek(0);
-
-            // Reset BTB counter if latest action is not difficult, but ignore all that do not clear lines
-            // Ignore including T-Spin mini, they are not breaking BTB
-            if (lastScoreActionFromHistory.LinesCleared > 0 && !lastScoreActionFromHistory.IsDifficult)
-            {
-                // Break BTB
-                DifficultMoveCounter = 0;
-            }
-            else if (lastScoreActionFromHistory.IsDifficult)
-            {
-                // Increase BTB counter
-                DifficultMoveCounter++;
-
-                // Reward BTB
-                if (DifficultMoveCounter > 1)
+                // Add action to history
+                actionsHistory.Push(action);
+                LinesCleared += action.LinesCleared;
+                if (action.Action == ScoreAction.Landed)
                 {
-                    var points = GetScore(ScoreAction.BackToBack, levelBefroreRegisteringAction, action.LinesCleared, lastScoreActionFromHistory.Action);
-                    Score += points;
-                    btbAwardedAlready = true;
-                    textualFeedback.Push(new Tuple<string, string>($"BTB {ComboCounter}", points.ToString()));
+                    // If mino landed without line clear, break combo
+                    ComboCounter = -1;
+                }
+
+                var lastScoreActionFromHistory = actionsHistory.Peek(0);
+
+                // Reset BTB counter if latest action is not difficult, but ignore all that do not clear lines
+                // Ignore including T-Spin mini, they are not breaking BTB
+                if (lastScoreActionFromHistory.LinesCleared > 0 && !lastScoreActionFromHistory.IsDifficult)
+                {
+                    // Break BTB
+                    DifficultMoveCounter = 0;
+                }
+                else if (lastScoreActionFromHistory.IsDifficult)
+                {
+                    // Increase BTB counter
+                    DifficultMoveCounter++;
+
+                    // Reward BTB
+                    if (DifficultMoveCounter > 1)
+                    {
+                        var points = GetScore(ScoreAction.BackToBack, levelBefroreRegisteringAction, action.LinesCleared, lastScoreActionFromHistory.Action);
+                        Score += points;
+                        btbAwardedAlready = true;
+                        textualFeedback.Push(new Tuple<string, string>($"BTB {ComboCounter}", points.ToString()));
+                        ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
+                    }
+                }
+                else
+                {
+                    // Ignore action in BTB calculation
+                    Debug.WriteLineIf(Config.EnableDebugOutput, "Ignoring action in BTB calcualtion:" + lastScoreActionFromHistory.Action);
+                }
+
+
+                // Get score for just added move if it was not awarded by BTB
+                if (!btbAwardedAlready)
+                {
+                    var pointsLatestMove = GetScore(lastScoreActionFromHistory.Action, levelBefroreRegisteringAction, lastScoreActionFromHistory.DroppedLines);
+                    Score += pointsLatestMove;
+                    lastScoreActionFromHistory.ScoreAwarded = pointsLatestMove;
+                    textualFeedback.Push(new Tuple<string, string>(lastScoreActionFromHistory.Action.ToString(), pointsLatestMove.ToString()));
                     ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
                 }
-            }
-            else
-            {
-                // Ignore action in BTB calculation
-                Debug.WriteLineIf(Config.EnableDebugOutput, "Ignoring action in BTB calcualtion:" + lastScoreActionFromHistory.Action);
-            }
 
+                // Increase Combo if lines were cleared
+                if (lastScoreActionFromHistory.LinesCleared > 0)
+                {
+                    ComboCounter++;
+                }
 
-            // Get score for just added move if it was not awarded by BTB
-            if (!btbAwardedAlready)
-            {
-                var pointsLatestMove = GetScore(lastScoreActionFromHistory.Action, levelBefroreRegisteringAction, lastScoreActionFromHistory.DroppedLines);
-                Score += pointsLatestMove;
-                lastScoreActionFromHistory.ScoreAwarded = pointsLatestMove;
-                textualFeedback.Push(new Tuple<string, string>(lastScoreActionFromHistory.Action.ToString(), pointsLatestMove.ToString()));
-                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
-            }
-
-            // Increase Combo if lines were cleared
-            if (lastScoreActionFromHistory.LinesCleared > 0)
-            {
-                ComboCounter++;
-            }
-
-            // Reward Combo
-            if (ComboCounter > 0)
-            {
-                var points = GetScore(ScoreAction.Combo, levelBefroreRegisteringAction);
-                Score += points;
-                textualFeedback.Push(new Tuple<string, string>($"Combo {ComboCounter}", points.ToString()));
-                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
+                // Reward Combo
+                if (ComboCounter > 0)
+                {
+                    var points = GetScore(ScoreAction.Combo, levelBefroreRegisteringAction);
+                    Score += points;
+                    textualFeedback.Push(new Tuple<string, string>($"Combo {ComboCounter}", points.ToString()));
+                    ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
+                }
             }
         }
 
