@@ -1,7 +1,7 @@
 ﻿# `BlockBusterXaml` project  
 This is just xaml based debugger for playtesting
 
-![Screen](readme/screen.jpg?raw=true "Title")
+![Screen](readme/screen.jpg?raw=true "Main window screenshot")
 
 
 # `BlockBuster` project  
@@ -38,13 +38,20 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Settings class with defaults in txt file
 - [x] Report actions to scoring counter
 - [x] Implement debug playfield states
+- [x] Check infinity again
+- [x] Check that soft drop does not lock mino
+- [x] Before assigning regular score I need to check if it is BTB, if so, then score BTB(actionScore*1.5) instead
+- [ ] Make HistoryStack concurrent
+- [ ] Tspin is not recognized by Score counter
 - [ ] Implement scoring tests
-- [ ] Tspin is broken now
-- [ ] Check infinity again
-- [ ] Check that soft drop does not lock mino
 - [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
+- [ ] Make replay funcionality: 
+    - [ ] Check if engine determenistic somehow
+    - [ ] each frame(or more frequent) store game inputs
+    - [ ] create ReplaytInputHandler 
+    - [ ] create ReplayWriter, to write to stream(game inputs, tetromino order, timestamps delta, hold, hext, level, mode)
 
 ## TODO Low priority
 - [x] Figure out snake sequences and what to do with them in spawn queue (more than 2 snakes consequently not permited)
@@ -52,6 +59,7 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Tests (maybe?)
 - [x] Make more appropriate layout in xaml
 - [x] Read about fourth kick upgrading simple move to diffucult move, so it won't break the combo and b2b counter
+- [ ] (?) Recongnize different BTB's
 - [ ] RotateLeftOrRight(): Make default rotation as part of kicks table so this methodd can be simplified
 - [ ] use Debug.WriteLineIf everywhere and look at config for toggle
 - [ ] Make XAML window resizable
@@ -59,7 +67,6 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [ ] In playfield history use Action.Landed instaed of mino property
 - [ ] Check that T spin wil be rewarded if teromino not lands and disappears(contininues moving)
 - [ ] Fix unit tests
-- [ ] Try making infinity like in tetris effect: your lock times got reset for every move you do, up to 16 tries
 - [ ] Probably I do too many checks and code can be simplified
 - [ ] ObjectCopier: check obsolete code
 - [ ] Fix spelling of 'tetromino' everywhere, or rebrand to Block

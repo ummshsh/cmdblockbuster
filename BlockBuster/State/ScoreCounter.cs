@@ -1,7 +1,7 @@
-﻿using BlockBuster.State;
-using BlockBuster.Utils;
+﻿using BlockBuster.Settings;
+using BlockBuster.State;
 using System;
-using System.Linq;
+using System.Diagnostics;
 
 namespace BlockBuster.Score;
 
@@ -11,20 +11,39 @@ namespace BlockBuster.Score;
 /// </summary>
 public class ScoreCounter
 {
-    public int Score { get; set; } = 0;
+    public double Score { get; set; } = 0;
 
     public int LinesCleared { get; private set; } = 0;
 
-    private readonly HistoryStack<ScoreablePlayfieldAction> actionsHistory = new(100);
+    private readonly HistoryStack<ScoreablePlayfieldAction> actionsHistory = new(400);
 
-    public int ComboCounter { get; set; } = -1; // Default value
+    private int comboCounter = -1;
+    public int ComboCounter
+    {
+        get => comboCounter;
+        set
+        {
+            comboCounter = value;
+            Debug.WriteLineIf(Config.EnableDebugOutput, "Combo counter was set to:" + comboCounter);
+        }
+    }
+
+    private int difficultMoveCounter = 0;
+    public int DifficultMoveCounter
+    {
+        get => difficultMoveCounter;
+        set
+        {
+            difficultMoveCounter = value;
+            Debug.WriteLineIf(Config.EnableDebugOutput, "Difficult move counter was set to:" + difficultMoveCounter);
+        }
+    }
 
     /// <summary>
     /// Level is always considered to be the level before the line clear. 
     /// All level multipliers for <see cref="ScoreAction"/> and <see cref="ScoreActionWithHistory"/>
     /// </summary>
     public Level Level => (Level)((LinesCleared / 10) + 1 > 15 ? 15 : (LinesCleared / 10) + 1);
-
 
     private readonly HistoryStack<Tuple<string, string>> textualFeedback = new(10);
     public delegate void ScoreTextFeedbackHandler(HistoryStack<Tuple<string, string>> historyStack);
@@ -37,103 +56,72 @@ public class ScoreCounter
     /// <param name="playfieldMinoAction"></param>
     internal void RegisterAction(ScoreablePlayfieldAction action)
     {
+        var levelBefroreRegisteringAction = Level;
+        var btbAwardedAlready = false;
+
         // Add action to history
-        if ((int)action.Action < 0 && action.Action != ScoreAction.Landed)
+        actionsHistory.Push(action);
+        LinesCleared += action.LinesCleared;
+        if (action.Action == ScoreAction.Landed)
         {
-            // Ignore trivial move like love down, left, right as they not impact scoring for B2B and Combos
-            return;
+            // If mino landed without line clear, break combo
+            ComboCounter = -1;
+        }
+
+        var lastScoreActionFromHistory = actionsHistory.Peek(0);
+
+        // Reset BTB counter if latest action is not difficult, but ignore all that do not clear lines
+        // Ignore including T-Spin mini, they are not breaking BTB
+        if (lastScoreActionFromHistory.LinesCleared > 0 && !lastScoreActionFromHistory.IsDifficult)
+        {
+            // Break BTB
+            DifficultMoveCounter = 0;
+        }
+        else if (lastScoreActionFromHistory.IsDifficult)
+        {
+            // Increase BTB counter
+            DifficultMoveCounter++;
+
+            // Reward BTB
+            if (DifficultMoveCounter > 1)
+            {
+                var points = GetScore(ScoreAction.BackToBack, levelBefroreRegisteringAction, action.LinesCleared, lastScoreActionFromHistory.Action);
+                Score += points;
+                btbAwardedAlready = true;
+                textualFeedback.Push(new Tuple<string, string>($"BTB {ComboCounter}", points.ToString()));
+                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
+            }
         }
         else
         {
-            if (action.Action == ScoreAction.Landed)
-            {
-                ComboCounter = -1;
-            }
-
-            actionsHistory.Push(action);
-            LinesCleared += action.LinesCleared;
+            // Ignore action in BTB calculation
+            Debug.WriteLineIf(Config.EnableDebugOutput, "Ignoring action in BTB calcualtion:" + lastScoreActionFromHistory.Action);
         }
 
-        // Go back inhistory and check for Combo
-        var indexHistoryForCombo = 0;
-        while (true)
+
+        // Get score for just added move if it was not awarded by BTB
+        if (!btbAwardedAlready)
         {
-            var scoreActionFromHistory = actionsHistory.Peek(indexHistoryForCombo);
-
-            if (scoreActionFromHistory == null)
-            {
-                break;
-            }
-
-            if (!scoreActionFromHistory.ScoreAddedAlready && scoreActionFromHistory.Action != ScoreAction.Landed)
-            {
-                scoreActionFromHistory.ScoreAddedAlready = true;
-                int points = GetScore(scoreActionFromHistory.Action, Level, action.DroppedLines);
-                Score += points;
-
-                textualFeedback.Push(new Tuple<string, string>(scoreActionFromHistory.Action.ToString(), points.ToString()));
-                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
-
-                if (scoreActionFromHistory.Action != ScoreAction.SoftDrop &&
-                    scoreActionFromHistory.Action != ScoreAction.HardDrop)
-                {
-                    ComboCounter++;
-                }
-                indexHistoryForCombo++;
-            }
-            else
-            {
-                break;
-            }
+            var pointsLatestMove = GetScore(lastScoreActionFromHistory.Action, levelBefroreRegisteringAction, lastScoreActionFromHistory.DroppedLines);
+            Score += pointsLatestMove;
+            lastScoreActionFromHistory.ScoreAwarded = pointsLatestMove;
+            textualFeedback.Push(new Tuple<string, string>(lastScoreActionFromHistory.Action.ToString(), pointsLatestMove.ToString()));
+            ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
         }
 
+        // Increase Combo if lines were cleared
+        if (lastScoreActionFromHistory.LinesCleared > 0)
+        {
+            ComboCounter++;
+        }
+
+        // Reward Combo
         if (ComboCounter > 0)
         {
-            int points = GetScore(ScoreAction.Combo, Level);
+            var points = GetScore(ScoreAction.Combo, levelBefroreRegisteringAction);
             Score += points;
             textualFeedback.Push(new Tuple<string, string>($"Combo {ComboCounter}", points.ToString()));
             ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
-
-        }
-
-        // Go back inhistory and check for BTB
-        var indexHistoryForBtb = 0;
-        var lastScoreActionFromHistory = actionsHistory.Peek(indexHistoryForBtb);
-
-        if (lastScoreActionFromHistory != null && !lastScoreActionFromHistory.IsDifficult)
-        {
-            return;
-        }
-
-        indexHistoryForBtb++;
-
-        while (true)
-        {
-            var scoreActionFromHistory = actionsHistory.Peek(indexHistoryForBtb);
-
-            if (scoreActionFromHistory is null)
-            {
-                return;
-            }
-
-            // if not difficult and not breaks the BTB, then search again
-            if (scoreActionFromHistory.LinesCleared > 0 && !scoreActionFromHistory.IsDifficult)
-            {
-                return; // Broken
-            }
-            else if (scoreActionFromHistory.IsDifficult)
-            {
-                int points = GetScore(actionsHistory.Peek(indexHistoryForBtb - 1).Action, Level, action.LinesCleared);
-                Score += points;
-                textualFeedback.Push(new Tuple<string, string>($"BTB {ComboCounter}", points.ToString()));
-                ScoreTextFeedbackUpdated?.Invoke(textualFeedback);
-                return;
-            }
-            else
-            {
-                indexHistoryForBtb++; // Check next
-                continue;
-            }
         }
     }
 
@@ -145,7 +133,7 @@ public class ScoreCounter
     /// <param name="linesDropped">Used to calculate hard and soft drops only</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    private int GetScore(ScoreAction action, Level level, int linesDropped = 0)
+    private double GetScore(ScoreAction action, Level level, int linesDropped = 0, ScoreAction actionToRewardInBtb = ScoreAction.None)
     {
         return action switch
         {
@@ -167,41 +155,10 @@ public class ScoreCounter
             ScoreAction.PerfectClearDoubleLine => 1200 * (int)level,
             ScoreAction.PerfectClearTripleLine => 1800 * (int)level,
             ScoreAction.PerfectClearTetris => 2000 * (int)level,
-            ScoreAction.BackToBack => CalculateBackToBackScore(),
+            ScoreAction.BackToBack => 1.5 * GetScore(actionToRewardInBtb, level),
             ScoreAction.Combo => ComboCounter * 50 * (int)level,
             ScoreAction.BackToBackPerfectClearTetris => 3200 * (int)level,
-            _ => throw new ArgumentException("Score not defined for action: " + action),
+            _ => 0,
         };
-    }
-
-    private int CalculateBackToBackScore()
-    {
-        // Check that last action is either Tetris or TSpin
-        if (!actionsHistory.Items.Last().IsDifficult)
-        {
-            return 0;
-        }
-
-        // Go back in history until found breaker(non difficult move) (ignoring soft\hard drops, moves to left\right)
-        // and if found another difficult action, then take it's score and award by formula
-        // Action score × 1.5
-        var reversedActionsList = actionsHistory.Items.ReverseList();
-        foreach (var item in reversedActionsList)
-        {
-            if (item.IsDifficult)
-            {
-                return (int)(item.ScoreAwarded * 1.5);
-            }
-            else if ((int)item.Action < 0)
-            {
-                continue;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        return 0;
     }
 }

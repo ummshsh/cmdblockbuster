@@ -14,9 +14,7 @@ public class ScoreablePlayfieldAction
 
     public int DroppedLines { get; set; } = 0; // Hard and Soft
 
-    public int ScoreAwarded { get; set; } = 0;
-
-    public bool ScoreAddedAlready { get; set; } = false;
+    public double ScoreAwarded { get; set; } = 0;
 
     public bool PerfectClear { get; set; } = false;
 
