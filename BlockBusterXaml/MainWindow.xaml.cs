@@ -32,9 +32,35 @@ public partial class MainWindow : Window
         await tetris.Start();
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => tetris.Stop();
+
+    private void Canvas_Loaded(object sender, RoutedEventArgs e)
     {
-        tetris.Stop();
+        Unpause.Visibility = Visibility.Collapsed;
+
+        if (Config.SkipMenuInXaml)
+        {
+            NewGame_Click(null, null);
+        }
+    }
+
+    private void Unpause_Click(object sender, RoutedEventArgs e)
+    {
+        paused = !paused;
+        MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        GameOver.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        tetris.Pause(paused);
+    }
+
+    private void Window_Deactivated(object sender, System.EventArgs e)
+    {
+        ////if (gameStarted)
+        ////{
+        ////    paused = true;
+        ////    MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        ////    Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
+        ////    tetris.Pause(paused);
+        ////}
     }
 
     private void OnKeyDownHandler(object sender, KeyEventArgs e)
@@ -54,7 +80,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        BlockBuster.InputHandler.InputType inputToReturn;
+        InputHandler.InputType inputToReturn;
 
         if (e.Key == Key.J | e.Key == Key.RightAlt)
         {
@@ -89,35 +115,46 @@ public partial class MainWindow : Window
             inputToReturn = InputHandler.InputType.None;
         }
 
-        wpfInputHandler.InputFromWpf(inputToReturn);
+        wpfInputHandler.InputStarted(inputToReturn);
     }
 
-    private void Canvas_Loaded(object sender, RoutedEventArgs e)
+    private void OnKeyUpHandler(object sender, KeyEventArgs e)
     {
-        Unpause.Visibility = Visibility.Collapsed;
+        InputHandler.InputType inputToReturn;
 
-        if (Config.SkipMenuInXaml)
+        if (e.Key == Key.J | e.Key == Key.RightAlt)
         {
-            NewGame_Click(null, null);
+            inputToReturn = InputHandler.InputType.RotateLeft;
         }
-    }
+        else if (e.Key == Key.K | e.Key == Key.RightCtrl)
+        {
+            inputToReturn = InputHandler.InputType.RotateRight;
+        }
+        else if (e.Key == Key.S | e.Key == Key.Down)
+        {
+            inputToReturn = InputHandler.InputType.SoftDrop;
+        }
+        else if (e.Key == Key.RightShift | e.Key == Key.LeftShift)
+        {
+            inputToReturn = InputHandler.InputType.Hold;
+        }
+        else if (e.Key == Key.W | e.Key == Key.Up | e.Key == Key.Space)
+        {
+            inputToReturn = InputHandler.InputType.HardDrop;
+        }
+        else if (e.Key == Key.A | e.Key == Key.Left)
+        {
+            inputToReturn = InputHandler.InputType.Left;
+        }
+        else if (e.Key == Key.D | e.Key == Key.Right)
+        {
+            inputToReturn = InputHandler.InputType.Right;
+        }
+        else
+        {
+            inputToReturn = InputHandler.InputType.None;
+        }
 
-    private void Unpause_Click(object sender, RoutedEventArgs e)
-    {
-        paused = !paused;
-        MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-        GameOver.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-        tetris.Pause(paused);
-    }
-
-    private void Window_Deactivated(object sender, System.EventArgs e)
-    {
-        ////if (gameStarted)
-        ////{
-        ////    paused = true;
-        ////    MenuStack.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-        ////    Unpause.Visibility = paused ? Visibility.Visible : Visibility.Collapsed;
-        ////    tetris.Pause(paused);
-        ////}
+        wpfInputHandler.InputEnded(inputToReturn);
     }
 }

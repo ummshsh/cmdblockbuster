@@ -5,17 +5,14 @@ using System.IO;
 
 namespace BlockBuster.Settings
 {
-
     public static class Config
     {
-        #region GameplayToggles
-
+        // Gameplay Settings
         public static bool EnableWallKick => TryGetValueFromTextConfigOrSetDefalut("EnableWallKick", true);
 
-        #endregion
+        public static long DelayedAutoShiftRate => int.Parse(TryGetValueFromTextConfigOrSetDefalut("DelayedAutoShiftRate", "150"));
 
-        #region DebugToggles
-
+        // Debug Settings
         public static bool EnableDebugPlayfieldState => TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
 
         public static string DebugPlayfieldStateType => TryGetValueFromTextConfigOrSetDefalut("DebugPlayfieldStateType", "tspinsingle");
@@ -23,7 +20,8 @@ namespace BlockBuster.Settings
         public static bool SkipMenuInXaml => TryGetValueFromTextConfigOrSetDefalut("SkipMenuInXaml", false);
 
         public static bool EnableDebugOutput { get; internal set; } = true;
-        #endregion
+
+        #region Helpers
 
         private static Dictionary<string, string> _settings = null;
         private static Dictionary<string, string> Settings
@@ -81,5 +79,7 @@ namespace BlockBuster.Settings
                 input.Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
                 input.Equals("yes", StringComparison.InvariantCultureIgnoreCase);
         }
+
+        #endregion
     }
 }

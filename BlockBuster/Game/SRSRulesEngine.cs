@@ -19,7 +19,7 @@ namespace BlockBuster.Game
     /// </summary>
     internal class SRSRulesEngine : IRulesEngine
     {
-        private InnerPlayfield playfieldInnerState; // All static elements without current tetromino
+        private readonly InnerPlayfield playfieldInnerState; // All static elements without current tetromino
         public VisiblePlayfield playfieldToDisplay;  // All static elements with current tetromino
 
         public event EventHandler<VisiblePlayfield> PlayFieldUpdated; // Event fires each time clean playfield is updated
@@ -33,16 +33,15 @@ namespace BlockBuster.Game
 
         private readonly HistoryStack<ScoreablePlayfieldAction> History = new(300);
 
-        private readonly object historyLock = new();
+        public IInputHandler InputHandler { get; }
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
-            inputHandler.InputProvided += InputProvided; // Set input handler
-
             playfieldInnerState = Config.EnableDebugPlayfieldState ? Config.DebugPlayfieldState : new InnerPlayfield(10, 22);
             playfieldToDisplay = new VisiblePlayfield(playfieldInnerState.Width, playfieldInnerState.Height);
 
             gameState = new GameState();
+            InputHandler = inputHandler;
         }
 
         #region StateManagement
@@ -79,6 +78,7 @@ namespace BlockBuster.Game
             SpawnTetromino();
             Gravity();
             UpdateGhost();
+            ProcessInput();
 
             if ((gameState.LastTimePlayfieldWasUpdated + Variables.RenderUpdateRate) < DateTime.Now)
             {
@@ -93,160 +93,157 @@ namespace BlockBuster.Game
         // Interpret current mino moves and send result to score counter
         private void PushEventsFromHistoryToScoreCounter(int linesCleared)
         {
-            lock (historyLock)
+            // Return If nothing to report
+            if (currentTetromino is null || !(History.Peek(0)?.Tetromino.IsLanded ?? false))
             {
-                // Return If nothing to report
-                if (currentTetromino is null || !(History.Peek(0)?.Tetromino.IsLanded ?? false))
-                {
-                    return;
-                }
-
-                Debug.WriteLineIf(linesCleared > 0, "Lines cleared:" + linesCleared);
-
-                // Report: By lines cleared + T-Spin
-                var previousActionBeforeLanding = History.Peek(1);
-                bool lastActionBeforeLandingWasRotation =
-                    previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
-                    previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
-
-                if (previousActionBeforeLanding is not null &&
-                    currentTetromino is TetrominoT &&
-                    lastActionBeforeLandingWasRotation)
-                {
-                    ScoreAction action;
-
-                    // T-Spin
-                    if (previousActionBeforeLanding.TSpin == TSpin.Normal)
-                    {
-                        if (linesCleared == 0)
-                        {
-                            action = ScoreAction.TSpinNoLines;
-                        }
-                        else if (linesCleared == 1)
-                        {
-                            action = ScoreAction.TSpinSingle;
-                        }
-                        else if (linesCleared == 2)
-                        {
-                            action = ScoreAction.TSpinDouble;
-                        }
-                        else if (linesCleared == 3)
-                        {
-                            action = ScoreAction.TSpinTriple;
-                        }
-                        else
-                        {
-                            throw new AggregateException("Not supported");
-                        }
-                    }
-                    // T-Spin upgrade by last kick
-                    else if (previousActionBeforeLanding.TSpin == TSpin.Mini && History.Peek(0).WithLastKick)
-                    {
-                        if (linesCleared == 0)
-                        {
-                            action = ScoreAction.TSpinNoLines;
-                        }
-                        else if (linesCleared == 1)
-                        {
-                            action = ScoreAction.TSpinSingle;
-                        }
-                        else if (linesCleared == 2)
-                        {
-                            action = ScoreAction.TSpinDouble;
-                        }
-                        else
-                        {
-                            throw new AggregateException("Not supported");
-                        }
-                    }
-                    // T-Spin mini
-                    else if (previousActionBeforeLanding.TSpin == TSpin.Mini)
-                    {
-                        if (linesCleared == 0)
-                        {
-                            action = ScoreAction.TSpinMiniNoLines;
-                        }
-                        else if (linesCleared == 1)
-                        {
-                            action = ScoreAction.TSpinMiniSingle;
-                        }
-                        else if (linesCleared == 2)
-                        {
-                            action = ScoreAction.TSpinMiniDouble;
-                        }
-                        else
-                        {
-                            throw new AggregateException("Not supported");
-                        }
-                    }
-                    else
-                    {
-                        throw new AggregateException("Should not be here");
-                    }
-
-                    gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
-                }
-
-                // Report: By lines cleared(1-4)
-                else if (linesCleared > 0)
-                {
-                    ScoreAction action;
-
-                    if (linesCleared == 1)
-                    {
-                        action = ScoreAction.Single;
-                    }
-                    else if (linesCleared == 2)
-                    {
-                        action = ScoreAction.Double;
-                    }
-                    else if (linesCleared == 3)
-                    {
-                        action = ScoreAction.Triple;
-                    }
-                    else if (linesCleared == 4)
-                    {
-                        action = ScoreAction.Tetris;
-                    }
-                    else
-                    {
-                        throw new AggregateException("Not supported");
-                    }
-
-                    gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
-                }
-
-                // Report: By playfield state(perfect clears)
-                if (playfieldInnerState.IsEmpty && linesCleared > 0)
-                {
-                    ScoreAction action;
-                    if (linesCleared == 1)
-                    {
-                        action = ScoreAction.PerfectClearSingleLine;
-                    }
-                    else if (linesCleared == 2)
-                    {
-                        action = ScoreAction.PerfectClearDoubleLine;
-                    }
-                    else if (linesCleared == 3)
-                    {
-                        action = ScoreAction.PerfectClearTripleLine;
-                    }
-                    else if (linesCleared == 2)
-                    {
-                        action = ScoreAction.PerfectClearTetris;
-                    }
-                    else
-                    {
-                        throw new AggregateException("Not supported");
-                    }
-
-                    gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
-                }
-
-                // Clear mino history
-                History.Items.Clear();
+                return;
             }
+
+            Debug.WriteLineIf(linesCleared > 0, "Lines cleared:" + linesCleared);
+
+            // Report: By lines cleared + T-Spin
+            var previousActionBeforeLanding = History.Peek(1);
+            bool lastActionBeforeLandingWasRotation =
+                previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
+                previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
+
+            if (previousActionBeforeLanding is not null &&
+                currentTetromino is TetrominoT &&
+                lastActionBeforeLandingWasRotation)
+            {
+                ScoreAction action;
+
+                // T-Spin
+                if (previousActionBeforeLanding.TSpin == TSpin.Normal)
+                {
+                    if (linesCleared == 0)
+                    {
+                        action = ScoreAction.TSpinNoLines;
+                    }
+                    else if (linesCleared == 1)
+                    {
+                        action = ScoreAction.TSpinSingle;
+                    }
+                    else if (linesCleared == 2)
+                    {
+                        action = ScoreAction.TSpinDouble;
+                    }
+                    else if (linesCleared == 3)
+                    {
+                        action = ScoreAction.TSpinTriple;
+                    }
+                    else
+                    {
+                        throw new AggregateException("Not supported");
+                    }
+                }
+                // T-Spin upgrade by last kick
+                else if (previousActionBeforeLanding.TSpin == TSpin.Mini && History.Peek(0).WithLastKick)
+                {
+                    if (linesCleared == 0)
+                    {
+                        action = ScoreAction.TSpinNoLines;
+                    }
+                    else if (linesCleared == 1)
+                    {
+                        action = ScoreAction.TSpinSingle;
+                    }
+                    else if (linesCleared == 2)
+                    {
+                        action = ScoreAction.TSpinDouble;
+                    }
+                    else
+                    {
+                        throw new AggregateException("Not supported");
+                    }
+                }
+                // T-Spin mini
+                else if (previousActionBeforeLanding.TSpin == TSpin.Mini)
+                {
+                    if (linesCleared == 0)
+                    {
+                        action = ScoreAction.TSpinMiniNoLines;
+                    }
+                    else if (linesCleared == 1)
+                    {
+                        action = ScoreAction.TSpinMiniSingle;
+                    }
+                    else if (linesCleared == 2)
+                    {
+                        action = ScoreAction.TSpinMiniDouble;
+                    }
+                    else
+                    {
+                        throw new AggregateException("Not supported");
+                    }
+                }
+                else
+                {
+                    throw new AggregateException("Should not be here");
+                }
+
+                gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+            }
+
+            // Report: By lines cleared(1-4)
+            else if (linesCleared > 0)
+            {
+                ScoreAction action;
+
+                if (linesCleared == 1)
+                {
+                    action = ScoreAction.Single;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.Double;
+                }
+                else if (linesCleared == 3)
+                {
+                    action = ScoreAction.Triple;
+                }
+                else if (linesCleared == 4)
+                {
+                    action = ScoreAction.Tetris;
+                }
+                else
+                {
+                    throw new AggregateException("Not supported");
+                }
+
+                gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+            }
+
+            // Report: By playfield state(perfect clears)
+            if (playfieldInnerState.IsEmpty && linesCleared > 0)
+            {
+                ScoreAction action;
+                if (linesCleared == 1)
+                {
+                    action = ScoreAction.PerfectClearSingleLine;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.PerfectClearDoubleLine;
+                }
+                else if (linesCleared == 3)
+                {
+                    action = ScoreAction.PerfectClearTripleLine;
+                }
+                else if (linesCleared == 2)
+                {
+                    action = ScoreAction.PerfectClearTetris;
+                }
+                else
+                {
+                    throw new AggregateException("Not supported");
+                }
+
+                gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
+            }
+
+            // Clear mino history
+            History.Items.Clear();
         }
 
         private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
@@ -359,9 +356,33 @@ namespace BlockBuster.Game
 
         #region HandleMovement
 
-        private void InputProvided(object sender, InputType inputType)
+        private void ProcessInput()
         {
-            switch (inputType)
+            foreach (var input in InputHandler.CurrentInputs)
+            {
+                if (input.Activated && !input.IsRepeat)
+                {
+                    ApplyInput(input.Type);
+                    input.LastTimeTriggered = DateTime.Now;
+                    input.IsRepeat = true;
+                }
+                else if (input.Activated &&
+                    input.IsRepeat &&
+                    input.LastTimeTriggered.AddMilliseconds(Config.DelayedAutoShiftRate) < DateTime.Now)
+                {
+                    ApplyInput(input.Type);
+                    input.LastTimeTriggered = DateTime.Now;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+        }
+
+        void ApplyInput(InputType input)
+        {
+            switch (input)
             {
                 case InputType.Left:
                     MoveLeft();
@@ -399,7 +420,7 @@ namespace BlockBuster.Game
                     break;
 
                 default:
-                    throw new NotImplementedException($"Input {inputType} not implemented");
+                    throw new NotImplementedException($"Input {input} not implemented");
             }
         }
 
@@ -446,10 +467,8 @@ namespace BlockBuster.Game
                 currentTetromino.WidthLocation = newRowItemCoordinate;
 
                 rotated = true;
-                lock (historyLock)
-                {
-                    History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
-                }
+
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
             }
 
             // Rotate mino back on failure to rotate
@@ -482,10 +501,7 @@ namespace BlockBuster.Game
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
             {
                 currentTetromino.WidthLocation = newLocation;
-                lock (historyLock)
-                {
-                    History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
-                }
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
                 SoundTriggered?.Invoke(this, TetrisSound.Movement);
                 return true;
             }
@@ -502,10 +518,7 @@ namespace BlockBuster.Game
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
             {
                 currentTetromino.WidthLocation = newLocation;
-                lock (historyLock)
-                {
-                    History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
-                }
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
                 SoundTriggered?.Invoke(this, TetrisSound.Movement);
                 return true;
             }
@@ -546,10 +559,7 @@ namespace BlockBuster.Game
             {
                 currentTetromino.HeightLocation = newLocation;
                 gameState.LastTimeTetrominoMovedDown = DateTime.Now;
-                lock (historyLock)
-                {
-                    History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
-                }
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
                 return true;
             }
 
@@ -557,10 +567,7 @@ namespace BlockBuster.Game
 
             bool LockMino()
             {
-                lock (historyLock)
-                {
-                    History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
-                }
+                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
                 AddCurrentTetrominoToInnerState();
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
                 return false;
@@ -806,7 +813,6 @@ namespace BlockBuster.Game
                 return TSpin.None;
             }
 
-            //continue debugging this method
             bool IsCellFilledOrOutsidePlayfield((int, int) coordinate)
             {
                 var heightToCheck = tetromino.HeightLocation + coordinate.Item1;
@@ -815,6 +821,7 @@ namespace BlockBuster.Game
                 // If empty cell outside playfield, then it is cosidered filled
                 // For T mino possible only from bottom
                 if (widthToCheck < 0 || // left side
+                    widthToCheck > playfieldInnerState.Width - 1 ||
                     tetromino.WidthLocation > tetromino.WidthLocation + tetromino.ColumnsLenght - 1 - tetromino.EmptyColumnsOnRightSideCount || // right side
                     tetromino.HeightLocation > tetromino.HeightLocation + tetromino.RowsLenght - 1 - tetromino.EmptyRowsOnBottomSideCount) // bottom
                 {

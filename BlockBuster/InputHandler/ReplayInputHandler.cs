@@ -1,9 +1,6 @@
-﻿using System;
-
-namespace BlockBuster.InputHandler
+﻿namespace BlockBuster.InputHandler
 {
-    internal class ReplayInputHandler : IInputHandler
-    {
-        public event EventHandler<InputType> InputProvided;
-    }
+    ////internal class ReplayInputHandler : IInputHandler
+    ////{
+    ////}
 }

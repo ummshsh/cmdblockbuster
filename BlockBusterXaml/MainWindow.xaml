@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:BlockBuster"
         mc:Ignorable="d"
         KeyDown="OnKeyDownHandler"
+        KeyUp="OnKeyUpHandler"
         Title="BlockBuster" Height="900" Width="830"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"

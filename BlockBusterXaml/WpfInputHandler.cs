@@ -1,14 +1,38 @@
 ﻿using BlockBuster.InputHandler;
-using System;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace BlockBusterXaml;
 
 public class WpfInputHandler : IInputHandler
 {
-    public event EventHandler<InputType> InputProvided;
+    public ConcurrentBag<InputInfo> CurrentInputs { get; } = new();
 
-    public void InputFromWpf(InputType input)
+    public void InputStarted(InputType input)
     {
-        InputProvided?.Invoke(this, input);
+        var inputToActivate = CurrentInputs.FirstOrDefault(i => i.Type == input);
+
+        if (inputToActivate == null)
+        {
+            CurrentInputs.Add(new InputInfo(input, true));
+        }
+        else
+        {
+            inputToActivate.Activated = true;
+        }
+    }
+
+    public void InputEnded(InputType input)
+    {
+        var inputToDeactivate = CurrentInputs.FirstOrDefault(i => i.Type == input);
+
+        if (inputToDeactivate == null)
+        {
+            CurrentInputs.Add(new InputInfo(input, false));
+        }
+        else
+        {
+            inputToDeactivate.Activated = false;
+        }
     }
 }

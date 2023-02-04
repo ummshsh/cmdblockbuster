@@ -1,9 +1,14 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace BlockBuster.InputHandler
 {
     public interface IInputHandler
     {
-        public event EventHandler<InputType> InputProvided;
+        public void InputStarted(InputType input);
+
+        public void InputEnded(InputType input);
+
+        public ConcurrentBag<InputInfo> CurrentInputs { get; }
     }
 }
