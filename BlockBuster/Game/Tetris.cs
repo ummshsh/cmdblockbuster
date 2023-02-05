@@ -29,7 +29,7 @@ namespace BlockBuster.Game
             this.rulesEngine.gameState.ScoreCounter.ScoreTextFeedbackUpdated += this.tetrisRenderer.RenderTextualFeedback;
             this.rulesEngine.SoundTriggered += this.soundPlayer.PlaySound;
 
-            return this.rulesEngine.Start();
+            return rulesEngine.Start();
         }
 
         public void Pause(bool pause)

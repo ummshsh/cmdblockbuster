@@ -7,13 +7,13 @@ using BlockBuster.State;
 using BlockBuster.Tetrominoes;
 using BlockBuster.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlockBuster.Game
 {
-
     /// <summary>
     /// Super Rotation System Engine
     /// </summary>
@@ -31,9 +31,11 @@ namespace BlockBuster.Game
 
         internal readonly GameState gameState;
 
-        private readonly HistoryStack<ScoreablePlayfieldAction> History = new(300);
+        private readonly List<ScoreablePlayfieldAction> History = new();
 
         public IInputHandler InputHandler { get; }
+
+        private Guid TickGuid = Guid.NewGuid();
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -73,10 +75,11 @@ namespace BlockBuster.Game
 
         private void Tick()
         {
-            var rowsDestroyed = DestroyRows();
-            PushEventsFromHistoryToScoreCounter(rowsDestroyed);
+            TickGuid = Guid.NewGuid();
             SpawnTetromino();
             Gravity();
+            var rowsDestroyed = DestroyRows();
+            PushEventsFromHistoryToScoreCounter(rowsDestroyed);
             UpdateGhost();
             ProcessInput();
 
@@ -90,28 +93,21 @@ namespace BlockBuster.Game
             GameStateUpdated?.Invoke(this, gameState);
         }
 
-        // Interpret current mino moves and send result to score counter
         private void PushEventsFromHistoryToScoreCounter(int linesCleared)
         {
             // Return If nothing to report
-            if (currentTetromino is null || !(History.Peek(0)?.Tetromino.IsLanded ?? false))
+            if (History.LastOrDefault() is null)
             {
                 return;
             }
 
-            Debug.WriteLineIf(linesCleared > 0, "Lines cleared:" + linesCleared);
+            var isTSpinRegisteredAlready = false;
+            var previousActionBeforeLanding = History.Last();
 
             // Report: By lines cleared + T-Spin
-            var previousActionBeforeLanding = History.Peek(1);
-            bool lastActionBeforeLandingWasRotation =
-                previousActionBeforeLanding?.Action == ScoreAction.RotatedLeft ||
-                previousActionBeforeLanding?.Action == ScoreAction.RotatedRight;
-
-            if (previousActionBeforeLanding is not null &&
-                currentTetromino is TetrominoT &&
-                lastActionBeforeLandingWasRotation)
+            if (currentTetromino is TetrominoT)
             {
-                ScoreAction action;
+                ScoreAction action = ScoreAction.None;
 
                 // T-Spin
                 if (previousActionBeforeLanding.TSpin == TSpin.Normal)
@@ -138,7 +134,7 @@ namespace BlockBuster.Game
                     }
                 }
                 // T-Spin upgrade by last kick
-                else if (previousActionBeforeLanding.TSpin == TSpin.Mini && History.Peek(0).WithLastKick)
+                else if (previousActionBeforeLanding.TSpin == TSpin.Mini && History.Last().WithLastKick)
                 {
                     if (linesCleared == 0)
                     {
@@ -179,14 +175,15 @@ namespace BlockBuster.Game
                 }
                 else
                 {
-                    throw new AggregateException("Should not be here");
+                    // Then it is not a T spin, just T figure landed, nothing to do
                 }
 
+                isTSpinRegisteredAlready = true;
                 gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
             }
 
             // Report: By lines cleared(1-4)
-            else if (linesCleared > 0)
+            if (linesCleared > 0 && !isTSpinRegisteredAlready)
             {
                 ScoreAction action;
 
@@ -242,8 +239,14 @@ namespace BlockBuster.Game
                 gameState.ScoreCounter.RegisterAction(new ScoreablePlayfieldAction(currentTetromino, action) { LinesCleared = linesCleared });
             }
 
-            // Clear mino history
-            History.Items.Clear();
+            // Clear mino history if mino landed
+            if (History.Last().Action == ScoreAction.Landed)
+            {
+                gameState
+                    .ScoreCounter
+                    .RegisterAction(new ScoreablePlayfieldAction(History.Last().Tetromino, History.Last().Action));
+                History.Clear();
+            }
         }
 
         private void UpdateFieldToDisplay(Tetromino tetromino, Tetromino tetrominoGhost)
@@ -468,7 +471,7 @@ namespace BlockBuster.Game
 
                 rotated = true;
 
-                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
+                History.Add(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.RotatedLeft) { WithLastKick = lastKick, TSpin = tSpin });
             }
 
             // Rotate mino back on failure to rotate
@@ -501,7 +504,7 @@ namespace BlockBuster.Game
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
             {
                 currentTetromino.WidthLocation = newLocation;
-                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
+                History.Add(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedLeft));
                 SoundTriggered?.Invoke(this, TetrisSound.Movement);
                 return true;
             }
@@ -518,7 +521,7 @@ namespace BlockBuster.Game
             if (CheckIfCanBePlacedOnCoordinate(currentTetromino, currentTetromino.HeightLocation, newLocation))
             {
                 currentTetromino.WidthLocation = newLocation;
-                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
+                History.Add(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedRight));
                 SoundTriggered?.Invoke(this, TetrisSound.Movement);
                 return true;
             }
@@ -559,7 +562,7 @@ namespace BlockBuster.Game
             {
                 currentTetromino.HeightLocation = newLocation;
                 gameState.LastTimeTetrominoMovedDown = DateTime.Now;
-                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
+                History.Add(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.MovedDown));
                 return true;
             }
 
@@ -567,7 +570,7 @@ namespace BlockBuster.Game
 
             bool LockMino()
             {
-                History.Push(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
+                History.Add(new ScoreablePlayfieldAction(currentTetromino, ScoreAction.Landed));
                 AddCurrentTetrominoToInnerState();
                 SoundTriggered?.Invoke(this, TetrisSound.Locking);
                 return false;
@@ -606,16 +609,19 @@ namespace BlockBuster.Game
 
         private void AddCurrentTetrominoToInnerState()
         {
-            currentTetromino.IsLanded = true;
-
-            for (int row = currentTetromino.HeightLocation; row < currentTetromino.HeightLocation + currentTetromino.RowsLenght; row++)
+            lock (playfieldInnerState)
             {
-                for (int rowItemIndex = currentTetromino.WidthLocation; rowItemIndex < currentTetromino.WidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
+                currentTetromino.IsLanded = true;
+
+                for (int row = currentTetromino.HeightLocation; row < currentTetromino.HeightLocation + currentTetromino.RowsLenght; row++)
                 {
-                    var cellToPaste = currentTetromino.Cells[row - currentTetromino.HeightLocation, rowItemIndex - currentTetromino.WidthLocation];
-                    if (cellToPaste != TetrominoCellType.Empty)
+                    for (int rowItemIndex = currentTetromino.WidthLocation; rowItemIndex < currentTetromino.WidthLocation + currentTetromino.ColumnsLenght; rowItemIndex++)
                     {
-                        playfieldInnerState.Cells[row, rowItemIndex] = cellToPaste;
+                        var cellToPaste = currentTetromino.Cells[row - currentTetromino.HeightLocation, rowItemIndex - currentTetromino.WidthLocation];
+                        if (cellToPaste != TetrominoCellType.Empty)
+                        {
+                            playfieldInnerState.Cells[row, rowItemIndex] = cellToPaste;
+                        }
                     }
                 }
             }
@@ -635,37 +641,46 @@ namespace BlockBuster.Game
 
         private int DestroyRows()
         {
-            var rowsDestroyed = 0;
-            for (int row = playfieldInnerState.Height - 1; row >= 0; row--)
+            var rowsDestroyed = new List<int>();
+
+            // Destroy rows
+            for (int row = 0; row < playfieldInnerState.Height; row++)
             {
                 if (CheckRowFilled(row))
                 {
                     DestroyRow(row);
-                    MoveTopRowsToRow(row);
-                    rowsDestroyed++;
+                    rowsDestroyed.Add(row);
                 }
             }
 
-            if (rowsDestroyed > 0)
+            Debug.WriteLineIf(rowsDestroyed.Count > 0, $"Thread:{Environment.CurrentManagedThreadId} Guid:{TickGuid} Rows destroyed:{rowsDestroyed.Count}");
+
+            // Move rows above
+            foreach (var row in rowsDestroyed)
+            {
+                MoveTopRowsToRow(row);
+            }
+
+            if (rowsDestroyed.Count > 0)
             {
                 SoundTriggered?.Invoke(this, TetrisSound.LineClear);
             }
 
-            return rowsDestroyed;
+            return rowsDestroyed.Count;
         }
 
-        private void MoveTopRowsToRow(int rowToMoveTo)
+        private void MoveTopRowsToRow(int row)
         {
-            for (int row = rowToMoveTo - 1; row > 0; row--)
+            for (int currentRow = row - 1; currentRow > 0; currentRow--)
             {
+                if (row == 0)
+                {
+                    break;
+                }
                 for (int rowItem = 0; rowItem < playfieldInnerState.Width; rowItem++)
                 {
-                    if (row == 0)
-                    {
-                        return;
-                    }
 
-                    playfieldInnerState[row + 1, rowItem] = playfieldInnerState[row, rowItem];
+                    playfieldInnerState[currentRow + 1, rowItem] = playfieldInnerState[currentRow, rowItem];
                 }
             }
         }

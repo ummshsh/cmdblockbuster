@@ -59,10 +59,15 @@ namespace BlockBuster.Score
             var levelBefroreRegisteringAction = Level;
             var btbAwardedAlready = false;
 
+            if (action.Action == ScoreAction.None)
+            {
+                return;
+            }
+
             // Add action to history
             actionsHistory.Push(action);
             LinesCleared += action.LinesCleared;
-            if (action.Action == ScoreAction.Landed)
+            if (action.Action == ScoreAction.Landed && action.LinesCleared == 0)
             {
                 // If mino landed without line clear, break combo
                 ComboCounter = -1;
@@ -95,9 +100,10 @@ namespace BlockBuster.Score
             else
             {
                 // Ignore action in BTB calculation
-                Debug.WriteLineIf(Config.EnableDebugOutput, "Ignoring action in BTB calcualtion:" + lastScoreActionFromHistory.Action);
+                Debug.WriteLineIf(
+                    Config.EnableDebugOutput && lastScoreActionFromHistory.Action != ScoreAction.SoftDrop,
+                    "Ignoring action in BTB calcualtion:" + lastScoreActionFromHistory.Action);
             }
-
 
             // Get score for just added move if it was not awarded by BTB
             if (!btbAwardedAlready)

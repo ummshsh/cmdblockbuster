@@ -29,6 +29,11 @@ namespace BlockBuster.Score
             this.Tetromino = tetromino;
             this.Action = playfieldActionsEnum;
         }
+
+        public override string ToString()
+        {
+            return $"A:{Action}";
+        }
     }
 
     public enum TSpin

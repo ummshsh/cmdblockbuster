@@ -41,10 +41,10 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] Check infinity again
 - [x] Check that soft drop does not lock mino
 - [x] Before assigning regular score I need to check if it is BTB, if so, then score BTB(actionScore*1.5) instead
+- [x] Auto repeat rate for rotation\horizontal and vertical movement
+- [ ] Implement scoring tests
 - [ ] Make HistoryStack concurrent
 - [ ] Tspin is not recognized by Score counter
-- [ ] Implement scoring tests
-- [ ] Auto repeat rate for rotation\horizontal and vertical movement
 - [ ] Save score to file with regard to game mode
 - [ ] Game modes: Quick play\Endless\Marathon\Sprint\Ultra 
 - [ ] Make replay funcionality: 

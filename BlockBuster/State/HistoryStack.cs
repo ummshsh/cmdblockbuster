@@ -1,14 +1,17 @@
-﻿using BlockBuster.Utils;
+﻿using BlockBuster.Settings;
+using BlockBuster.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace BlockBuster.Score
 {
-
     public class HistoryStack<T>
     {
         private readonly LinkedList<T> items = new();
         private int capacity;
+
+        public object _lockObject = new();
 
         public List<T> Items
         {
@@ -25,10 +28,7 @@ namespace BlockBuster.Score
         {
             get
             {
-                lock (_lockObject)
-                {
-                    return capacity;
-                }
+                return capacity;
             }
             private set
             {
@@ -41,18 +41,13 @@ namespace BlockBuster.Score
             Capacity = capacity;
         }
 
-        public object _lockObject = new();
-
         public void Push(T item)
         {
             lock (_lockObject)
             {
-
-                // full
+                ////Debug.WriteLineIf(Config.EnableDebugOutput, "HistoryStack push:" + item);
                 if (items.Count == Capacity)
                 {
-                    // we should remove first, because some times, if we exceeded the size of the internal array
-                    // the system will allocate new array.
                     items.RemoveFirst();
                     items.AddLast(item);
                 }

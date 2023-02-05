@@ -1,6 +1,8 @@
 ﻿using BlockBuster.Game;
 using BlockBuster.Settings;
 using BlockBusterXaml;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -29,6 +31,7 @@ public partial class MainWindow : Window
         paused = false;
         gameStarted = true;
         MenuStack.Visibility = Visibility.Collapsed;
+
         await tetris.Start();
     }
 
