@@ -49,7 +49,11 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] 🔧 Clicking on 'New game' after another game started causes +50mb ram
 - [x] 🔧 Level switched to 2 only after 20th mino
 - [x] Delayed Auto Shift: the amount of time before an input is repeated/ARR is engaged.(Auto Repeat Rate)
+- [x] 🔧 Do not DAS rotations and hard drops
+- [ ] 🔧 With DAS implementation input started to feel unresponsive for shifts, rotations are fine
 - [ ] 🔧 S mino sometimes not locking in defalut rotation if left corner is not on foundation(Hard drop locks it though)
+- [ ] 🔧 Soft drop should not lock mino
+- [ ] 🔧 Soft drop counted towards score even if it doensn't dropped lines
 - [ ] Implement scoring tests
 - [ ] Tspin is not recognized by Score counter
 - [ ] Save score to file with regard to game mode
@@ -78,10 +82,12 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [ ] Playtest variable levels up
 - [ ] 20G does not have a ghost Tetrimino function for you. When you see the Tetrimino on the ground, it’ll be too late. But if your movement gets fast enough, you’ll get more time to look at the NEXTs. Remember,
 - [ ] Refactor main class
+- [ ] If I elect to implement ARE, then I should also add:
+    - [ ] Initial hold system
+    - [ ] Initial rotation system 
+    - [ ] Charging for movements and for hold
 
 ## 💡 Ideas to check
-- [ ] Probably I do too many checks and code can be simplified
-- [ ] Initial hold system, Initial rotation system or charging for movements and for hold, probably goes with THAT delay on new tetromino entry
-- [ ] There is a short time gap between the Tetrimino placed and the next spawned. This interval is called the entry delay, or usually called ARE (a term in Japanese indicating “that” gap). This is a gap where you can charge your movement, so when the Tetrimino comes out, it will automatically shift in that direction. 
-- [ ] Recongnize different BTB's
 - [ ] Make HistoryStack concurrent
+- [ ] Probably I do too many checks and code can be simplified
+- [ ] Recongnize different BTB's

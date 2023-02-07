@@ -8,7 +8,6 @@ using BlockBuster.Tetrominoes;
 using BlockBuster.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,8 +33,6 @@ namespace BlockBuster.Game
         private readonly List<ScoreablePlayfieldAction> History = new();
 
         public IInputHandler InputHandler { get; }
-
-        private Guid TickGuid = Guid.NewGuid();
 
         public SRSRulesEngine(IInputHandler inputHandler)
         {
@@ -75,7 +72,6 @@ namespace BlockBuster.Game
 
         private void Tick()
         {
-            TickGuid = Guid.NewGuid();
             SpawnTetromino();
             Gravity();
             var rowsDestroyed = DestroyRows();
@@ -373,6 +369,14 @@ namespace BlockBuster.Game
                     input.IsRepeat &&
                     input.LastTimeTriggered.AddMilliseconds(Config.DelayedAutoShiftRate) < DateTime.Now)
                 {
+                    // Do not repeat rotaion and Hard drop inputs
+                    if (input.Type == InputType.RotateLeft |
+                        input.Type == InputType.RotateRight |
+                        input.Type == InputType.HardDrop)
+                    {
+                        continue;
+                    }
+
                     ApplyInput(input.Type);
                     input.LastTimeTriggered = DateTime.Now;
                 }
@@ -652,8 +656,6 @@ namespace BlockBuster.Game
                     rowsDestroyed.Add(row);
                 }
             }
-
-            Debug.WriteLineIf(rowsDestroyed.Count > 0, $"Thread:{Environment.CurrentManagedThreadId} Guid:{TickGuid} Rows destroyed:{rowsDestroyed.Count}");
 
             // Move rows above
             foreach (var row in rowsDestroyed)

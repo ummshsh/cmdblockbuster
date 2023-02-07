@@ -16,11 +16,11 @@ namespace BlockBuster.InputHandler
             }
             set
             {
-                activated = value;
-                if (activated)
+                if (activated != value)
                 {
-                    LastTimeTriggered = DateTime.Now;
+                    activated = value;
                     IsRepeat = false;
+                    LastTimeTriggered = DateTime.Now;
                 }
             }
         }
