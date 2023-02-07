@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace BlockBuster.InputHandler
 {
@@ -8,6 +9,6 @@ namespace BlockBuster.InputHandler
 
         public void InputEnded(InputType input);
 
-        public ConcurrentBag<InputInfo> CurrentInputs { get; }
+        public Dictionary<InputType, InputInfo> CurrentInputs { get; }
     }
 }

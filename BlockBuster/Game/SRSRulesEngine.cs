@@ -359,30 +359,28 @@ namespace BlockBuster.Game
         {
             foreach (var input in InputHandler.CurrentInputs)
             {
-                if (input.Activated && !input.IsRepeat)
+                // Input without repeat
+                if (input.Value.Activated && !input.Value.IsRepeat)
                 {
-                    ApplyInput(input.Type);
-                    input.LastTimeTriggered = DateTime.Now;
-                    input.IsRepeat = true;
+                    ApplyInput(input.Value.Type);
+                    input.Value.LastTimeTriggered = DateTime.Now;
+                    input.Value.IsRepeat = true;
                 }
-                else if (input.Activated &&
-                    input.IsRepeat &&
-                    input.LastTimeTriggered.AddMilliseconds(Config.DelayedAutoShiftRate) < DateTime.Now)
+                // Input with repeat
+                else if (input.Value.Activated &&
+                    input.Value.IsRepeat &&
+                    input.Value.LastTimeTriggered.AddMilliseconds(Config.DelayedAutoShiftRate) < DateTime.Now)
                 {
                     // Do not repeat rotaion and Hard drop inputs
-                    if (input.Type == InputType.RotateLeft |
-                        input.Type == InputType.RotateRight |
-                        input.Type == InputType.HardDrop)
+                    if (input.Value.Type == InputType.RotateLeft |
+                        input.Value.Type == InputType.RotateRight |
+                        input.Value.Type == InputType.HardDrop)
                     {
                         continue;
                     }
 
-                    ApplyInput(input.Type);
-                    input.LastTimeTriggered = DateTime.Now;
-                }
-                else
-                {
-                    continue;
+                    ApplyInput(input.Value.Type);
+                    input.Value.LastTimeTriggered = DateTime.Now;
                 }
             }
         }

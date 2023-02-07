@@ -50,6 +50,9 @@ It have 2 top rows to spawn tetrominoes that are intended to be invisible, they 
 - [x] 🔧 Level switched to 2 only after 20th mino
 - [x] Delayed Auto Shift: the amount of time before an input is repeated/ARR is engaged.(Auto Repeat Rate)
 - [x] 🔧 Do not DAS rotations and hard drops
+- [ ] 🔧 Implement global game timer as a time reference for all time based conditions
+- [ ] 🔧 On fast movement playfield update incorrectly, and some junk displayed until tile updated
+- [ ] Do not call `UpdateFieldToDisplay()` if nothing changed
 - [ ] 🔧 With DAS implementation input started to feel unresponsive for shifts, rotations are fine
 - [ ] 🔧 S mino sometimes not locking in defalut rotation if left corner is not on foundation(Hard drop locks it though)
 - [ ] 🔧 Soft drop should not lock mino

@@ -10,7 +10,7 @@ namespace BlockBuster.Settings
         // Gameplay Settings
         public static bool EnableWallKick => TryGetValueFromTextConfigOrSetDefalut("EnableWallKick", true);
 
-        public static long DelayedAutoShiftRate => int.Parse(TryGetValueFromTextConfigOrSetDefalut("DelayedAutoShiftRate", "100"));
+        public static long DelayedAutoShiftRate => int.Parse(TryGetValueFromTextConfigOrSetDefalut("DelayedAutoShiftRate", "50"));
 
         // Debug Settings
         public static bool EnableDebugPlayfieldState => TryGetValueFromTextConfigOrSetDefalut("EnableDebugPlayfieldState", false);
